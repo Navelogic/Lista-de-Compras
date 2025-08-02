@@ -1,11 +1,361 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR" data-theme="cupcake">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Compras - Navelogic</title>
+    <title>Lista de Compras | Mobile</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
 </head>
-<body>
-    
+<body class="bg-base-200 min-h-screen transition-colors duration-500">
+    <header class="sticky top-0 z-50 bg-base-100 shadow-lg border-b border-base-300">
+        <div class="navbar px-4 py-2">
+            <div class="flex-1">
+                <h1 class="text-xl font-bold text-primary truncate">Lista de Compras</h1>
+            </div>
+            <div class="flex-none">
+                <label class="swap swap-rotate">
+                    <input type="checkbox" id="theme-toggle" class="theme-controller" />
+                    <i class="fa-solid fa-sun swap-off text-lg"></i>
+                    <i class="fa-solid fa-moon swap-on text-lg"></i>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="px-4 pb-24">
+        <div class="sticky top-16 z-40 bg-base-200 pt-4 pb-2">
+            <div class="card bg-base-100 shadow-lg">
+                <div class="card-body p-4">
+                    <form id="addItemForm" class="space-y-3">
+                        <div class="form-control">
+                            <input type="text" id="itemName" placeholder="Nome do item (ex: Pão de Forma)" 
+                                   class="input input-bordered w-full text-base" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="form-control">
+                                <input type="number" id="itemQuantity" value="1" min="1" 
+                                       class="input input-bordered w-full text-base" placeholder="Qtd" required>
+                            </div>
+                            <div class="form-control">
+                                <select id="itemSection" class="select select-bordered w-full text-base" required>
+                                    <option value="Genérico">🛒 Genérico</option>
+                                    <option value="Hortifrúti">🥕 Hortifrúti</option>
+                                    <option value="Padaria">🍞 Padaria</option>
+                                    <option value="Laticínios">🧀 Laticínios</option>
+                                    <option value="Carnes">🍖 Carnes</option>
+                                    <option value="Limpeza">🧽 Limpeza</option>
+                                    <option value="Outros">📦 Outros</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-full gap-2 text-base">
+                            <i class="fa-solid fa-plus"></i>
+                            Adicionar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 space-y-4" id="shoppingListContainer"></div>
+    </main>
+    <div class="btm-nav btm-nav-lg bg-base-100 border-t border-base-300 shadow-2xl">
+        <div class="flex justify-between items-center w-full px-6 py-2">
+            <div class="text-left">
+                <div class="text-xs text-base-content/60">Total Previsto</div>
+                <div id="totalPrice" class="text-2xl font-bold text-primary">R$ 0,00</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-base-content/60">Itens</div>
+                <div id="itemCount" class="text-lg font-semibold">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const addItemForm = document.getElementById('addItemForm');
+            const shoppingListContainer = document.getElementById('shoppingListContainer');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const itemCountElement = document.getElementById('itemCount');
+            const themeToggle = document.getElementById('theme-toggle');
+
+            const sectionIcons = {
+                'Genérico': '🛒',
+                'Hortifrúti': '🥕',
+                'Carnes': '🍖',
+                'Padaria': '🍞',
+                'Laticínios': '🧀',
+                'Limpeza': '🧽',
+                'Outros': '📦'
+            };
+
+            const sectionOrder = ['Genérico', 'Hortifrúti', 'Padaria', 'Laticínios', 'Carnes', 'Limpeza', 'Outros'];
+
+            let collapsedSections = new Set();
+            
+            const lightTheme = "cupcake";
+            const darkTheme = "night";
+
+            const applyTheme = (theme) => {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                themeToggle.checked = theme === darkTheme;
+            };
+
+            themeToggle.addEventListener('change', () => {
+                applyTheme(themeToggle.checked ? darkTheme : lightTheme);
+            });
+
+            let shoppingList = JSON.parse(localStorage.getItem('shoppingListAppV3')) || [];
+
+            const saveAndRender = () => {
+                localStorage.setItem('shoppingListAppV3', JSON.stringify(shoppingList));
+                renderList();
+                updateStats();
+            };
+
+            const formatCurrency = (value) => {
+                if (typeof value !== 'number') value = 0;
+                return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            };
+
+            const updateStats = () => {
+                const total = shoppingList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const itemCount = shoppingList.length;
+                totalPriceElement.textContent = formatCurrency(total);
+                itemCountElement.textContent = itemCount;
+            };
+
+            const renderList = () => {
+                shoppingListContainer.innerHTML = '';
+
+                const presentSections = [...new Set(shoppingList.map(item => item.section))]
+                    .sort((a, b) => {
+                        const indexA = sectionOrder.indexOf(a);
+                        const indexB = sectionOrder.indexOf(b);
+                        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+                    });
+
+                if (shoppingList.length === 0) {
+                    shoppingListContainer.innerHTML = `
+                        <div class="card bg-base-100 shadow-md">
+                            <div class="card-body text-center py-12">
+                                <div class="text-6xl mb-4">🛒</div>
+                                <h3 class="text-lg font-semibold mb-2">Lista vazia</h3>
+                                <p class="text-base-content/60">Adicione seu primeiro item acima!</p>
+                            </div>
+                        </div>`;
+                    return;
+                }
+
+                presentSections.forEach(section => {
+                    const itemsInSection = shoppingList.filter(item => item.section === section);
+                    const sectionTotal = itemsInSection.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    const completedItems = itemsInSection.filter(item => item.inCart).length;
+                    const isCollapsed = collapsedSections.has(section);
+
+                    const sectionElement = document.createElement('div');
+                    sectionElement.className = 'collapse collapse-arrow bg-base-100 shadow-md';
+                    sectionElement.innerHTML = `
+                        <input type="checkbox" ${!isCollapsed ? 'checked' : ''} onchange="toggleSection('${section}')" />
+                        <div class="collapse-title">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">${sectionIcons[section]}</span>
+                                    <div>
+                                        <div class="font-semibold text-base">${section}</div>
+                                        <div class="text-xs text-base-content/60">${completedItems}/${itemsInSection.length} itens</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-primary">${formatCurrency(sectionTotal)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="space-y-3 pt-2">
+                                ${itemsInSection.map(item => renderItemCard(item)).join('')}
+                            </div>
+                        </div>`;
+                    
+                    shoppingListContainer.appendChild(sectionElement);
+                    
+                    itemsInSection.forEach(item => {
+                        const priceInput = document.getElementById(`price-input-${item.id}`);
+                        const quantityInput = document.getElementById(`quantity-input-${item.id}`);
+                        
+                        if (priceInput) {
+                            priceInput.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') updatePrice(item.id, parseFloat(e.target.value));
+                            });
+                            priceInput.addEventListener('blur', (e) => updatePrice(item.id, parseFloat(e.target.value)));
+                        }
+                        
+                        if (quantityInput) {
+                            quantityInput.addEventListener('change', (e) => updateQuantity(item.id, parseInt(e.target.value)));
+                        }
+                    });
+                });
+            };
+            
+            const renderItemCard = (item) => {
+                const isCompleted = item.inCart;
+                const hasPrice = item.price > 0;
+                
+                return `
+                    <div class="card bg-base-50 ${isCompleted ? 'opacity-60' : ''}">
+                        <div class="card-body p-4">
+                            <div class="flex justify-between items-start gap-3">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-base ${isCompleted ? 'line-through' : ''} truncate">
+                                        ${item.name}
+                                    </h4>
+                                    
+                                    ${hasPrice ? `
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm text-base-content/70">Qtd:</span>
+                                                <input type="number" min="1" value="${item.quantity}" 
+                                                       id="quantity-input-${item.id}" 
+                                                       class="input input-xs input-bordered w-16 text-center" />
+                                            </div>
+                                            <div class="cursor-pointer" onclick="editPrice('${item.id}')">
+                                                <div class="text-sm text-base-content/70">Preço unit.</div>
+                                                <div class="font-semibold text-primary">${formatCurrency(item.price)}</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <div class="text-sm text-base-content/70">Total</div>
+                                            <div class="font-bold text-lg">${formatCurrency(item.price * item.quantity)}</div>
+                                        </div>
+                                    ` : `
+                                        <div class="mt-2">
+                                            <div class="text-sm text-base-content/70 mb-1">Qtd: ${item.quantity}</div>
+                                            <div class="join">
+                                                <span class="join-item btn btn-sm btn-disabled">R$</span>
+                                                <input type="number" step="0.01" min="0" placeholder="0,00" 
+                                                       id="price-input-${item.id}" 
+                                                       class="join-item input input-sm input-bordered flex-1" />
+                                            </div>
+                                        </div>
+                                    `}
+                                </div>
+                                
+                                <div class="flex flex-col gap-2 items-end">
+                                    <button class="btn btn-xs btn-circle btn-error btn-outline" onclick="removeItem('${item.id}')">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                    
+                                    ${hasPrice ? `
+                                        ${isCompleted ? `
+                                            <div class="badge badge-success gap-1 cursor-pointer text-xs" onclick="toggleInCartStatus('${item.id}')">
+                                                <i class="fa-solid fa-check"></i>
+                                                Feito
+                                            </div>
+                                        ` : `
+                                            <button class="btn btn-xs btn-primary btn-outline" onclick="toggleInCartStatus('${item.id}')">
+                                                <i class="fa-solid fa-cart-plus text-xs"></i>
+                                            </button>
+                                        `}
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            };
+            
+            window.toggleSection = (section) => {
+                if (collapsedSections.has(section)) {
+                    collapsedSections.delete(section);
+                } else {
+                    collapsedSections.add(section);
+                }
+            };
+
+            window.editPrice = (id) => {
+                const item = shoppingList.find(item => item.id === id);
+                if (item) {
+                    item.price = 0;
+                    saveAndRender();
+                    setTimeout(() => document.getElementById(`price-input-${id}`)?.focus(), 100);
+                }
+            };
+            
+            const updatePrice = (id, newPrice) => {
+                const item = shoppingList.find(item => item.id === id);
+                if (item && !isNaN(newPrice) && newPrice > 0) {
+                    item.price = newPrice;
+                    saveAndRender();
+                }
+            };
+            
+            const updateQuantity = (id, newQuantity) => {
+                const item = shoppingList.find(item => item.id === id);
+                if (item && !isNaN(newQuantity) && newQuantity > 0) {
+                    item.quantity = newQuantity;
+                    saveAndRender();
+                }
+            };
+
+            window.toggleInCartStatus = (id) => {
+                const item = shoppingList.find(item => item.id === id);
+                if (item && item.price > 0) {
+                    item.inCart = !item.inCart;
+                    saveAndRender();
+                }
+            };
+            
+            window.removeItem = (id) => {
+                if (confirm('Remover este item da lista?')) {
+                    shoppingList = shoppingList.filter(item => item.id !== id);
+                    saveAndRender();
+                }
+            };
+            
+            addItemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const itemName = document.getElementById('itemName').value.trim();
+                const itemQuantity = parseInt(document.getElementById('itemQuantity').value);
+                const itemSection = document.getElementById('itemSection').value;
+                
+                if (itemName && !isNaN(itemQuantity) && itemQuantity > 0) {
+                    const newItem = {
+                        id: Date.now().toString(),
+                        name: itemName,
+                        quantity: itemQuantity,
+                        section: itemSection,
+                        price: 0,
+                        inCart: false
+                    };
+                    
+                    shoppingList.push(newItem);
+                    saveAndRender();
+                    addItemForm.reset();
+                    document.getElementById('itemQuantity').value = 1;
+                    document.getElementById('itemSection').value = 'Genérico';
+                    document.getElementById('itemName').focus();
+                    
+                    const submitBtn = document.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Adicionado!';
+                    submitBtn.classList.add('btn-success');
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.classList.remove('btn-success');
+                    }, 1000);
+                }
+            });
+
+            const savedTheme = localStorage.getItem('theme') || lightTheme;
+            applyTheme(savedTheme);
+            saveAndRender();
+
+            document.getElementById('itemName').focus();
+        });
+    </script>
 </body>
 </html>
