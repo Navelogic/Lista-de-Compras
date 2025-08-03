@@ -12,20 +12,39 @@
         .sortable-ghost { opacity: 0.4; background: #e0e7ff; }
         .sortable-chosen { cursor: grabbing !important; }
         .drag-handle { cursor: grab; }
+
+        .currency-display { 
+            font-feature-settings: 'tnum' 1;
+            letter-spacing: -0.025em;
+        }
+        .section-card { transition: all 0.2s ease; }
+        .section-card:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(0,0,0,0.1); }
+        
+        .section-badge { 
+            background: rgba(var(--p), 0.1); 
+            color: rgb(var(--p)); 
+            border: 1px solid rgba(var(--p), 0.2);
+        }
+        .subsection-badge { 
+            background: rgba(var(--s), 0.1); 
+            color: rgb(var(--s)); 
+            border: 1px solid rgba(var(--s), 0.2);
+        }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen transition-colors duration-500">
-    <header class="sticky top-0 z-50 bg-base-100 shadow-md">
+    <header class="sticky top-0 z-30 bg-base-100 shadow-md">
         <div class="navbar px-4">
             <div class="flex-1">
                 <h1 class="text-xl font-bold text-primary truncate">Minha Lista de Compras</h1>
             </div>
-            <div class="flex-none">
-                <label class="swap swap-rotate">
-                    <input type="checkbox" id="theme-toggle" />
-                    <i class="fa-solid fa-sun swap-off text-lg"></i>
-                    <i class="fa-solid fa-moon swap-on text-lg"></i>
-                </label>
+            <div class="flex-none gap-2">
+                <button class="btn btn-sm btn-outline" data-action="open-section-modal">
+                    <i class="fa-solid fa-plus"></i> Seção
+                </button>
+                <button class="btn btn-sm btn-ghost btn-circle" data-action="open-settings-modal">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -33,14 +52,14 @@
     <main class="p-4 space-y-4 pb-24">
         <div class="collapse collapse-arrow bg-base-100 shadow-md">
             <input type="checkbox" id="adder-toggle" checked />
-            <div class="collapse-title text-lg font-medium flex justify-between items-center">
-                <span>Resumo e Adição</span>
+            <div class="collapse-title text-lg font-medium">
+                Resumo e Adição
             </div>
             <div class="collapse-content space-y-4">
-                <div class="stats shadow w-full">
+                <div class="stats shadow w-full stats-vertical lg:stats-horizontal">
                     <div class="stat">
                         <div class="stat-title">Total Previsto</div>
-                        <div id="totalPrice" class="stat-value text-primary">R$ 0,00</div>
+                        <div id="totalPrice" class="stat-value text-primary currency-display">R$ 0,00</div>
                     </div>
                     <div class="stat">
                         <div class="stat-title">Itens na Lista</div>
@@ -51,16 +70,20 @@
                     <div class="card-body p-4">
                         <form id="addItemForm" class="space-y-3">
                             <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required>
-                            <div class="grid grid-cols-2 gap-3">
-                                <input type="number" id="itemQuantity" value="1" min="1" class="input input-bordered w-full" placeholder="Qtd" required>
-                                <select id="itemSection" class="select select-bordered w-full" required>
-                                    <option value="Genérico">🛒 Genérico</option>
-                                    <option value="Hortifrúti">🥕 Hortifrúti</option>
-                                    <option value="Padaria">🍞 Padaria</option>
-                                    <option value="Laticínios">🧀 Laticínios</option>
-                                    <option value="Carnes">🍖 Carnes</option>
-                                    <option value="Limpeza">🧽 Limpeza</option>
-                                    <option value="Outros">📦 Outros</option>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="flex gap-2">
+                                    <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required>
+                                    <select id="itemUnit" class="select select-bordered min-w-fit">
+                                        <option value="un">Un</option>
+                                        <option value="kg">Kg</option>
+                                        <option value="g">g</option>
+                                        <option value="l">L</option>
+                                        <option value="ml">mL</option>
+                                    </select>
+                                </div>
+                                <select id="itemSection" class="select select-bordered w-full" required></select>
+                                <select id="itemSubsection" class="select select-bordered w-full">
+                                    <option value="">Sem subseção</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary w-full gap-2">
@@ -75,6 +98,19 @@
         <div id="shoppingListContainer" class="space-y-4"></div>
     </main>
 
+    <footer class="fixed bottom-0 left-0 right-0 z-30 bg-base-100 border-t border-base-300 shadow-inner">
+         <div class="flex justify-between items-center w-full px-4 py-2 max-w-4xl mx-auto">
+             <div class="text-left">
+                 <div class="text-xs text-base-content/60">Total Final</div>
+                 <div id="footerTotalPrice" class="text-xl sm:text-2xl font-bold text-primary currency-display">R$ 0,00</div>
+             </div>
+             <div class="text-right">
+                 <div class="text-xs text-base-content/60">Itens</div>
+                 <div id="footerItemCount" class="text-base sm:text-lg font-semibold">0</div>
+             </div>
+         </div>
+    </footer>
+
     <dialog id="edit_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg mb-4">Editar Item</h3>
@@ -84,17 +120,30 @@
                     <label class="label"><span class="label-text">Nome do Item</span></label>
                     <input type="text" id="editItemName" class="input input-bordered w-full" required>
                 </div>
-                <div class="form-control">
-                    <label class="label"><span class="label-text">Seção</span></label>
-                    <select id="editItemSection" class="select select-bordered w-full" required>
-                         <option value="Genérico">🛒 Genérico</option>
-                         <option value="Hortifrúti">🥕 Hortifrúti</option>
-                         <option value="Padaria">🍞 Padaria</option>
-                         <option value="Laticínios">🧀 Laticínios</option>
-                         <option value="Carnes">🍖 Carnes</option>
-                         <option value="Limpeza">🧽 Limpeza</option>
-                         <option value="Outros">📦 Outros</option>
-                    </select>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Quantidade</span></label>
+                        <div class="flex gap-2">
+                            <input type="number" id="editItemQuantity" min="0.01" step="0.01" class="input input-bordered flex-1" required>
+                            <select id="editItemUnit" class="select select-bordered min-w-fit">
+                                <option value="un">Un</option><option value="kg">Kg</option><option value="g">g</option><option value="l">L</option><option value="ml">mL</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Preço (opcional)</span></label>
+                        <input type="number" id="editItemPrice" step="0.01" min="0" class="input input-bordered w-full" placeholder="R$ 0,00">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Seção</span></label>
+                        <select id="editItemSection" class="select select-bordered w-full" required></select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Subseção</span></label>
+                        <select id="editItemSubsection" class="select select-bordered w-full"></select>
+                    </div>
                 </div>
                 <div class="modal-action">
                     <button type="button" class="btn" onclick="edit_modal.close()">Cancelar</button>
@@ -104,19 +153,86 @@
         </div>
         <form method="dialog" class="modal-backdrop"><button>close</button></form>
     </dialog>
+
+    <dialog id="section_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4" id="sectionModalTitle">Nova Seção</h3>
+            <form id="sectionForm" method="dialog" class="space-y-3">
+                <input type="hidden" id="sectionId">
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Nome da Seção</span></label>
+                    <input type="text" id="sectionName" class="input input-bordered w-full" required>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Ícone (emoji)</span></label>
+                    <input type="text" id="sectionIcon" class="input input-bordered w-full" placeholder="🛒" maxlength="2">
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Seção Pai (para subseção)</span></label>
+                    <select id="sectionParent" class="select select-bordered w-full"></select>
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn" onclick="section_modal.close()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
     
-    <footer class="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-base-300 shadow-inner">
-         <div class="flex justify-between items-center w-full px-6 py-2 max-w-4xl mx-auto">
-            <div class="text-left">
-                <div class="text-xs text-base-content/60">Total Final</div>
-                <div id="footerTotalPrice" class="text-2xl font-bold text-primary">R$ 0,00</div>
+    <dialog id="settings_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Configurações</h3>
+            <div class="py-4 space-y-4">
+                <div>
+                    <h4 class="font-semibold mb-2">Tema da Interface</h4>
+                    <div id="theme-selector-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2"></div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div>
+                    <h4 class="font-semibold mb-2">Gerenciar Seções e Subseções</h4>
+                    <div id="section-manager-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2 space-y-2">
+                        </div>
+                    <button class="btn btn-sm btn-outline mt-3 w-full" data-action="open-section-modal">
+                        <i class="fa-solid fa-plus"></i> Adicionar Seção/Subseção
+                    </button>
+                </div>
             </div>
-            <div class="text-right">
-                <div class="text-xs text-base-content/60">Itens</div>
-                <div id="footerItemCount" class="text-lg font-semibold">0</div>
+            <div class="modal-action">
+                <form method="dialog"><button class="btn">Fechar</button></form>
             </div>
         </div>
-    </footer>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
+    
+    <dialog id="confirm_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg" id="confirmModalTitle">Confirmar Ação</h3>
+            <p class="py-4" id="confirmModalMessage">Você tem certeza?</p>
+            <div class="modal-action">
+                <button class="btn" id="confirmModalCancel">Cancelar</button>
+                <button class="btn btn-error" id="confirmModalConfirm">Confirmar</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
+
+    <dialog id="prompt_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg" id="promptModalTitle">Entrada</h3>
+            <p class="py-2" id="promptModalMessage">Digite um valor:</p>
+            <form id="promptForm" method="dialog">
+                <input id="promptModalInput" class="input input-bordered w-full">
+                <div class="modal-action">
+                    <button type="button" class="btn" id="promptModalCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="promptModalConfirm">OK</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -124,60 +240,120 @@
         const totalPriceElements = [document.getElementById('totalPrice'), document.getElementById('footerTotalPrice')];
         const itemCountElements = [document.getElementById('itemCount'), document.getElementById('footerItemCount')];
         const addItemForm = document.getElementById('addItemForm');
-        const themeToggle = document.getElementById('theme-toggle');
         const editModal = document.getElementById('edit_modal');
         const editItemForm = document.getElementById('editItemForm');
+        const sectionModal = document.getElementById('section_modal');
+        const sectionForm = document.getElementById('sectionForm');
+        const settingsModal = document.getElementById('settings_modal');
+        const themeSelectorContainer = document.getElementById('theme-selector-container');
+        const confirmModal = document.getElementById('confirm_modal');
+        const promptModal = document.getElementById('prompt_modal');
 
-        const sectionIcons = { 
-            'Genérico': '🛒', 
-            'Hortifrúti': '🥕', 
-            'Carnes': '🍖', 
-            'Padaria': '🍞', 
-            'Laticínios': '🧀', 
-            'Limpeza': '🧽', 
-            'Outros': '📦' 
-        };
-        const sectionOrder = Object.keys(sectionIcons);
-        const lightTheme = "cupcake";
-        const darkTheme = "night";
+        const daisyuiThemes = [ "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter", "dim", "nord", "sunset" ];
+        
+        const defaultSections = [
+            { id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', name: 'Genérico', icon: '🛒', parent: null, order: 0 },
+            { id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef1', name: 'Hortifrúti', icon: '🥕', parent: null, order: 1 },
+            { id: 'c3d4e5f6-a7b8-9012-3456-7890abcdef12', name: 'Padaria', icon: '🍞', parent: null, order: 2 },
+            { id: 'd4e5f6a7-b8c9-0123-4567-890abcdef123', name: 'Laticínios', icon: '🧀', parent: null, order: 3 },
+            { id: 'e5f6a7b8-c9d0-1234-5678-90abcdef1234', name: 'Carnes', icon: '🍖', parent: null, order: 4 },
+            { id: 'f6a7b8c9-d0e1-2345-6789-0abcdef12345', name: 'Limpeza', icon: '🧽', parent: null, order: 5 },
+            { id: 'a7b8c9d0-e1f2-3456-7890-bcdef1234567', name: 'Outros', icon: '📦', parent: null, order: 6 }
+        ];
+
         let shoppingList = [];
+        let sections = [];
         let collapsedState = { sections: [], adder: false };
 
-        const formatCurrency = (value) => {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value || 0);
+        const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+        const formatCompactCurrency = (value) => new Intl.NumberFormat('pt-BR', { notation: 'compact', style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(value || 0);
+
+        const showConfirmModal = (title, message, onConfirm) => {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMessage').innerHTML = message;
+            
+            const confirmBtn = document.getElementById('confirmModalConfirm');
+            const cancelBtn = document.getElementById('confirmModalCancel');
+
+            const confirmHandler = () => {
+                onConfirm();
+                confirmModal.close();
+                cleanup();
+            };
+            const cancelHandler = () => {
+                confirmModal.close();
+                cleanup();
+            };
+            const cleanup = () => {
+                confirmBtn.removeEventListener('click', confirmHandler);
+                cancelBtn.removeEventListener('click', cancelHandler);
+            };
+
+            confirmBtn.addEventListener('click', confirmHandler);
+            cancelBtn.addEventListener('click', cancelHandler);
+            confirmModal.showModal();
+        };
+
+        const showPromptModal = (title, message, initialValue, inputType, onConfirm) => {
+            document.getElementById('promptModalTitle').textContent = title;
+            document.getElementById('promptModalMessage').textContent = message;
+            const input = document.getElementById('promptModalInput');
+            input.value = initialValue;
+            input.type = inputType;
+            input.placeholder = (inputType === 'number') ? '0,00' : '...';
+            
+            const form = document.getElementById('promptForm');
+            const cancelBtn = document.getElementById('promptModalCancel');
+
+            const submitHandler = (e) => {
+                e.preventDefault();
+                onConfirm(input.value);
+                promptModal.close();
+                cleanup();
+            };
+            const cancelHandler = () => {
+                promptModal.close();
+                cleanup();
+            };
+            const cleanup = () => {
+                form.removeEventListener('submit', submitHandler);
+                cancelBtn.removeEventListener('click', cancelHandler);
+            };
+
+            form.addEventListener('submit', submitHandler);
+            cancelBtn.addEventListener('click', cancelHandler);
+            promptModal.showModal();
+            setTimeout(() => input.focus(), 50);
         };
 
         const loadState = () => {
             try {
-                const savedList = localStorage.getItem('shoppingListAppV5');
-                const savedCollapsed = localStorage.getItem('collapsedStateV5');
+                const savedList = localStorage.getItem('shoppingListAppV7');
+                const savedSections = localStorage.getItem('sectionsV7');
+                const savedCollapsed = localStorage.getItem('collapsedStateV7');
                 
-                if (savedList) {
-                    shoppingList = JSON.parse(savedList);
+                if (savedList) shoppingList = JSON.parse(savedList);
+                if (savedSections) {
+                    sections = JSON.parse(savedSections);
+                    sections.forEach(s => { if (!s.id) s.id = crypto.randomUUID(); });
+                } else {
+                    sections = defaultSections.map(s => ({...s}));
                 }
-                if (savedCollapsed) {
-                    collapsedState = JSON.parse(savedCollapsed);
-                }
+                if (savedCollapsed) collapsedState = JSON.parse(savedCollapsed);
+
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 shoppingList = [];
+                sections = defaultSections.map(s => ({...s}));
                 collapsedState = { sections: [], adder: false };
             }
         };
 
-        const applyTheme = (theme) => {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeToggle.checked = theme === darkTheme;
-        };
-
         const saveState = () => {
             try {
-                localStorage.setItem('shoppingListAppV5', JSON.stringify(shoppingList));
-                localStorage.setItem('collapsedStateV5', JSON.stringify(collapsedState));
+                localStorage.setItem('shoppingListAppV7', JSON.stringify(shoppingList));
+                localStorage.setItem('sectionsV7', JSON.stringify(sections));
+                localStorage.setItem('collapsedStateV7', JSON.stringify(collapsedState));
             } catch (error) {
                 console.error('Erro ao salvar dados:', error);
             }
@@ -187,353 +363,629 @@
             saveState();
             renderList();
             updateStats();
+            updateAllSectionSelects();
         };
+
+        const getSectionById = (id) => sections.find(s => s.id === id);
+        const getSubsections = (parentId) => sections.filter(s => s.parent === parentId).sort((a,b) => a.order - b.order);
+
+        const updateAllSectionSelects = () => {
+            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
+            
+            const itemSelects = [document.getElementById('itemSection'), document.getElementById('editItemSection')];
+            itemSelects.forEach(select => {
+                if (!select) return;
+                const currentValue = select.value;
+                select.innerHTML = '';
+                mainSections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.id;
+                    option.textContent = `${section.icon} ${section.name}`;
+                    select.appendChild(option);
+                });
+                if (sections.some(s => s.id === currentValue)) select.value = currentValue;
+            });
+
+            const parentSelect = document.getElementById('sectionParent');
+            if(parentSelect) {
+                const currentValue = parentSelect.value;
+                parentSelect.innerHTML = '<option value="">Nenhuma (Seção Principal)</option>';
+                mainSections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.id;
+                    option.textContent = `${section.icon} ${section.name}`;
+                    parentSelect.appendChild(option);
+                });
+                if (sections.some(s => s.id === currentValue)) parentSelect.value = currentValue;
+            }
+
+            updateSubsectionSelects(document.getElementById('itemSubsection'), document.getElementById('itemSection').value);
+            updateSubsectionSelects(document.getElementById('editItemSubsection'), document.getElementById('editItemSection').value);
+        };
+
+        const updateSubsectionSelects = (subSelect, parentId, currentSubValue = '') => {
+            if (!subSelect) return;
+            subSelect.innerHTML = '<option value="">Sem subseção</option>';
+            if (!parentId) return;
+
+            const subsections = getSubsections(parentId);
+            subsections.forEach(subsection => {
+                const option = document.createElement('option');
+                option.value = subsection.id;
+                option.textContent = `${subsection.icon} ${subsection.name}`;
+                subSelect.appendChild(option);
+            });
+            if (subsections.some(s => s.id === currentSubValue)) subSelect.value = currentSubValue;
+        };
+
+        const renderList = () => {
+            shoppingListContainer.innerHTML = '';
+            if (shoppingList.length === 0) {
+                shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">🛒</div><h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3><p class="text-base-content/60">Adicione seu primeiro item no formulário acima!</p></div></div>`;
+                return;
+            }
+
+            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
+            mainSections.forEach(section => {
+                const itemsInSection = shoppingList.filter(item => item.section === section.id && !item.subsection);
+                const subsections = getSubsections(section.id);
+                const hasContent = itemsInSection.length > 0 || subsections.some(sub => shoppingList.some(item => item.subsection === sub.id));
+                if (!hasContent) return;
+
+                const sectionElement = createSectionElement(section, itemsInSection, subsections);
+                shoppingListContainer.appendChild(sectionElement);
+            });
+            
+            initSortable();
+        };
+
+        function createSectionElement(section, items, subsections) {
+            const isCollapsed = collapsedState.sections.includes(section.id);
+            const allItems = shoppingList.filter(item => item.section === section.id);
+            const sectionTotal = allItems.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+            const completedItems = allItems.filter(item => item.inCart).length;
+        
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'collapse collapse-arrow bg-base-100 shadow-md section-card';
+            sectionElement.dataset.sectionId = section.id;
+
+            sectionElement.innerHTML = `
+                <input type="checkbox" ${!isCollapsed ? 'checked' : ''} data-action="toggle-section-collapse" data-id="${section.id}" />
+                <div class="collapse-title">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <span class="text-3xl">${section.icon}</span>
+                            <div class="min-w-0">
+                                <div class="font-bold text-lg">${section.name}</div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="badge badge-sm section-badge">${completedItems}/${allItems.length} itens</span>
+                                    ${sectionTotal > 0 ? `<span class="badge badge-sm badge-primary currency-display">${formatCompactCurrency(sectionTotal)}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 self-end sm:self-center">
+                            ${sectionTotal > 0 ? `<div class="text-right hidden sm:block"><div class="text-xs text-base-content/60">Total</div><div class="font-bold text-lg text-primary currency-display">${formatCurrency(sectionTotal)}</div></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const collapseContent = document.createElement('div');
+            collapseContent.className = 'collapse-content';
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'space-y-4 pt-3';
+            
+            if (items.length > 0) {
+                const itemList = document.createElement('div');
+                itemList.className = 'space-y-3 item-list';
+                itemList.dataset.sectionId = section.id;
+                items.map(createItemCard).forEach(card => itemList.appendChild(card));
+                contentWrapper.appendChild(itemList);
+            }
+
+            subsections.forEach(subsection => {
+                const subsectionItems = shoppingList.filter(item => item.subsection === subsection.id);
+                if (subsectionItems.length > 0) {
+                    contentWrapper.appendChild(createSubsectionElement(subsection, subsectionItems));
+                }
+            });
+
+            collapseContent.appendChild(contentWrapper);
+            sectionElement.appendChild(collapseContent);
+            return sectionElement;
+        }
+
+        function createSubsectionElement(subsection, items) {
+            const subsectionTotal = items.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+            const completedItems = items.filter(item => item.inCart).length;
+        
+            const subsectionContainer = document.createElement('div');
+            subsectionContainer.className = 'ml-2 sm:ml-6 mt-4';
+            subsectionContainer.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-3 mb-3 p-3 bg-base-200 rounded-lg border border-base-300">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="text-xl">${subsection.icon}</span>
+                        <div class="min-w-0">
+                            <div class="font-semibold">${subsection.name}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="badge badge-xs subsection-badge">${completedItems}/${items.length} itens</span>
+                                ${subsectionTotal > 0 ? `<span class="badge badge-xs badge-secondary currency-display">${formatCompactCurrency(subsectionTotal)}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const itemList = document.createElement('div');
+            itemList.className = 'space-y-3 item-list';
+            itemList.dataset.sectionId = subsection.parent;
+            itemList.dataset.subsectionId = subsection.id;
+            items.map(createItemCard).forEach(card => itemList.appendChild(card));
+            subsectionContainer.appendChild(itemList);
+
+            return subsectionContainer;
+        }
+
+        function createItemCard(item) {
+            const isCompleted = item.inCart;
+            const hasPrice = item.price > 0;
+            const itemTotal = item.price * item.quantity;
+        
+            const card = document.createElement('div');
+            card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200';
+            card.dataset.id = item.id;
+        
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-3 sm:p-4';
+        
+            const mainFlex = document.createElement('div');
+            mainFlex.className = 'flex justify-between items-start gap-3';
+        
+            const leftSide = document.createElement('div');
+            leftSide.className = 'flex items-start gap-3 flex-1 min-w-0';
+        
+            const handle = document.createElement('i');
+            handle.className = 'fa-solid fa-grip-vertical drag-handle text-base-content/30 pt-1 hover:text-primary transition-colors';
+        
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'flex-1 min-w-0';
+        
+            const itemName = document.createElement('h4');
+            itemName.className = `font-semibold text-base break-words ${isCompleted ? 'line-through opacity-60' : ''}`;
+            itemName.textContent = item.name;
+        
+            const detailsContainer = document.createElement('div');
+            detailsContainer.className = 'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-3';
+
+            const quantityHtml = `
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-base-content/70 font-medium">Qtd:</span>
+                    <input type="number" min="0.01" step="0.01" value="${item.quantity}" data-action="update-quantity" data-id="${item.id}" class="input input-xs input-bordered w-20 text-center" />
+                    <select data-action="update-unit" data-id="${item.id}" class="select select-xs select-bordered">
+                        <option value="un" ${item.unit === 'un' ? 'selected' : ''}>Un</option>
+                        <option value="kg" ${item.unit === 'kg' ? 'selected' : ''}>Kg</option>
+                        <option value="g" ${item.unit === 'g' ? 'selected' : ''}>g</option>
+                        <option value="l" ${item.unit === 'l' ? 'selected' : ''}>L</option>
+                        <option value="ml" ${item.unit === 'ml' ? 'selected' : ''}>mL</option>
+                    </select>
+                </div>`;
+            detailsContainer.innerHTML += quantityHtml;
+        
+            if (hasPrice) {
+                const priceHtml = `
+                    <div class="cursor-pointer hover:bg-base-300 p-2 rounded-lg transition-colors" data-action="edit-price" data-id="${item.id}">
+                        <div class="text-xs text-base-content/60">Preço unitário</div>
+                        <div class="font-bold text-primary currency-display">${formatCurrency(item.price)}</div>
+                        ${item.quantity > 1 ? `<div class="text-xs text-base-content/60">Total: ${formatCurrency(itemTotal)}</div>` : ''}
+                    </div>`;
+                detailsContainer.innerHTML += priceHtml;
+            } else {
+                const priceInputHtml = `
+                    <div class="join">
+                        <span class="join-item btn btn-xs btn-disabled bg-base-300">R$</span>
+                        <input type="number" step="0.01" min="0" placeholder="0,00" data-action="update-price-input" data-id="${item.id}" class="join-item input input-xs input-bordered w-24" />
+                    </div>`;
+                detailsContainer.innerHTML += priceInputHtml;
+            }
+        
+            infoContainer.append(itemName, detailsContainer);
+            leftSide.append(handle, infoContainer);
+        
+            const rightSide = document.createElement('div');
+            rightSide.className = 'flex flex-col gap-2 items-center pt-1';
+        
+            const dropdownHtml = `
+                <div class="dropdown dropdown-end dropdown-bottom">
+                    <button tabindex="0" class="btn btn-xs btn-circle btn-ghost hover:btn-primary"><i class="fa-solid fa-ellipsis-v"></i></button>
+                    <ul tabindex="0" class="dropdown-content z-[40] menu p-2 shadow bg-base-100 rounded-box w-32 border border-base-300">
+                        <li><a data-action="edit-item" data-id="${item.id}"><i class="fa-solid fa-pen w-4"></i> Editar</a></li>
+                        <li><a data-action="remove-item" data-id="${item.id}"><i class="fa-solid fa-trash w-4 text-error"></i> Remover</a></li>
+                    </ul>
+                </div>`;
+            rightSide.innerHTML = dropdownHtml;
+        
+            if (hasPrice) {
+                const cartButton = document.createElement('button');
+                cartButton.dataset.action = 'toggle-cart-status';
+                cartButton.dataset.id = item.id;
+                if (isCompleted) {
+                    cartButton.className = 'btn btn-xs btn-success gap-1';
+                    cartButton.innerHTML = `<i class="fa-solid fa-check"></i><span class="hidden sm:inline">Feito</span>`;
+                } else {
+                    cartButton.className = 'btn btn-xs btn-primary btn-outline gap-1';
+                    cartButton.innerHTML = `<i class="fa-solid fa-cart-plus"></i><span class="hidden sm:inline">Adicionar</span>`;
+                }
+                rightSide.appendChild(cartButton);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'h-6 w-6';
+                rightSide.appendChild(placeholder);
+            }
+        
+            mainFlex.append(leftSide, rightSide);
+            cardBody.appendChild(mainFlex);
+            card.appendChild(cardBody);
+        
+            return card;
+        }
 
         const initSortable = () => {
             document.querySelectorAll('.item-list').forEach(list => {
                 new Sortable(list, {
-                    group: 'shopping-list', 
-                    animation: 150, 
-                    handle: '.drag-handle', 
+                    group: 'shopping-list',
+                    animation: 150,
+                    handle: '.drag-handle',
                     ghostClass: 'sortable-ghost',
                     onEnd: (evt) => {
-                        const newShoppingList = [];
-                        const processedIds = new Set();
-                        
-                        document.querySelectorAll('.item-list').forEach(sectionEl => {
-                            const sectionName = sectionEl.dataset.section;
-                            
-                            sectionEl.querySelectorAll('[data-id]').forEach(itemEl => {
-                                const itemId = itemEl.dataset.id;
-                                
-                                if (!processedIds.has(itemId)) {
-                                    const item = shoppingList.find(i => i.id === itemId);
-                                    if (item) {
-                                        item.section = sectionName;
-                                        newShoppingList.push(item);
-                                        processedIds.add(itemId);
-                                    }
-                                }
-                            });
+                        const orderedIds = [];
+                        const itemUpdates = {};
+
+                        document.querySelectorAll('.item-list [data-id]').forEach(itemEl => {
+                            const id = itemEl.dataset.id;
+                            const sectionId = itemEl.closest('.item-list').dataset.sectionId;
+                            const subsectionId = itemEl.closest('.item-list').dataset.subsectionId || null;
+                            orderedIds.push(id);
+                            itemUpdates[id] = { section: sectionId, subsection: subsectionId };
                         });
                         
-                        if (newShoppingList.length === shoppingList.length) {
-                            shoppingList = newShoppingList;
-                            saveState();
-                        } else {
-                            saveAndRender();
-                        }
+                        shoppingList.forEach(item => {
+                            if (itemUpdates[item.id]) {
+                                item.section = itemUpdates[item.id].section;
+                                item.subsection = itemUpdates[item.id].subsection;
+                            }
+                        });
+
+                        shoppingList.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
+                        
+                        saveAndRender();
                     }
                 });
             });
-        };
-        
-        const renderList = () => {
-            if (!shoppingListContainer) {
-                console.error('Container da lista não encontrado');
-                return;
-            }
-
-            shoppingListContainer.innerHTML = '';
-            
-            if (shoppingList.length === 0) {
-                shoppingListContainer.innerHTML = `
-                    <div class="card bg-base-100 shadow-md">
-                        <div class="card-body text-center py-12">
-                            <div class="text-6xl mb-4">🛒</div>
-                            <h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3>
-                            <p class="text-base-content/60">Adicione seu primeiro item no formulário acima!</p>
-                        </div>
-                    </div>`;
-                return;
-            }
-
-            const sections = [...new Set(shoppingList.map(item => item.section))]
-                .sort((a, b) => sectionOrder.indexOf(a) - sectionOrder.indexOf(b));
-
-            sections.forEach(section => {
-                const itemsInSection = shoppingList.filter(item => item.section === section);
-                const sectionElement = document.createElement('div');
-                sectionElement.className = 'collapse collapse-arrow bg-base-100 shadow-md';
-                sectionElement.innerHTML = renderSection(section, itemsInSection);
-                shoppingListContainer.appendChild(sectionElement);
-            });
-
-            initSortable();
-            bindEventListeners();
-        };
-
-        const renderSection = (section, items) => {
-            const isCollapsed = collapsedState.sections.includes(section);
-            const sectionTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const completedItems = items.filter(item => item.inCart).length;
-            const sectionIcon = sectionIcons[section] || '📦';
-            
-            return `
-                <input type="checkbox" ${!isCollapsed ? 'checked' : ''} onchange="toggleSection('${section}')" />
-                <div class="collapse-title">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">${sectionIcon}</span>
-                            <div>
-                                <div class="font-semibold text-base">${section}</div>
-                                <div class="text-xs text-base-content/60">${completedItems}/${items.length} itens</div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-primary">${formatCurrency(sectionTotal)}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="collapse-content">
-                    <div class="space-y-3 pt-2 item-list" data-section="${section}">
-                        ${items.map(renderItemCard).join('')}
-                    </div>
-                </div>`;
-        };
-
-        const renderItemCard = (item) => {
-            const isCompleted = item.inCart;
-            const hasPrice = item.price > 0;
-            
-            return `
-                <div class="card bg-base-200" data-id="${item.id}">
-                    <div class="card-body p-3">
-                        <div class="flex justify-between items-start gap-3">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-semibold text-base ${isCompleted ? 'line-through' : ''} truncate">${item.name}</h4>
-                                ${hasPrice ? `
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm text-base-content/70">Qtd:</span>
-                                            <input type="number" min="1" value="${item.quantity}" data-id="${item.id}" class="input input-xs input-bordered w-16 text-center item-quantity" />
-                                        </div>
-                                        <div class="cursor-pointer" onclick="editPrice('${item.id}')">
-                                            <div class="text-sm text-base-content/70">Preço</div>
-                                            <div class="font-semibold text-primary">${formatCurrency(item.price)}</div>
-                                        </div>
-                                    </div>` :
-                                    `<div class="mt-2">
-                                        <div class="text-sm text-base-content/70 mb-1">Qtd: ${item.quantity}</div>
-                                        <div class="join w-full">
-                                            <span class="join-item btn btn-sm btn-disabled">R$</span>
-                                            <input type="number" step="0.01" min="0" placeholder="0,00" data-id="${item.id}" class="join-item input input-sm input-bordered flex-1 item-price" />
-                                        </div>
-                                    </div>`
-                                }
-                            </div>
-                            <div class="flex flex-col gap-2 items-center">
-                                <i class="fa-solid fa-grip-vertical drag-handle text-base-content/30"></i>
-                                <div class="dropdown dropdown-end">
-                                    <button tabindex="0" class="btn btn-xs btn-circle btn-ghost">
-                                        <i class="fa-solid fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-32">
-                                        <li><a onclick="openEditModal('${item.id}')"><i class="fa-solid fa-pen w-4"></i> Editar</a></li>
-                                        <li><a onclick="removeItem('${item.id}')"><i class="fa-solid fa-trash w-4"></i> Remover</a></li>
-                                    </ul>
-                                </div>
-                                ${hasPrice ? (isCompleted ? 
-                                    `<button class="btn btn-xs btn-success" onclick="toggleInCartStatus('${item.id}')">
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>` : 
-                                    `<button class="btn btn-xs btn-primary btn-outline" onclick="toggleInCartStatus('${item.id}')">
-                                        <i class="fa-solid fa-cart-plus"></i>
-                                    </button>`) : 
-                                    '<div class="h-6 w-6"></div>'
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
         };
 
         const updateStats = () => {
-            const total = shoppingList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const formattedTotal = formatCurrency(total);
-            
-            totalPriceElements.forEach(el => {
-                if (el) el.textContent = formattedTotal;
-            });
-            itemCountElements.forEach(el => {
-                if (el) el.textContent = shoppingList.length;
-            });
-        };
-        
-        const bindEventListeners = () => {
-            document.querySelectorAll('.item-price').forEach(input => {
-                input.addEventListener('keydown', (e) => { 
-                    if (e.key === 'Enter') {
-                        updatePrice(e.target.dataset.id, e.target.value); 
-                    }
-                });
-                input.addEventListener('blur', (e) => {
-                    updatePrice(e.target.dataset.id, e.target.value);
-                });
-            });
-            
-            document.querySelectorAll('.item-quantity').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    updateQuantity(e.target.dataset.id, e.target.value);
-                });
-            });
+            const total = shoppingList.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+            totalPriceElements.forEach(el => el && (el.textContent = formatCurrency(total)));
+            itemCountElements.forEach(el => el && (el.textContent = shoppingList.length));
         };
 
-        if (addItemForm) {
-            addItemForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const itemNameInput = document.getElementById('itemName');
-                const itemQuantityInput = document.getElementById('itemQuantity');
-                const itemSectionSelect = document.getElementById('itemSection');
-                
-                if (!itemNameInput || !itemQuantityInput || !itemSectionSelect) {
-                    console.error('Elementos do formulário não encontrados');
-                    return;
-                }
-                
-                const itemName = itemNameInput.value.trim();
-                const itemQuantity = parseInt(itemQuantityInput.value);
-                const itemSection = itemSectionSelect.value;
-                const submitBtn = e.target.querySelector('button[type="submit"]');
-
-                if (itemName && !isNaN(itemQuantity) && itemQuantity > 0) {
-                    const newItem = {
-                        id: Date.now().toString(),
-                        name: itemName,
-                        quantity: itemQuantity,
-                        section: itemSection,
-                        price: 0,
-                        inCart: false
-                    };
-                    
-                    shoppingList.push(newItem);
-                    localStorage.setItem('lastUsedSection', itemSection);
-                    saveAndRender();
-                    
-                    addItemForm.reset();
-                    itemQuantityInput.value = 1;
-                    itemSectionSelect.value = itemSection;
-                    itemNameInput.focus();
-                    
-                    if (submitBtn) {
-                        submitBtn.classList.remove('btn-primary');
-                        submitBtn.classList.add('btn-success');
-                        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Adicionado!';
-                        setTimeout(() => {
-                            submitBtn.classList.remove('btn-success');
-                            submitBtn.classList.add('btn-primary');
-                            submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Adicionar';
-                        }, 1200);
-                    }
-                }
+        const addItem = (name, quantity, unit, sectionId, subsectionId) => {
+            shoppingList.push({ 
+                id: crypto.randomUUID(), 
+                name: name, 
+                quantity: quantity, 
+                unit: unit, 
+                section: sectionId, 
+                subsection: subsectionId || null, 
+                price: 0, 
+                inCart: false 
             });
-        }
-
-        if (editItemForm) {
-            editItemForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const id = document.getElementById('editItemId').value;
-                const item = shoppingList.find(i => i.id === id);
-                
-                if (item) {
-                    const nameInput = document.getElementById('editItemName');
-                    const sectionSelect = document.getElementById('editItemSection');
-                    
-                    if (nameInput && sectionSelect) {
-                        item.name = nameInput.value.trim();
-                        item.section = sectionSelect.value;
-                        saveAndRender();
-                        editModal.close();
-                    }
-                }
-            });
-        }
-
-        if (themeToggle) {
-            themeToggle.addEventListener('change', () => {
-                applyTheme(themeToggle.checked ? darkTheme : lightTheme);
-            });
-        }
-
-        window.toggleSection = (section) => {
-            const index = collapsedState.sections.indexOf(section);
-            if (index > -1) {
-                collapsedState.sections.splice(index, 1);
-            } else {
-                collapsedState.sections.push(section);
-            }
-            saveState();
+            localStorage.setItem('lastUsedSection', sectionId);
+            localStorage.setItem('lastUsedSubsection', subsectionId || '');
+            saveAndRender();
         };
 
-        window.openEditModal = (id) => {
+        const updateItem = (id, updates) => {
             const item = shoppingList.find(i => i.id === id);
-            if (item && editModal) {
-                const editItemId = document.getElementById('editItemId');
-                const editItemName = document.getElementById('editItemName');
-                const editItemSection = document.getElementById('editItemSection');
-                
-                if (editItemId && editItemName && editItemSection) {
-                    editItemId.value = item.id;
-                    editItemName.value = item.name;
-                    editItemSection.value = item.section;
-                    editModal.showModal();
-                }
+            if (item) {
+                Object.assign(item, updates);
+                saveAndRender();
             }
         };
 
-        window.editPrice = (id) => { 
-            const item = shoppingList.find(i => i.id === id); 
-            if (item) { 
-                item.price = 0; 
-                saveAndRender(); 
-            } 
+        const removeItem = (id) => {
+            shoppingList = shoppingList.filter(i => i.id !== id);
+            saveAndRender();
         };
 
-        const updatePrice = (id, val) => { 
-            const item = shoppingList.find(i => i.id === id); 
-            if (item && !isNaN(parseFloat(val))) { 
-                item.price = parseFloat(val); 
-                saveAndRender(); 
-            } 
+        const addOrUpdateSection = (id, name, icon, parentId) => {
+            if (id) {
+                const section = getSectionById(id);
+                if (section) {
+                    const oldName = section.name;
+                    section.name = name;
+                    section.icon = icon;
+                    section.parent = parentId;
+                    shoppingList.forEach(item => {
+                        if (item.section === oldName) item.section = name;
+                        if (item.subsection === oldName) item.subsection = name;
+                    });
+                }
+            } else {
+                const newId = crypto.randomUUID();
+                sections.push({ 
+                    id: newId, 
+                    name, 
+                    icon: icon || '📦', 
+                    parent: parentId, 
+                    order: sections.filter(s => s.parent === parentId).length 
+                });
+            }
+            saveAndRender();
         };
 
-        const updateQuantity = (id, val) => { 
-            const item = shoppingList.find(i => i.id === id); 
-            if (item && !isNaN(parseInt(val)) && parseInt(val) > 0) { 
-                item.quantity = parseInt(val); 
-                saveAndRender(); 
-            } 
+        const removeSection = (id) => {
+            const section = getSectionById(id);
+            if (!section) return;
+
+            if (defaultSections.some(ds => ds.id === id)) {
+                showConfirmModal('Ação Bloqueada', 'Não é possível remover seções padrão do sistema.', () => {});
+                document.getElementById('confirmModalConfirm').style.display = 'none';
+                return;
+            }
+
+            const itemsInSection = shoppingList.filter(i => i.section === id || i.subsection === id);
+            let message = `Deseja realmente remover a seção "<b>${section.name}</b>"?`;
+            if (itemsInSection.length > 0) {
+                message += `<br><br>Isso também removerá <b>${itemsInSection.length}</b> item(ns) permanentemente.`;
+            }
+
+            showConfirmModal('Remover Seção', message, () => {
+                shoppingList = shoppingList.filter(i => i.section !== id && i.subsection !== id);
+                sections = sections.filter(s => s.id !== id && s.parent !== id);
+                saveAndRender();
+                if (settingsModal.open) {
+                    renderSectionManager();
+                }
+            });
         };
 
-        window.toggleInCartStatus = (id) => { 
-            const item = shoppingList.find(i => i.id === id); 
-            if (item && item.price > 0) { 
-                item.inCart = !item.inCart; 
-                saveAndRender(); 
-            } 
-        };
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const itemName = document.getElementById('itemName').value.trim();
+            const itemQuantity = parseFloat(document.getElementById('itemQuantity').value);
+            const itemSection = document.getElementById('itemSection').value;
+            const itemSubsection = document.getElementById('itemSubsection').value;
 
-        window.removeItem = (id) => { 
-            if (confirm('Deseja realmente remover este item?')) { 
-                shoppingList = shoppingList.filter(i => i.id !== id); 
-                saveAndRender(); 
-            } 
+            if (itemName && !isNaN(itemQuantity) && itemQuantity > 0) {
+                addItem(itemName, itemQuantity, document.getElementById('itemUnit').value, itemSection, itemSubsection);
+                
+                addItemForm.reset();
+                document.getElementById('itemQuantity').value = 1;
+                document.getElementById('itemUnit').value = 'un';
+                document.getElementById('itemSection').value = itemSection;
+                updateSubsectionSelects(document.getElementById('itemSubsection'), itemSection, itemSubsection);
+                document.getElementById('itemName').focus();
+            }
+        });
+
+        editItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editItemId').value;
+            updateItem(id, {
+                name: document.getElementById('editItemName').value.trim(),
+                quantity: parseFloat(document.getElementById('editItemQuantity').value),
+                unit: document.getElementById('editItemUnit').value,
+                price: parseFloat(document.getElementById('editItemPrice').value) || 0,
+                section: document.getElementById('editItemSection').value,
+                subsection: document.getElementById('editItemSubsection').value || null
+            });
+            editModal.close();
+        });
+
+        sectionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('sectionId').value;
+            const name = document.getElementById('sectionName').value.trim();
+            const icon = document.getElementById('sectionIcon').value.trim();
+            const parentId = document.getElementById('sectionParent').value || null;
+            if (name) {
+                addOrUpdateSection(id, name, icon, parentId);
+                sectionModal.close();
+                if (settingsModal.open) {
+                    renderSectionManager();
+                }
+            }
+        });
+
+        document.getElementById('itemSection').addEventListener('change', (e) => updateSubsectionSelects(document.getElementById('itemSubsection'), e.target.value));
+        document.getElementById('editItemSection').addEventListener('change', (e) => updateSubsectionSelects(document.getElementById('editItemSubsection'), e.target.value));
+
+        document.body.addEventListener('click', (e) => {
+            const actionTarget = e.target.closest('[data-action]');
+            if (!actionTarget) return;
+
+            const { action, id } = actionTarget.dataset;
+            const item = id ? shoppingList.find(i => i.id === id) : null;
+            const section = id ? getSectionById(id) : null;
+
+            switch (action) {
+                case 'edit-item':
+                    if (item) {
+                        document.getElementById('editItemId').value = item.id;
+                        document.getElementById('editItemName').value = item.name;
+                        document.getElementById('editItemQuantity').value = item.quantity;
+                        document.getElementById('editItemUnit').value = item.unit || 'un';
+                        document.getElementById('editItemPrice').value = item.price || '';
+                        document.getElementById('editItemSection').value = item.section;
+                        updateSubsectionSelects(document.getElementById('editItemSubsection'), item.section, item.subsection);
+                        editModal.showModal();
+                    }
+                    break;
+                case 'remove-item':
+                    if (item) {
+                        showConfirmModal('Remover Item', `Deseja realmente remover "<b>${item.name}</b>"?`, () => removeItem(id));
+                    }
+                    break;
+                case 'edit-price':
+                    if (item) {
+                        showPromptModal('Editar Preço', `Digite o novo preço para "${item.name}":`, item.price, 'number', (newPrice) => {
+                            if (newPrice !== null && !isNaN(parseFloat(newPrice))) {
+                                updateItem(id, { price: parseFloat(newPrice) || 0 });
+                            }
+                        });
+                    }
+                    break;
+                case 'toggle-cart-status':
+                    if (item && item.price > 0) {
+                        updateItem(id, { inCart: !item.inCart });
+                    }
+                    break;
+                case 'open-section-modal':
+                    sectionForm.reset();
+                    document.getElementById('sectionModalTitle').textContent = 'Nova Seção';
+                    document.getElementById('sectionId').value = '';
+                    updateAllSectionSelects();
+                    sectionModal.showModal();
+                    break;
+                case 'edit-section':
+                    if (section) {
+                        document.getElementById('sectionModalTitle').textContent = 'Editar Seção';
+                        document.getElementById('sectionId').value = section.id;
+                        document.getElementById('sectionName').value = section.name;
+                        document.getElementById('sectionIcon').value = section.icon;
+                        document.getElementById('sectionParent').value = section.parent || '';
+                        updateAllSectionSelects();
+                        sectionModal.showModal();
+                    }
+                    break;
+                case 'remove-section':
+                    if (section) removeSection(id);
+                    break;
+                case 'toggle-section-collapse':
+                    const index = collapsedState.sections.indexOf(id);
+                    index > -1 ? collapsedState.sections.splice(index, 1) : collapsedState.sections.push(id);
+                    saveState();
+                    break;
+                case 'open-settings-modal':
+                    renderThemeSelector();
+                    renderSectionManager();
+                    settingsModal.showModal();
+                    break;
+            }
+        });
+
+        document.body.addEventListener('change', (e) => {
+            const actionTarget = e.target.closest('[data-action]');
+            if (!actionTarget) return;
+            const { action, id } = actionTarget.dataset;
+            switch(action) {
+                case 'update-quantity':
+                    updateItem(id, { quantity: parseFloat(e.target.value) || 1 });
+                    break;
+                case 'update-unit':
+                    updateItem(id, { unit: e.target.value });
+                    break;
+            }
+        });
+        document.body.addEventListener('blur', (e) => {
+            const actionTarget = e.target.closest('[data-action="update-price-input"]');
+            if (actionTarget) {
+                const { id } = actionTarget.dataset;
+                const value = e.target.value;
+                if (value && !isNaN(parseFloat(value))) {
+                    updateItem(id, { price: parseFloat(value) });
+                }
+            }
+        }, true);
+
+        const renderThemeSelector = () => {
+            const currentTheme = localStorage.getItem('theme') || 'cupcake';
+            themeSelectorContainer.innerHTML = '';
+            const themeJoin = document.createElement('div');
+            themeJoin.className = 'join join-vertical w-full';
+            
+            daisyuiThemes.forEach(theme => {
+                const button = document.createElement('button');
+                button.className = `btn join-item ${theme === currentTheme ? 'btn-active' : ''}`;
+                button.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
+                button.onclick = () => {
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    renderThemeSelector();
+                };
+                themeJoin.appendChild(button);
+            });
+            themeSelectorContainer.appendChild(themeJoin);
         };
         
+        const renderSectionManager = () => {
+            const container = document.getElementById('section-manager-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
+
+            if (mainSections.length === 0) {
+                container.textContent = 'Nenhuma seção criada.';
+                return;
+            }
+
+            mainSections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'p-2 bg-base-100 rounded-lg';
+                let sectionHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2 font-semibold truncate">
+                            <span class="text-lg">${section.icon}</span>
+                            <span class="truncate">${section.name}</span>
+                        </div>
+                        <div class="join">
+                            <button class="btn btn-xs join-item" title="Editar Seção" data-action="edit-section" data-id="${section.id}"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-xs join-item" title="Remover Seção" data-action="remove-section" data-id="${section.id}"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+
+                const subsections = getSubsections(section.id);
+                if (subsections.length > 0) {
+                    let subHTML = '<div class="ml-6 mt-2 space-y-1 border-l-2 border-base-300 pl-3">';
+                    subsections.forEach(sub => {
+                        subHTML += `
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2 text-sm truncate">
+                                    <span class="text-base">${sub.icon}</span>
+                                    <span class="truncate">${sub.name}</span>
+                                </div>
+                                <div class="join">
+                                    <button class="btn btn-xs join-item" title="Editar Subseção" data-action="edit-section" data-id="${sub.id}"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-xs join-item" title="Remover Subseção" data-action="remove-section" data-id="${sub.id}"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    subHTML += '</div>';
+                    sectionHTML += subHTML;
+                }
+                
+                sectionDiv.innerHTML = sectionHTML;
+                container.appendChild(sectionDiv);
+            });
+        };
+
         const init = () => {
             loadState();
+            const currentTheme = localStorage.getItem('theme') || 'cupcake';
+            document.documentElement.setAttribute('data-theme', currentTheme);
             
-            const savedTheme = localStorage.getItem('theme') || lightTheme;
-            applyTheme(savedTheme);
+            updateAllSectionSelects();
             
-            const itemSectionSelect = document.getElementById('itemSection');
-            if (itemSectionSelect) {
-                const lastUsedSection = localStorage.getItem('lastUsedSection') || 'Genérico';
-                itemSectionSelect.value = lastUsedSection;
+            const lastUsedSection = localStorage.getItem('lastUsedSection');
+            if(sections.some(s => s.id === lastUsedSection)) {
+                document.getElementById('itemSection').value = lastUsedSection;
             }
-            
+            updateSubsectionSelects(document.getElementById('itemSubsection'), document.getElementById('itemSection').value, localStorage.getItem('lastUsedSubsection'));
+
             const adderToggle = document.getElementById('adder-toggle');
             if (adderToggle) {
                 adderToggle.checked = !collapsedState.adder;
@@ -544,11 +996,7 @@
             }
             
             saveAndRender();
-            
-            const itemNameInput = document.getElementById('itemName');
-            if (itemNameInput) {
-                itemNameInput.focus();
-            }
+            document.getElementById('itemName')?.focus();
         };
 
         init();
