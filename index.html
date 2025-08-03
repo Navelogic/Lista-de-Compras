@@ -17,6 +17,7 @@
             font-feature-settings: 'tnum' 1;
             letter-spacing: -0.025em;
         }
+        
         .section-card { transition: all 0.2s ease; }
         .section-card:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(0,0,0,0.1); }
         
@@ -39,9 +40,6 @@
                 <h1 class="text-xl font-bold text-primary truncate">Minha Lista de Compras</h1>
             </div>
             <div class="flex-none gap-2">
-                <button class="btn btn-sm btn-outline" data-action="open-section-modal">
-                    <i class="fa-solid fa-plus"></i> Seção
-                </button>
                 <button class="btn btn-sm btn-ghost btn-circle" data-action="open-settings-modal">
                     <i class="fa-solid fa-gear text-lg"></i>
                 </button>
@@ -53,12 +51,12 @@
         <div class="collapse collapse-arrow bg-base-100 shadow-md">
             <input type="checkbox" id="adder-toggle" checked />
             <div class="collapse-title text-lg font-medium">
-                Resumo e Adição
+                Resumo e Adição Rápida
             </div>
             <div class="collapse-content space-y-4">
                 <div class="stats shadow w-full stats-vertical lg:stats-horizontal">
                     <div class="stat">
-                        <div class="stat-title">Total Previsto</div>
+                        <div class="stat-title">Total</div>
                         <div id="totalPrice" class="stat-value text-primary currency-display">R$ 0,00</div>
                     </div>
                     <div class="stat">
@@ -73,21 +71,42 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <div class="flex gap-2">
                                     <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required>
-                                    <select id="itemUnit" class="select select-bordered min-w-fit">
-                                        <option value="un">Un</option>
-                                        <option value="kg">Kg</option>
-                                        <option value="g">g</option>
-                                        <option value="l">L</option>
-                                        <option value="ml">mL</option>
-                                    </select>
+                                    <div id="itemUnitDropdown" class="dropdown">
+                                        <button type="button" tabindex="0" class="btn btn-bordered min-w-fit">Un <i class="fa-solid fa-chevron-down text-xs"></i></button>
+                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-24">
+                                            <li><a data-value="un">Un</a></li>
+                                            <li><a data-value="kg">Kg</a></li>
+                                            <li><a data-value="g">g</a></li>
+                                            <li><a data-value="l">L</a></li>
+                                            <li><a data-value="ml">mL</a></li>
+                                        </ul>
+                                    </div>
+                                    <input type="hidden" id="itemUnit" value="un">
                                 </div>
-                                <select id="itemSection" class="select select-bordered w-full" required></select>
-                                <select id="itemSubsection" class="select select-bordered w-full">
-                                    <option value="">Sem subseção</option>
-                                </select>
+                                <div class="flex gap-2">
+                                    <div id="itemSectionDropdown" class="dropdown w-full">
+                                        <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal">
+                                            <span class="truncate">Selecione</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                                        </button>
+                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto">
+                                        </ul>
+                                    </div>
+                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder"><i class="fa-solid fa-plus"></i></button>
+                                    <input type="hidden" id="itemSection" required>
+                                </div>
+                                <div class="flex gap-2">
+                                    <div id="itemSubsectionDropdown" class="dropdown w-full">
+                                        <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal" disabled>
+                                            <span class="truncate">Sem subseção</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                                        </button>
+                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto">
+                                        </ul>
+                                    </div>
+                                    <input type="hidden" id="itemSubsection">
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-primary w-full gap-2">
-                                <i class="fa-solid fa-plus"></i> Adicionar
+                                <i class="fa-solid fa-plus"></i> Adicionar Item
                             </button>
                         </form>
                     </div>
@@ -97,18 +116,18 @@
         
         <div id="shoppingListContainer" class="space-y-4"></div>
     </main>
-
+    
     <footer class="fixed bottom-0 left-0 right-0 z-30 bg-base-100 border-t border-base-300 shadow-inner">
-         <div class="flex justify-between items-center w-full px-4 py-2 max-w-4xl mx-auto">
-             <div class="text-left">
-                 <div class="text-xs text-base-content/60">Total Final</div>
-                 <div id="footerTotalPrice" class="text-xl sm:text-2xl font-bold text-primary currency-display">R$ 0,00</div>
-             </div>
-             <div class="text-right">
-                 <div class="text-xs text-base-content/60">Itens</div>
-                 <div id="footerItemCount" class="text-base sm:text-lg font-semibold">0</div>
-             </div>
-         </div>
+        <div class="flex justify-between items-center w-full px-4 py-2 max-w-4xl mx-auto">
+            <div class="text-left">
+                <div class="text-xs text-base-content/60">Total</div>
+                <div id="footerTotalPrice" class="text-xl sm:text-2xl font-bold text-primary currency-display">R$ 0,00</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-base-content/60">Itens</div>
+                <div id="footerItemCount" class="text-base sm:text-lg font-semibold">0</div>
+            </div>
+        </div>
     </footer>
 
     <dialog id="edit_modal" class="modal">
@@ -122,12 +141,16 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Quantidade</span></label>
-                        <div class="flex gap-2">
+                        <label class="label"><span class="label-text">Quantidade e Unidade</span></label>
+                         <div class="flex gap-2">
                             <input type="number" id="editItemQuantity" min="0.01" step="0.01" class="input input-bordered flex-1" required>
-                            <select id="editItemUnit" class="select select-bordered min-w-fit">
-                                <option value="un">Un</option><option value="kg">Kg</option><option value="g">g</option><option value="l">L</option><option value="ml">mL</option>
-                            </select>
+                            <div id="editItemUnitDropdown" class="dropdown">
+                                <button type="button" tabindex="0" class="btn btn-bordered min-w-fit">Un <i class="fa-solid fa-chevron-down text-xs"></i></button>
+                                <ul tabindex="0" class="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-24">
+                                     <li><a data-value="un">Un</a></li><li><a data-value="kg">Kg</a></li><li><a data-value="g">g</a></li><li><a data-value="l">L</a></li><li><a data-value="ml">mL</a></li>
+                                </ul>
+                            </div>
+                            <input type="hidden" id="editItemUnit" value="un">
                         </div>
                     </div>
                     <div class="form-control">
@@ -136,22 +159,30 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="form-control">
+                     <div class="form-control">
                         <label class="label"><span class="label-text">Seção</span></label>
-                        <select id="editItemSection" class="select select-bordered w-full" required></select>
+                        <div id="editItemSectionDropdown" class="dropdown w-full">
+                           <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal"><span class="truncate">Selecione</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i></button>
+                           <ul tabindex="0" class="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto"></ul>
+                        </div>
+                        <input type="hidden" id="editItemSection" required>
                     </div>
                     <div class="form-control">
                         <label class="label"><span class="label-text">Subseção</span></label>
-                        <select id="editItemSubsection" class="select select-bordered w-full"></select>
+                         <div id="editItemSubsectionDropdown" class="dropdown w-full">
+                           <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal"><span class="truncate">Sem subseção</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i></button>
+                           <ul tabindex="0" class="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto"></ul>
+                        </div>
+                        <input type="hidden" id="editItemSubsection">
                     </div>
                 </div>
                 <div class="modal-action">
                     <button type="button" class="btn" onclick="edit_modal.close()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                 </div>
             </form>
         </div>
-        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
 
     <dialog id="section_modal" class="modal">
@@ -164,12 +195,16 @@
                     <input type="text" id="sectionName" class="input input-bordered w-full" required>
                 </div>
                 <div class="form-control">
-                    <label class="label"><span class="label-text">Ícone (emoji)</span></label>
-                    <input type="text" id="sectionIcon" class="input input-bordered w-full" placeholder="🛒" maxlength="2">
+                    <label class="label"><span class="label-text">Ícones (até 5 emojis)</span></label>
+                    <input type="text" id="sectionIcon" class="input input-bordered w-full" placeholder="🛒" maxlength="11" onfocus="this.placeholder=''" onblur="if(!this.value)this.placeholder='🛒'">
                 </div>
                 <div class="form-control">
-                    <label class="label"><span class="label-text">Seção Pai (para subseção)</span></label>
-                    <select id="sectionParent" class="select select-bordered w-full"></select>
+                    <label class="label"><span class="label-text">Vincular a (para criar subseção)</span></label>
+                    <div id="sectionParentDropdown" class="dropdown w-full">
+                       <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal"><span class="truncate">Nenhuma (Será uma seção principal)</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i></button>
+                       <ul tabindex="0" class="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto"></ul>
+                    </div>
+                    <input type="hidden" id="sectionParent">
                 </div>
                 <div class="modal-action">
                     <button type="button" class="btn" onclick="section_modal.close()">Cancelar</button>
@@ -177,7 +212,7 @@
                 </div>
             </form>
         </div>
-        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
     
     <dialog id="settings_modal" class="modal">
@@ -185,18 +220,17 @@
             <h3 class="font-bold text-lg">Configurações</h3>
             <div class="py-4 space-y-4">
                 <div>
-                    <h4 class="font-semibold mb-2">Tema da Interface</h4>
+                    <h4 class="font-semibold mb-2">Aparência do Aplicativo</h4>
                     <div id="theme-selector-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2"></div>
                 </div>
 
                 <div class="divider"></div>
 
                 <div>
-                    <h4 class="font-semibold mb-2">Gerenciar Seções e Subseções</h4>
-                    <div id="section-manager-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2 space-y-2">
-                        </div>
+                    <h4 class="font-semibold mb-2">Gerenciar Seções</h4>
+                    <div id="section-manager-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2 space-y-2"></div>
                     <button class="btn btn-sm btn-outline mt-3 w-full" data-action="open-section-modal">
-                        <i class="fa-solid fa-plus"></i> Adicionar Seção/Subseção
+                        <i class="fa-solid fa-plus"></i> Adicionar Nova Seção
                     </button>
                 </div>
             </div>
@@ -204,7 +238,7 @@
                 <form method="dialog"><button class="btn">Fechar</button></form>
             </div>
         </div>
-        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
     
     <dialog id="confirm_modal" class="modal">
@@ -216,12 +250,12 @@
                 <button class="btn btn-error" id="confirmModalConfirm">Confirmar</button>
             </div>
         </div>
-        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
 
     <dialog id="prompt_modal" class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg" id="promptModalTitle">Entrada</h3>
+            <h3 class="font-bold text-lg" id="promptModalTitle">Entrada de Dados</h3>
             <p class="py-2" id="promptModalMessage">Digite um valor:</p>
             <form id="promptForm" method="dialog">
                 <input id="promptModalInput" class="input input-bordered w-full">
@@ -231,11 +265,14 @@
                 </div>
             </form>
         </div>
-        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Água", "lofi": "Lofi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Pálido", "nord": "Nórdico", "sunset": "Pôr do Sol" };
+        const daisyuiThemes = Object.keys(themeNames);
+
         const shoppingListContainer = document.getElementById('shoppingListContainer');
         const totalPriceElements = [document.getElementById('totalPrice'), document.getElementById('footerTotalPrice')];
         const itemCountElements = [document.getElementById('itemCount'), document.getElementById('footerItemCount')];
@@ -249,21 +286,20 @@
         const confirmModal = document.getElementById('confirm_modal');
         const promptModal = document.getElementById('prompt_modal');
 
-        const daisyuiThemes = [ "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter", "dim", "nord", "sunset" ];
-        
         const defaultSections = [
-            { id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', name: 'Genérico', icon: '🛒', parent: null, order: 0 },
+            { id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', name: 'Alimentos Gerais', icon: '🛒', parent: null, order: 0 },
             { id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef1', name: 'Hortifrúti', icon: '🥕', parent: null, order: 1 },
             { id: 'c3d4e5f6-a7b8-9012-3456-7890abcdef12', name: 'Padaria', icon: '🍞', parent: null, order: 2 },
-            { id: 'd4e5f6a7-b8c9-0123-4567-890abcdef123', name: 'Laticínios', icon: '🧀', parent: null, order: 3 },
-            { id: 'e5f6a7b8-c9d0-1234-5678-90abcdef1234', name: 'Carnes', icon: '🍖', parent: null, order: 4 },
-            { id: 'f6a7b8c9-d0e1-2345-6789-0abcdef12345', name: 'Limpeza', icon: '🧽', parent: null, order: 5 },
-            { id: 'a7b8c9d0-e1f2-3456-7890-bcdef1234567', name: 'Outros', icon: '📦', parent: null, order: 6 }
+            { id: 'd4e5f6a7-b8c9-0123-4567-890abcdef123', name: 'Frios e Laticínios', icon: '🧀', parent: null, order: 3 },
+            { id: 'e5f6a7b8-c9d0-1234-5678-90abcdef1234', name: 'Açougue e Peixaria', icon: '🍖', parent: null, order: 4 },
+            { id: 'f6a7b8c9-d0e1-2345-6789-0abcdef12345', name: 'Produtos de Limpeza', icon: '🧽', parent: null, order: 5 },
+            { id: 'a7b8c9d0-e1f2-3456-7890-bcdef1234567', name: 'Higiene Pessoal', icon: '🧴', parent: null, order: 6 }
         ];
+
 
         let shoppingList = [];
         let sections = [];
-        let collapsedState = { sections: [], adder: false };
+        let collapsedState = { sections: [], adder: true };
 
         const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
         const formatCompactCurrency = (value) => new Intl.NumberFormat('pt-BR', { notation: 'compact', style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(value || 0);
@@ -271,24 +307,14 @@
         const showConfirmModal = (title, message, onConfirm) => {
             document.getElementById('confirmModalTitle').textContent = title;
             document.getElementById('confirmModalMessage').innerHTML = message;
-            
             const confirmBtn = document.getElementById('confirmModalConfirm');
             const cancelBtn = document.getElementById('confirmModalCancel');
-
-            const confirmHandler = () => {
-                onConfirm();
-                confirmModal.close();
-                cleanup();
-            };
-            const cancelHandler = () => {
-                confirmModal.close();
-                cleanup();
-            };
+            const confirmHandler = () => { onConfirm(); confirmModal.close(); cleanup(); };
+            const cancelHandler = () => { confirmModal.close(); cleanup(); };
             const cleanup = () => {
                 confirmBtn.removeEventListener('click', confirmHandler);
                 cancelBtn.removeEventListener('click', cancelHandler);
             };
-
             confirmBtn.addEventListener('click', confirmHandler);
             cancelBtn.addEventListener('click', cancelHandler);
             confirmModal.showModal();
@@ -301,25 +327,14 @@
             input.value = initialValue;
             input.type = inputType;
             input.placeholder = (inputType === 'number') ? '0,00' : '...';
-            
             const form = document.getElementById('promptForm');
             const cancelBtn = document.getElementById('promptModalCancel');
-
-            const submitHandler = (e) => {
-                e.preventDefault();
-                onConfirm(input.value);
-                promptModal.close();
-                cleanup();
-            };
-            const cancelHandler = () => {
-                promptModal.close();
-                cleanup();
-            };
+            const submitHandler = (e) => { e.preventDefault(); onConfirm(input.value); promptModal.close(); cleanup(); };
+            const cancelHandler = () => { promptModal.close(); cleanup(); };
             const cleanup = () => {
                 form.removeEventListener('submit', submitHandler);
                 cancelBtn.removeEventListener('click', cancelHandler);
             };
-
             form.addEventListener('submit', submitHandler);
             cancelBtn.addEventListener('click', cancelHandler);
             promptModal.showModal();
@@ -328,10 +343,9 @@
 
         const loadState = () => {
             try {
-                const savedList = localStorage.getItem('shoppingListAppV7');
-                const savedSections = localStorage.getItem('sectionsV7');
-                const savedCollapsed = localStorage.getItem('collapsedStateV7');
-                
+                const savedList = localStorage.getItem('shoppingListAppV8');
+                const savedSections = localStorage.getItem('sectionsV8');
+                const savedCollapsed = localStorage.getItem('collapsedStateV8');
                 if (savedList) shoppingList = JSON.parse(savedList);
                 if (savedSections) {
                     sections = JSON.parse(savedSections);
@@ -340,20 +354,19 @@
                     sections = defaultSections.map(s => ({...s}));
                 }
                 if (savedCollapsed) collapsedState = JSON.parse(savedCollapsed);
-
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 shoppingList = [];
                 sections = defaultSections.map(s => ({...s}));
-                collapsedState = { sections: [], adder: false };
+                collapsedState = { sections: [], adder: true };
             }
         };
 
         const saveState = () => {
             try {
-                localStorage.setItem('shoppingListAppV7', JSON.stringify(shoppingList));
-                localStorage.setItem('sectionsV7', JSON.stringify(sections));
-                localStorage.setItem('collapsedStateV7', JSON.stringify(collapsedState));
+                localStorage.setItem('shoppingListAppV8', JSON.stringify(shoppingList));
+                localStorage.setItem('sectionsV8', JSON.stringify(sections));
+                localStorage.setItem('collapsedStateV8', JSON.stringify(collapsedState));
             } catch (error) {
                 console.error('Erro ao salvar dados:', error);
             }
@@ -363,79 +376,27 @@
             saveState();
             renderList();
             updateStats();
-            updateAllSectionSelects();
+            updateAllDropdowns();
         };
 
         const getSectionById = (id) => sections.find(s => s.id === id);
         const getSubsections = (parentId) => sections.filter(s => s.parent === parentId).sort((a,b) => a.order - b.order);
-
-        const updateAllSectionSelects = () => {
-            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
-            
-            const itemSelects = [document.getElementById('itemSection'), document.getElementById('editItemSection')];
-            itemSelects.forEach(select => {
-                if (!select) return;
-                const currentValue = select.value;
-                select.innerHTML = '';
-                mainSections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section.id;
-                    option.textContent = `${section.icon} ${section.name}`;
-                    select.appendChild(option);
-                });
-                if (sections.some(s => s.id === currentValue)) select.value = currentValue;
-            });
-
-            const parentSelect = document.getElementById('sectionParent');
-            if(parentSelect) {
-                const currentValue = parentSelect.value;
-                parentSelect.innerHTML = '<option value="">Nenhuma (Seção Principal)</option>';
-                mainSections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section.id;
-                    option.textContent = `${section.icon} ${section.name}`;
-                    parentSelect.appendChild(option);
-                });
-                if (sections.some(s => s.id === currentValue)) parentSelect.value = currentValue;
-            }
-
-            updateSubsectionSelects(document.getElementById('itemSubsection'), document.getElementById('itemSection').value);
-            updateSubsectionSelects(document.getElementById('editItemSubsection'), document.getElementById('editItemSection').value);
-        };
-
-        const updateSubsectionSelects = (subSelect, parentId, currentSubValue = '') => {
-            if (!subSelect) return;
-            subSelect.innerHTML = '<option value="">Sem subseção</option>';
-            if (!parentId) return;
-
-            const subsections = getSubsections(parentId);
-            subsections.forEach(subsection => {
-                const option = document.createElement('option');
-                option.value = subsection.id;
-                option.textContent = `${subsection.icon} ${subsection.name}`;
-                subSelect.appendChild(option);
-            });
-            if (subsections.some(s => s.id === currentSubValue)) subSelect.value = currentSubValue;
-        };
-
+        
         const renderList = () => {
             shoppingListContainer.innerHTML = '';
             if (shoppingList.length === 0) {
-                shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">🛒</div><h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3><p class="text-base-content/60">Adicione seu primeiro item no formulário acima!</p></div></div>`;
+                shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">🛒</div><h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3><p class="text-base-content/60">Use o formulário acima para adicionar seu primeiro item!</p></div></div>`;
                 return;
             }
-
             const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
             mainSections.forEach(section => {
                 const itemsInSection = shoppingList.filter(item => item.section === section.id && !item.subsection);
                 const subsections = getSubsections(section.id);
                 const hasContent = itemsInSection.length > 0 || subsections.some(sub => shoppingList.some(item => item.subsection === sub.id));
                 if (!hasContent) return;
-
                 const sectionElement = createSectionElement(section, itemsInSection, subsections);
                 shoppingListContainer.appendChild(sectionElement);
             });
-            
             initSortable();
         };
 
@@ -444,13 +405,11 @@
             const allItems = shoppingList.filter(item => item.section === section.id);
             const sectionTotal = allItems.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const completedItems = allItems.filter(item => item.inCart).length;
-        
             const sectionElement = document.createElement('div');
             sectionElement.className = 'collapse collapse-arrow bg-base-100 shadow-md section-card';
             sectionElement.dataset.sectionId = section.id;
-
             sectionElement.innerHTML = `
-                <input type="checkbox" ${!isCollapsed ? 'checked' : ''} data-action="toggle-section-collapse" data-id="${section.id}" />
+                <input type="checkbox" ${isCollapsed ? '' : 'checked'} data-action="toggle-section-collapse" data-id="${section.id}" />
                 <div class="collapse-title">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -467,29 +426,24 @@
                             ${sectionTotal > 0 ? `<div class="text-right hidden sm:block"><div class="text-xs text-base-content/60">Total</div><div class="font-bold text-lg text-primary currency-display">${formatCurrency(sectionTotal)}</div></div>` : ''}
                         </div>
                     </div>
-                </div>
-            `;
-
+                </div>`;
             const collapseContent = document.createElement('div');
             collapseContent.className = 'collapse-content';
             const contentWrapper = document.createElement('div');
             contentWrapper.className = 'space-y-4 pt-3';
-            
             if (items.length > 0) {
                 const itemList = document.createElement('div');
                 itemList.className = 'space-y-3 item-list';
                 itemList.dataset.sectionId = section.id;
-                items.map(createItemCard).forEach(card => itemList.appendChild(card));
+                items.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
                 contentWrapper.appendChild(itemList);
             }
-
             subsections.forEach(subsection => {
                 const subsectionItems = shoppingList.filter(item => item.subsection === subsection.id);
                 if (subsectionItems.length > 0) {
                     contentWrapper.appendChild(createSubsectionElement(subsection, subsectionItems));
                 }
             });
-
             collapseContent.appendChild(contentWrapper);
             sectionElement.appendChild(collapseContent);
             return sectionElement;
@@ -498,7 +452,6 @@
         function createSubsectionElement(subsection, items) {
             const subsectionTotal = items.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const completedItems = items.filter(item => item.inCart).length;
-        
             const subsectionContainer = document.createElement('div');
             subsectionContainer.className = 'ml-2 sm:ml-6 mt-4';
             subsectionContainer.innerHTML = `
@@ -513,16 +466,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
-            
+                </div>`;
             const itemList = document.createElement('div');
             itemList.className = 'space-y-3 item-list';
             itemList.dataset.sectionId = subsection.parent;
             itemList.dataset.subsectionId = subsection.id;
-            items.map(createItemCard).forEach(card => itemList.appendChild(card));
+            items.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
             subsectionContainer.appendChild(itemList);
-
             return subsectionContainer;
         }
 
@@ -530,133 +480,138 @@
             const isCompleted = item.inCart;
             const hasPrice = item.price > 0;
             const itemTotal = item.price * item.quantity;
-        
             const card = document.createElement('div');
             card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200';
             card.dataset.id = item.id;
-        
-            const cardBody = document.createElement('div');
-            cardBody.className = 'card-body p-3 sm:p-4';
-        
-            const mainFlex = document.createElement('div');
-            mainFlex.className = 'flex justify-between items-start gap-3';
-        
-            const leftSide = document.createElement('div');
-            leftSide.className = 'flex items-start gap-3 flex-1 min-w-0';
-        
-            const handle = document.createElement('i');
-            handle.className = 'fa-solid fa-grip-vertical drag-handle text-base-content/30 pt-1 hover:text-primary transition-colors';
-        
-            const infoContainer = document.createElement('div');
-            infoContainer.className = 'flex-1 min-w-0';
-        
-            const itemName = document.createElement('h4');
-            itemName.className = `font-semibold text-base break-words ${isCompleted ? 'line-through opacity-60' : ''}`;
-            itemName.textContent = item.name;
-        
-            const detailsContainer = document.createElement('div');
-            detailsContainer.className = 'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-3';
-
-            const quantityHtml = `
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-base-content/70 font-medium">Qtd:</span>
-                    <input type="number" min="0.01" step="0.01" value="${item.quantity}" data-action="update-quantity" data-id="${item.id}" class="input input-xs input-bordered w-20 text-center" />
-                    <select data-action="update-unit" data-id="${item.id}" class="select select-xs select-bordered">
-                        <option value="un" ${item.unit === 'un' ? 'selected' : ''}>Un</option>
-                        <option value="kg" ${item.unit === 'kg' ? 'selected' : ''}>Kg</option>
-                        <option value="g" ${item.unit === 'g' ? 'selected' : ''}>g</option>
-                        <option value="l" ${item.unit === 'l' ? 'selected' : ''}>L</option>
-                        <option value="ml" ${item.unit === 'ml' ? 'selected' : ''}>mL</option>
-                    </select>
+            card.innerHTML = `
+                <div class="card-body p-3 sm:p-4">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="flex items-start gap-3 flex-1 min-w-0">
+                            <i class="fa-solid fa-grip-vertical drag-handle text-base-content/30 pt-1 hover:text-primary transition-colors"></i>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-base break-words ${isCompleted ? 'line-through opacity-60' : ''}">${item.name}</h4>
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="badge badge-outline">${item.quantity} ${item.unit}</span>
+                                    </div>
+                                    ${hasPrice ? `
+                                    <div class="cursor-pointer hover:bg-base-300 p-2 rounded-lg transition-colors" data-action="edit-price" data-id="${item.id}">
+                                        <div class="text-xs text-base-content/60">Preço unit.</div>
+                                        <div class="font-bold text-primary currency-display">${formatCurrency(item.price)}</div>
+                                        ${item.quantity > 1 ? `<div class="text-xs text-base-content/60">Total: ${formatCurrency(itemTotal)}</div>` : ''}
+                                    </div>` : `
+                                    <div class="join">
+                                        <span class="join-item btn btn-xs btn-disabled bg-base-300">R$</span>
+                                        <input type="number" step="0.01" min="0" placeholder="0,00" data-action="update-price-input" data-id="${item.id}" class="join-item input input-xs input-bordered w-24" />
+                                    </div>`}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 items-center pt-1">
+                            <div class="dropdown dropdown-end dropdown-bottom">
+                                <button tabindex="0" class="btn btn-xs btn-circle btn-ghost hover:btn-primary"><i class="fa-solid fa-ellipsis-v"></i></button>
+                                <ul tabindex="0" class="dropdown-content z-[40] menu p-2 shadow bg-base-100 rounded-box w-32 border border-base-300">
+                                    <li><a data-action="edit-item" data-id="${item.id}"><i class="fa-solid fa-pen w-4"></i> Editar</a></li>
+                                    <li><a data-action="remove-item" data-id="${item.id}"><i class="fa-solid fa-trash w-4 text-error"></i> Remover</a></li>
+                                </ul>
+                            </div>
+                            ${hasPrice ? `
+                            <button class="btn btn-xs ${isCompleted ? 'btn-success' : 'btn-primary btn-outline'} gap-1" data-action="toggle-cart-status" data-id="${item.id}">
+                                ${isCompleted ? '<i class="fa-solid fa-check"></i><span class="hidden sm:inline">No Carrinho</span>' : '<i class="fa-solid fa-cart-plus"></i><span class="hidden sm:inline">Pôr no Carrinho</span>'}
+                            </button>` : `<div class="h-6 w-6"></div>`}
+                        </div>
+                    </div>
                 </div>`;
-            detailsContainer.innerHTML += quantityHtml;
-        
-            if (hasPrice) {
-                const priceHtml = `
-                    <div class="cursor-pointer hover:bg-base-300 p-2 rounded-lg transition-colors" data-action="edit-price" data-id="${item.id}">
-                        <div class="text-xs text-base-content/60">Preço unitário</div>
-                        <div class="font-bold text-primary currency-display">${formatCurrency(item.price)}</div>
-                        ${item.quantity > 1 ? `<div class="text-xs text-base-content/60">Total: ${formatCurrency(itemTotal)}</div>` : ''}
-                    </div>`;
-                detailsContainer.innerHTML += priceHtml;
-            } else {
-                const priceInputHtml = `
-                    <div class="join">
-                        <span class="join-item btn btn-xs btn-disabled bg-base-300">R$</span>
-                        <input type="number" step="0.01" min="0" placeholder="0,00" data-action="update-price-input" data-id="${item.id}" class="join-item input input-xs input-bordered w-24" />
-                    </div>`;
-                detailsContainer.innerHTML += priceInputHtml;
-            }
-        
-            infoContainer.append(itemName, detailsContainer);
-            leftSide.append(handle, infoContainer);
-        
-            const rightSide = document.createElement('div');
-            rightSide.className = 'flex flex-col gap-2 items-center pt-1';
-        
-            const dropdownHtml = `
-                <div class="dropdown dropdown-end dropdown-bottom">
-                    <button tabindex="0" class="btn btn-xs btn-circle btn-ghost hover:btn-primary"><i class="fa-solid fa-ellipsis-v"></i></button>
-                    <ul tabindex="0" class="dropdown-content z-[40] menu p-2 shadow bg-base-100 rounded-box w-32 border border-base-300">
-                        <li><a data-action="edit-item" data-id="${item.id}"><i class="fa-solid fa-pen w-4"></i> Editar</a></li>
-                        <li><a data-action="remove-item" data-id="${item.id}"><i class="fa-solid fa-trash w-4 text-error"></i> Remover</a></li>
-                    </ul>
-                </div>`;
-            rightSide.innerHTML = dropdownHtml;
-        
-            if (hasPrice) {
-                const cartButton = document.createElement('button');
-                cartButton.dataset.action = 'toggle-cart-status';
-                cartButton.dataset.id = item.id;
-                if (isCompleted) {
-                    cartButton.className = 'btn btn-xs btn-success gap-1';
-                    cartButton.innerHTML = `<i class="fa-solid fa-check"></i><span class="hidden sm:inline">Feito</span>`;
-                } else {
-                    cartButton.className = 'btn btn-xs btn-primary btn-outline gap-1';
-                    cartButton.innerHTML = `<i class="fa-solid fa-cart-plus"></i><span class="hidden sm:inline">Adicionar</span>`;
-                }
-                rightSide.appendChild(cartButton);
-            } else {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'h-6 w-6';
-                rightSide.appendChild(placeholder);
-            }
-        
-            mainFlex.append(leftSide, rightSide);
-            cardBody.appendChild(mainFlex);
-            card.appendChild(cardBody);
-        
             return card;
+        }
+        
+        function setupDropdown(dropdownId, hiddenInputId, onSelectCallback) {
+            const dropdown = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const button = dropdown.querySelector('button');
+            const menu = dropdown.querySelector('ul');
+
+            menu.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('a');
+                if (target) {
+                    const value = target.dataset.value;
+                    const text = target.innerHTML;
+                    hiddenInput.value = value;
+                    button.querySelector('.truncate, button').innerHTML = text;
+                    if (document.activeElement) document.activeElement.blur();
+                    if (onSelectCallback) onSelectCallback(value);
+                }
+            });
+        }
+
+        function populateDropdown(dropdownId, items, hiddenInputId, placeholder, selectedValue) {
+            const dropdown = document.getElementById(dropdownId);
+            const button = dropdown.querySelector('button');
+            const menu = dropdown.querySelector('ul');
+            const hiddenInput = document.getElementById(hiddenInputId);
+
+            menu.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.dataset.value = item.id;
+                a.innerHTML = `${item.icon || ''} ${item.name}`;
+                li.appendChild(a);
+                menu.appendChild(li);
+            });
+
+            const selectedItem = items.find(item => item.id === selectedValue);
+            if (selectedItem) {
+                button.querySelector('.truncate').innerHTML = `${selectedItem.icon || ''} ${selectedItem.name}`;
+                hiddenInput.value = selectedValue;
+            } else {
+                button.querySelector('.truncate').innerHTML = placeholder;
+                hiddenInput.value = '';
+            }
+            button.disabled = items.length === 0;
+        }
+
+        function updateAllDropdowns() {
+            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
+            const lastUsedSection = localStorage.getItem('lastUsedSection');
+            const lastUsedSubsection = localStorage.getItem('lastUsedSubsection');
+
+            populateDropdown('itemSectionDropdown', mainSections, 'itemSection', 'Selecione uma seção', lastUsedSection);
+            populateDropdown('editItemSectionDropdown', mainSections, 'editItemSection', 'Selecione uma seção', null);
+            
+            const parentItems = [{id: '', name: 'Nenhuma (Seção Principal)', icon: '📁'}].concat(mainSections);
+            populateDropdown('sectionParentDropdown', parentItems, 'sectionParent', 'Nenhuma (Seção Principal)', null);
+
+            updateSubsectionDropdown('itemSubsectionDropdown', 'itemSubsection', lastUsedSection, lastUsedSubsection);
+            updateSubsectionDropdown('editItemSubsectionDropdown', 'editItemSubsection', null, null);
+        }
+
+        function updateSubsectionDropdown(dropdownId, hiddenInputId, parentId, selectedValue) {
+            const subsections = parentId ? getSubsections(parentId) : [];
+            const items = [{id: '', name: 'Sem subseção', icon: '➖'}].concat(subsections);
+            populateDropdown(dropdownId, items, hiddenInputId, 'Sem subseção', selectedValue);
         }
 
         const initSortable = () => {
             document.querySelectorAll('.item-list').forEach(list => {
                 new Sortable(list, {
-                    group: 'shopping-list',
-                    animation: 150,
-                    handle: '.drag-handle',
-                    ghostClass: 'sortable-ghost',
+                    group: 'shopping-list', animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost',
                     onEnd: (evt) => {
-                        const orderedIds = [];
-                        const itemUpdates = {};
-
-                        document.querySelectorAll('.item-list [data-id]').forEach(itemEl => {
-                            const id = itemEl.dataset.id;
-                            const sectionId = itemEl.closest('.item-list').dataset.sectionId;
-                            const subsectionId = itemEl.closest('.item-list').dataset.subsectionId || null;
-                            orderedIds.push(id);
-                            itemUpdates[id] = { section: sectionId, subsection: subsectionId };
-                        });
+                        const itemEl = evt.item;
+                        const id = itemEl.dataset.id;
+                        const newSectionId = itemEl.closest('.item-list').dataset.sectionId;
+                        const newSubsectionId = itemEl.closest('.item-list').dataset.subsectionId || null;
                         
-                        shoppingList.forEach(item => {
-                            if (itemUpdates[item.id]) {
-                                item.section = itemUpdates[item.id].section;
-                                item.subsection = itemUpdates[item.id].subsection;
-                            }
-                        });
+                        const movedItem = shoppingList.find(i => i.id === id);
+                        if(movedItem) {
+                            movedItem.section = newSectionId;
+                            movedItem.subsection = newSubsectionId;
+                        }
 
+                        const orderedIds = Array.from(document.querySelectorAll('.item-card')).map(el => el.dataset.id);
                         shoppingList.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
-                        
+
                         saveAndRender();
                     }
                 });
@@ -670,16 +625,8 @@
         };
 
         const addItem = (name, quantity, unit, sectionId, subsectionId) => {
-            shoppingList.push({ 
-                id: crypto.randomUUID(), 
-                name: name, 
-                quantity: quantity, 
-                unit: unit, 
-                section: sectionId, 
-                subsection: subsectionId || null, 
-                price: 0, 
-                inCart: false 
-            });
+            const order = shoppingList.filter(i => i.section === sectionId && i.subsection === subsectionId).length;
+            shoppingList.push({ id: crypto.randomUUID(), name, quantity, unit, section: sectionId, subsection: subsectionId || null, price: 0, inCart: false, order });
             localStorage.setItem('lastUsedSection', sectionId);
             localStorage.setItem('lastUsedSubsection', subsectionId || '');
             saveAndRender();
@@ -687,10 +634,7 @@
 
         const updateItem = (id, updates) => {
             const item = shoppingList.find(i => i.id === id);
-            if (item) {
-                Object.assign(item, updates);
-                saveAndRender();
-            }
+            if (item) { Object.assign(item, updates); saveAndRender(); }
         };
 
         const removeItem = (id) => {
@@ -701,25 +645,11 @@
         const addOrUpdateSection = (id, name, icon, parentId) => {
             if (id) {
                 const section = getSectionById(id);
-                if (section) {
-                    const oldName = section.name;
-                    section.name = name;
-                    section.icon = icon;
-                    section.parent = parentId;
-                    shoppingList.forEach(item => {
-                        if (item.section === oldName) item.section = name;
-                        if (item.subsection === oldName) item.subsection = name;
-                    });
-                }
+                if (section) { Object.assign(section, { name, icon, parent: parentId }); }
             } else {
                 const newId = crypto.randomUUID();
-                sections.push({ 
-                    id: newId, 
-                    name, 
-                    icon: icon || '📦', 
-                    parent: parentId, 
-                    order: sections.filter(s => s.parent === parentId).length 
-                });
+                const order = sections.filter(s => s.parent === parentId).length;
+                sections.push({ id: newId, name, icon: icon || '📦', parent: parentId, order });
             }
             saveAndRender();
         };
@@ -727,26 +657,19 @@
         const removeSection = (id) => {
             const section = getSectionById(id);
             if (!section) return;
-
             if (defaultSections.some(ds => ds.id === id)) {
                 showConfirmModal('Ação Bloqueada', 'Não é possível remover seções padrão do sistema.', () => {});
                 document.getElementById('confirmModalConfirm').style.display = 'none';
                 return;
             }
-
             const itemsInSection = shoppingList.filter(i => i.section === id || i.subsection === id);
             let message = `Deseja realmente remover a seção "<b>${section.name}</b>"?`;
-            if (itemsInSection.length > 0) {
-                message += `<br><br>Isso também removerá <b>${itemsInSection.length}</b> item(ns) permanentemente.`;
-            }
-
+            if (itemsInSection.length > 0) message += `<br><br>Isso também removerá <b>${itemsInSection.length}</b> item(ns) permanentemente.`;
             showConfirmModal('Remover Seção', message, () => {
                 shoppingList = shoppingList.filter(i => i.section !== id && i.subsection !== id);
                 sections = sections.filter(s => s.id !== id && s.parent !== id);
                 saveAndRender();
-                if (settingsModal.open) {
-                    renderSectionManager();
-                }
+                if (settingsModal.open) renderSectionManager();
             });
         };
 
@@ -754,18 +677,19 @@
             e.preventDefault();
             const itemName = document.getElementById('itemName').value.trim();
             const itemQuantity = parseFloat(document.getElementById('itemQuantity').value);
+            const itemUnit = document.getElementById('itemUnit').value;
             const itemSection = document.getElementById('itemSection').value;
             const itemSubsection = document.getElementById('itemSubsection').value;
-
-            if (itemName && !isNaN(itemQuantity) && itemQuantity > 0) {
-                addItem(itemName, itemQuantity, document.getElementById('itemUnit').value, itemSection, itemSubsection);
-                
+            if (itemName && !isNaN(itemQuantity) && itemQuantity > 0 && itemSection) {
+                addItem(itemName, itemQuantity, itemUnit, itemSection, itemSubsection);
                 addItemForm.reset();
                 document.getElementById('itemQuantity').value = 1;
                 document.getElementById('itemUnit').value = 'un';
-                document.getElementById('itemSection').value = itemSection;
-                updateSubsectionSelects(document.getElementById('itemSubsection'), itemSection, itemSubsection);
+                document.querySelector('#itemUnitDropdown button').innerHTML = 'Un <i class="fa-solid fa-chevron-down text-xs"></i>';
                 document.getElementById('itemName').focus();
+                saveAndRender();
+            } else {
+                alert("Por favor, preencha o nome, quantidade e selecione uma seção.");
             }
         });
 
@@ -792,60 +716,62 @@
             if (name) {
                 addOrUpdateSection(id, name, icon, parentId);
                 sectionModal.close();
-                if (settingsModal.open) {
-                    renderSectionManager();
-                }
+                if (settingsModal.open) renderSectionManager();
             }
         });
-
-        document.getElementById('itemSection').addEventListener('change', (e) => updateSubsectionSelects(document.getElementById('itemSubsection'), e.target.value));
-        document.getElementById('editItemSection').addEventListener('change', (e) => updateSubsectionSelects(document.getElementById('editItemSubsection'), e.target.value));
 
         document.body.addEventListener('click', (e) => {
             const actionTarget = e.target.closest('[data-action]');
             if (!actionTarget) return;
-
             const { action, id } = actionTarget.dataset;
             const item = id ? shoppingList.find(i => i.id === id) : null;
             const section = id ? getSectionById(id) : null;
-
             switch (action) {
                 case 'edit-item':
                     if (item) {
                         document.getElementById('editItemId').value = item.id;
                         document.getElementById('editItemName').value = item.name;
                         document.getElementById('editItemQuantity').value = item.quantity;
-                        document.getElementById('editItemUnit').value = item.unit || 'un';
                         document.getElementById('editItemPrice').value = item.price || '';
-                        document.getElementById('editItemSection').value = item.section;
-                        updateSubsectionSelects(document.getElementById('editItemSubsection'), item.section, item.subsection);
+                        
+                        document.getElementById('editItemUnit').value = item.unit;
+                        document.querySelector('#editItemUnitDropdown button').innerHTML = `${item.unit} <i class="fa-solid fa-chevron-down text-xs"></i>`;
+                        
+                        populateDropdown('editItemSectionDropdown', sections.filter(s => !s.parent), 'editItemSection', 'Selecione', item.section);
+                        updateSubsectionDropdown('editItemSubsectionDropdown', 'editItemSubsection', item.section, item.subsection);
+
                         editModal.showModal();
                     }
                     break;
                 case 'remove-item':
-                    if (item) {
-                        showConfirmModal('Remover Item', `Deseja realmente remover "<b>${item.name}</b>"?`, () => removeItem(id));
-                    }
+                    if (item) showConfirmModal('Remover Item', `Deseja realmente remover "<b>${item.name}</b>"?`, () => removeItem(id));
                     break;
                 case 'edit-price':
-                    if (item) {
-                        showPromptModal('Editar Preço', `Digite o novo preço para "${item.name}":`, item.price, 'number', (newPrice) => {
-                            if (newPrice !== null && !isNaN(parseFloat(newPrice))) {
-                                updateItem(id, { price: parseFloat(newPrice) || 0 });
-                            }
-                        });
-                    }
+                    if (item) showPromptModal('Editar Preço', `Digite o novo preço para "${item.name}":`, item.price, 'number', (newPrice) => {
+                        if (newPrice !== null && !isNaN(parseFloat(newPrice))) updateItem(id, { price: parseFloat(newPrice) || 0 });
+                    });
                     break;
                 case 'toggle-cart-status':
-                    if (item && item.price > 0) {
-                        updateItem(id, { inCart: !item.inCart });
-                    }
+                    if (item && item.price > 0) updateItem(id, { inCart: !item.inCart });
                     break;
                 case 'open-section-modal':
+                case 'open-section-modal-from-adder':
                     sectionForm.reset();
-                    document.getElementById('sectionModalTitle').textContent = 'Nova Seção';
+                    document.getElementById('sectionModalTitle').textContent = 'Criar Nova Seção';
                     document.getElementById('sectionId').value = '';
-                    updateAllSectionSelects();
+                    populateDropdown('sectionParentDropdown', [{id: '', name: 'Nenhuma (Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent)), 'sectionParent', 'Nenhuma (Seção Principal)', '');
+                    sectionModal.showModal();
+                    break;
+                case 'open-subsection-modal-from-adder':
+                    const currentSection = document.getElementById('itemSection').value;
+                    if (!currentSection) {
+                        alert('Por favor, selecione uma seção principal primeiro para poder criar uma subseção.');
+                        return;
+                    }
+                    sectionForm.reset();
+                    document.getElementById('sectionModalTitle').textContent = 'Criar Nova Subseção';
+                    document.getElementById('sectionId').value = '';
+                    populateDropdown('sectionParentDropdown', [{id: '', name: 'Nenhuma (Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent)), 'sectionParent', 'Nenhuma (Seção Principal)', currentSection);
                     sectionModal.showModal();
                     break;
                 case 'edit-section':
@@ -854,8 +780,7 @@
                         document.getElementById('sectionId').value = section.id;
                         document.getElementById('sectionName').value = section.name;
                         document.getElementById('sectionIcon').value = section.icon;
-                        document.getElementById('sectionParent').value = section.parent || '';
-                        updateAllSectionSelects();
+                        populateDropdown('sectionParentDropdown', [{id: '', name: 'Nenhuma (Seção Principal)', icon: '�'}].concat(sections.filter(s => !s.parent)), 'sectionParent', 'Nenhuma (Seção Principal)', section.parent || '');
                         sectionModal.showModal();
                     }
                     break;
@@ -875,40 +800,24 @@
             }
         });
 
-        document.body.addEventListener('change', (e) => {
-            const actionTarget = e.target.closest('[data-action]');
-            if (!actionTarget) return;
-            const { action, id } = actionTarget.dataset;
-            switch(action) {
-                case 'update-quantity':
-                    updateItem(id, { quantity: parseFloat(e.target.value) || 1 });
-                    break;
-                case 'update-unit':
-                    updateItem(id, { unit: e.target.value });
-                    break;
-            }
-        });
         document.body.addEventListener('blur', (e) => {
-            const actionTarget = e.target.closest('[data-action="update-price-input"]');
-            if (actionTarget) {
-                const { id } = actionTarget.dataset;
+            const target = e.target.closest('[data-action="update-price-input"]');
+            if (target) {
+                const { id } = target.dataset;
                 const value = e.target.value;
-                if (value && !isNaN(parseFloat(value))) {
-                    updateItem(id, { price: parseFloat(value) });
-                }
+                if (value && !isNaN(parseFloat(value))) updateItem(id, { price: parseFloat(value) });
             }
         }, true);
-
+        
         const renderThemeSelector = () => {
             const currentTheme = localStorage.getItem('theme') || 'cupcake';
             themeSelectorContainer.innerHTML = '';
             const themeJoin = document.createElement('div');
             themeJoin.className = 'join join-vertical w-full';
-            
             daisyuiThemes.forEach(theme => {
                 const button = document.createElement('button');
                 button.className = `btn join-item ${theme === currentTheme ? 'btn-active' : ''}`;
-                button.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
+                button.textContent = themeNames[theme];
                 button.onclick = () => {
                     document.documentElement.setAttribute('data-theme', theme);
                     localStorage.setItem('theme', theme);
@@ -921,16 +830,12 @@
         
         const renderSectionManager = () => {
             const container = document.getElementById('section-manager-container');
-            if (!container) return;
             container.innerHTML = '';
-
             const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
-
             if (mainSections.length === 0) {
                 container.textContent = 'Nenhuma seção criada.';
                 return;
             }
-
             mainSections.forEach(section => {
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'p-2 bg-base-100 rounded-lg';
@@ -944,9 +849,7 @@
                             <button class="btn btn-xs join-item" title="Editar Seção" data-action="edit-section" data-id="${section.id}"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-xs join-item" title="Remover Seção" data-action="remove-section" data-id="${section.id}"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                    </div>
-                `;
-
+                    </div>`;
                 const subsections = getSubsections(section.id);
                 if (subsections.length > 0) {
                     let subHTML = '<div class="ml-6 mt-2 space-y-1 border-l-2 border-base-300 pl-3">';
@@ -961,13 +864,11 @@
                                     <button class="btn btn-xs join-item" title="Editar Subseção" data-action="edit-section" data-id="${sub.id}"><i class="fa-solid fa-pen"></i></button>
                                     <button class="btn btn-xs join-item" title="Remover Subseção" data-action="remove-section" data-id="${sub.id}"><i class="fa-solid fa-trash"></i></button>
                                 </div>
-                            </div>
-                        `;
+                            </div>`;
                     });
                     subHTML += '</div>';
                     sectionHTML += subHTML;
                 }
-                
                 sectionDiv.innerHTML = sectionHTML;
                 container.appendChild(sectionDiv);
             });
@@ -978,19 +879,21 @@
             const currentTheme = localStorage.getItem('theme') || 'cupcake';
             document.documentElement.setAttribute('data-theme', currentTheme);
             
-            updateAllSectionSelects();
-            
-            const lastUsedSection = localStorage.getItem('lastUsedSection');
-            if(sections.some(s => s.id === lastUsedSection)) {
-                document.getElementById('itemSection').value = lastUsedSection;
-            }
-            updateSubsectionSelects(document.getElementById('itemSubsection'), document.getElementById('itemSection').value, localStorage.getItem('lastUsedSubsection'));
+            setupDropdown('itemUnitDropdown', 'itemUnit');
+            setupDropdown('editItemUnitDropdown', 'editItemUnit');
+            setupDropdown('itemSectionDropdown', 'itemSection', (value) => updateSubsectionDropdown('itemSubsectionDropdown', 'itemSubsection', value, ''));
+            setupDropdown('editItemSectionDropdown', 'editItemSection', (value) => updateSubsectionDropdown('editItemSubsectionDropdown', 'editItemSubsection', value, ''));
+            setupDropdown('itemSubsectionDropdown', 'itemSubsection');
+            setupDropdown('editItemSubsectionDropdown', 'editItemSubsection');
+            setupDropdown('sectionParentDropdown', 'sectionParent');
 
+            updateAllDropdowns();
+            
             const adderToggle = document.getElementById('adder-toggle');
             if (adderToggle) {
-                adderToggle.checked = !collapsedState.adder;
+                adderToggle.checked = collapsedState.adder;
                 adderToggle.addEventListener('change', (e) => {
-                    collapsedState.adder = !e.target.checked;
+                    collapsedState.adder = e.target.checked;
                     saveState();
                 });
             }
