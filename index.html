@@ -40,7 +40,7 @@
                 <h1 class="text-xl font-bold text-primary truncate">Minha Lista de Compras</h1>
             </div>
             <div class="flex-none gap-2">
-                <button class="btn btn-sm btn-ghost btn-circle" data-action="open-settings-modal">
+                <button class="btn btn-sm btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações">
                     <i class="fa-solid fa-gear text-lg"></i>
                 </button>
             </div>
@@ -91,7 +91,7 @@
                                         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto">
                                         </ul>
                                     </div>
-                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder"><i class="fa-solid fa-plus"></i></button>
+                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus"></i></button>
                                     <input type="hidden" id="itemSection" required>
                                 </div>
                                 <div class="flex gap-2">
@@ -187,25 +187,34 @@
 
     <dialog id="section_modal" class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg mb-4" id="sectionModalTitle">Nova Seção</h3>
-            <form id="sectionForm" method="dialog" class="space-y-3">
+            <h3 class="font-bold text-lg mb-4" id="sectionModalTitle">Adicionar Seção/Subseção</h3>
+            <form id="sectionForm" method="dialog" class="space-y-4">
                 <input type="hidden" id="sectionId">
+                
                 <div class="form-control">
-                    <label class="label"><span class="label-text">Nome da Seção</span></label>
-                    <input type="text" id="sectionName" class="input input-bordered w-full" required>
-                </div>
-                <div class="form-control">
-                    <label class="label"><span class="label-text">Ícones (até 5 emojis)</span></label>
-                    <input type="text" id="sectionIcon" class="input input-bordered w-full" placeholder="🛒" maxlength="11" onfocus="this.placeholder=''" onblur="if(!this.value)this.placeholder='🛒'">
-                </div>
-                <div class="form-control">
-                    <label class="label"><span class="label-text">Vincular a (para criar subseção)</span></label>
+                    <label class="label"><span class="label-text">Onde você quer criar?</span></label>
                     <div id="sectionParentDropdown" class="dropdown w-full">
-                       <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal"><span class="truncate">Nenhuma (Será uma seção principal)</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i></button>
+                       <button type="button" tabindex="0" class="btn btn-bordered w-full justify-start font-normal">
+                           <span class="truncate">Nenhuma (Será uma seção principal)</span> 
+                           <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                       </button>
                        <ul tabindex="0" class="dropdown-content z-[2] menu p-2 shadow bg-base-100 rounded-box w-full max-h-48 overflow-y-auto"></ul>
                     </div>
                     <input type="hidden" id="sectionParent">
                 </div>
+    
+                <div id="sectionTypeFeedback" class="p-3 rounded-lg bg-base-200 text-sm text-base-content/80 transition-all duration-300 ease-in-out">
+                </div>
+    
+                <div class="form-control">
+                    <label class="label"><span class="label-text" id="sectionNameLabel">Nome</span></label>
+                    <input type="text" id="sectionName" class="input input-bordered w-full" required>
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Ícone (emoji)</span></label>
+                    <input type="text" id="sectionIcon" class="input input-bordered w-full" placeholder="🛒" maxlength="11">
+                </div>
+                
                 <div class="modal-action">
                     <button type="button" class="btn" onclick="section_modal.close()">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Salvar</button>
@@ -220,7 +229,7 @@
             <h3 class="font-bold text-lg">Configurações</h3>
             <div class="py-4 space-y-4">
                 <div>
-                    <h4 class="font-semibold mb-2">Aparência do Aplicativo</h4>
+                    <h4 class="font-semibold mb-2">Tema</h4>
                     <div id="theme-selector-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2"></div>
                 </div>
 
@@ -296,7 +305,6 @@
             { id: 'a7b8c9d0-e1f2-3456-7890-bcdef1234567', name: 'Higiene Pessoal', icon: '🧴', parent: null, order: 6 }
         ];
 
-
         let shoppingList = [];
         let sections = [];
         let collapsedState = { sections: [], adder: true };
@@ -309,6 +317,7 @@
             document.getElementById('confirmModalMessage').innerHTML = message;
             const confirmBtn = document.getElementById('confirmModalConfirm');
             const cancelBtn = document.getElementById('confirmModalCancel');
+            confirmBtn.style.display = 'inline-flex';
             const confirmHandler = () => { onConfirm(); confirmModal.close(); cleanup(); };
             const cancelHandler = () => { confirmModal.close(); cleanup(); };
             const cleanup = () => {
@@ -556,7 +565,7 @@
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.dataset.value = item.id;
-                a.innerHTML = `${item.icon || ''} ${item.name}`;
+                a.innerHTML = `${item.icon || ''} <span class="truncate">${item.name}</span>`;
                 li.appendChild(a);
                 menu.appendChild(li);
             });
@@ -569,7 +578,7 @@
                 button.querySelector('.truncate').innerHTML = placeholder;
                 hiddenInput.value = '';
             }
-            button.disabled = items.length === 0;
+            button.disabled = items.length === 0 && !placeholder.includes("Nenhuma");
         }
 
         function updateAllDropdowns() {
@@ -580,9 +589,6 @@
             populateDropdown('itemSectionDropdown', mainSections, 'itemSection', 'Selecione uma seção', lastUsedSection);
             populateDropdown('editItemSectionDropdown', mainSections, 'editItemSection', 'Selecione uma seção', null);
             
-            const parentItems = [{id: '', name: 'Nenhuma (Seção Principal)', icon: '📁'}].concat(mainSections);
-            populateDropdown('sectionParentDropdown', parentItems, 'sectionParent', 'Nenhuma (Seção Principal)', null);
-
             updateSubsectionDropdown('itemSubsectionDropdown', 'itemSubsection', lastUsedSection, lastUsedSubsection);
             updateSubsectionDropdown('editItemSubsectionDropdown', 'editItemSubsection', null, null);
         }
@@ -593,6 +599,39 @@
             populateDropdown(dropdownId, items, hiddenInputId, 'Sem subseção', selectedValue);
         }
 
+        const updateSectionModalUI = (parentId, isEditing = false) => {
+            const modalTitle = document.getElementById('sectionModalTitle');
+            const nameLabel = document.getElementById('sectionNameLabel');
+            const feedbackDiv = document.getElementById('sectionTypeFeedback');
+            const sectionNameInput = document.getElementById('sectionName');
+            const editingPrefix = isEditing ? 'Editar' : 'Criar';
+
+            if (!parentId) {
+                modalTitle.textContent = `${editingPrefix} Seção Principal`;
+                nameLabel.textContent = 'Nome da Nova Seção';
+                sectionNameInput.placeholder = 'Ex: Bebidas';
+                feedbackDiv.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-folder-plus text-lg text-primary"></i>
+                        <div>
+                            Você está ${isEditing ? 'editando uma' : 'criando uma nova'} <strong>seção principal</strong>.
+                        </div>
+                    </div>`;
+            } else {
+                const parentSection = getSectionById(parentId);
+                modalTitle.textContent = `${editingPrefix} Subseção`;
+                nameLabel.textContent = 'Nome da Nova Subseção';
+                sectionNameInput.placeholder = 'Ex: Refrigerantes';
+                feedbackDiv.innerHTML = `
+                     <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-turn-up fa-rotate-90 text-lg text-secondary"></i>
+                        <div>
+                            Você está ${isEditing ? 'editando uma' : 'criando uma nova'} <strong>subseção</strong> dentro de:
+                            <div class="font-bold mt-1 badge badge-outline">${parentSection.icon} ${parentSection.name}</div>
+                        </div>
+                    </div>`;
+            }
+        };
         const initSortable = () => {
             document.querySelectorAll('.item-list').forEach(list => {
                 new Sortable(list, {
@@ -617,13 +656,11 @@
                 });
             });
         };
-
         const updateStats = () => {
             const total = shoppingList.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             totalPriceElements.forEach(el => el && (el.textContent = formatCurrency(total)));
             itemCountElements.forEach(el => el && (el.textContent = shoppingList.length));
         };
-
         const addItem = (name, quantity, unit, sectionId, subsectionId) => {
             const order = shoppingList.filter(i => i.section === sectionId && i.subsection === subsectionId).length;
             shoppingList.push({ id: crypto.randomUUID(), name, quantity, unit, section: sectionId, subsection: subsectionId || null, price: 0, inCart: false, order });
@@ -757,31 +794,24 @@
                 case 'open-section-modal':
                 case 'open-section-modal-from-adder':
                     sectionForm.reset();
-                    document.getElementById('sectionModalTitle').textContent = 'Criar Nova Seção';
                     document.getElementById('sectionId').value = '';
-                    populateDropdown('sectionParentDropdown', [{id: '', name: 'Nenhuma (Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent)), 'sectionParent', 'Nenhuma (Seção Principal)', '');
+                    const mainSectionsForNew = [{id: '', name: 'Nenhuma (Criar Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent));
+                    populateDropdown('sectionParentDropdown', mainSectionsForNew, 'sectionParent', 'Nenhuma (Criar Seção Principal)', '');
+                    updateSectionModalUI(null, false);
                     sectionModal.showModal();
-                    break;
-                case 'open-subsection-modal-from-adder':
-                    const currentSection = document.getElementById('itemSection').value;
-                    if (!currentSection) {
-                        alert('Por favor, selecione uma seção principal primeiro para poder criar uma subseção.');
-                        return;
-                    }
-                    sectionForm.reset();
-                    document.getElementById('sectionModalTitle').textContent = 'Criar Nova Subseção';
-                    document.getElementById('sectionId').value = '';
-                    populateDropdown('sectionParentDropdown', [{id: '', name: 'Nenhuma (Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent)), 'sectionParent', 'Nenhuma (Seção Principal)', currentSection);
-                    sectionModal.showModal();
+                    setTimeout(() => document.getElementById('sectionName').focus(), 50);
                     break;
                 case 'edit-section':
                     if (section) {
-                        document.getElementById('sectionModalTitle').textContent = 'Editar Seção';
                         document.getElementById('sectionId').value = section.id;
                         document.getElementById('sectionName').value = section.name;
                         document.getElementById('sectionIcon').value = section.icon;
-                        populateDropdown('sectionParentDropdown', [{id: '', name: 'Nenhuma (Seção Principal)', icon: '�'}].concat(sections.filter(s => !s.parent)), 'sectionParent', 'Nenhuma (Seção Principal)', section.parent || '');
+                        const parentId = section.parent || '';
+                        const availableParents = [{id: '', name: 'Nenhuma (Tornar Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent && s.id !== section.id));
+                        populateDropdown('sectionParentDropdown', availableParents, 'sectionParent', 'Nenhuma (Tornar Seção Principal)', parentId);
+                        updateSectionModalUI(parentId, true);
                         sectionModal.showModal();
+                        setTimeout(() => document.getElementById('sectionName').focus(), 50);
                     }
                     break;
                 case 'remove-section':
@@ -832,7 +862,11 @@
             const container = document.getElementById('section-manager-container');
             container.innerHTML = '';
             const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
-            if (mainSections.length === 0) {
+            if (mainSections.length === 0 && sections.length > 0) {
+                container.textContent = 'Apenas subseções existem. Crie uma seção principal.';
+                return;
+            }
+             if (sections.length === 0) {
                 container.textContent = 'Nenhuma seção criada.';
                 return;
             }
@@ -885,7 +919,10 @@
             setupDropdown('editItemSectionDropdown', 'editItemSection', (value) => updateSubsectionDropdown('editItemSubsectionDropdown', 'editItemSubsection', value, ''));
             setupDropdown('itemSubsectionDropdown', 'itemSubsection');
             setupDropdown('editItemSubsectionDropdown', 'editItemSubsection');
-            setupDropdown('sectionParentDropdown', 'sectionParent');
+            setupDropdown('sectionParentDropdown', 'sectionParent', (value) => {
+                const sectionId = document.getElementById('sectionId').value;
+                updateSectionModalUI(value || null, !!sectionId);
+            });
 
             updateAllDropdowns();
             
