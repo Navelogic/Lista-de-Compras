@@ -9,7 +9,6 @@
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-
         .sortable-ghost { 
             opacity: 0.4; 
             background: #e0e7ff; 
@@ -23,15 +22,12 @@
             color: oklch(var(--p));
             transform: scale(1.1);
         }
-
         .currency-display { 
             font-feature-settings: 'tnum' 1;
             letter-spacing: -0.025em;
         }
-        
         .section-card { transition: all 0.2s ease; }
         .section-card:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(0,0,0,0.1); }
-        
         .section-badge { 
             background: rgba(var(--p), 0.1); 
             color: oklch(var(--p)); 
@@ -78,7 +74,7 @@
                 <div class="card bg-base-200">
                     <div class="card-body p-4">
                         <form id="addItemForm" class="space-y-3">
-                            <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required maxlength="30">
+                            <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required maxlength="50">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <div class="flex gap-2">
                                     <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required>
@@ -150,7 +146,7 @@
                     </div>
                     <div class="form-control">
                         <label class="label"><span class="label-text">Preço (opcional)</span></label>
-                        <input type="number" id="editItemPrice" step="0.01" min="0" class="input input-bordered w-full" placeholder="R$ 0,00">
+                        <input type="text" inputmode="decimal" id="editItemPrice" class="input input-bordered w-full" placeholder="R$ 0,00">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -251,7 +247,7 @@
             <h3 class="font-bold text-lg" id="promptModalTitle">Entrada de Dados</h3>
             <p class="py-2" id="promptModalMessage">Digite um valor:</p>
             <form id="promptForm" method="dialog">
-                <input id="promptModalInput" class="input input-bordered w-full">
+                <input id="promptModalInput" type="text" inputmode="decimal" class="input input-bordered w-full">
                 <div class="modal-action">
                     <button type="button" class="btn" id="promptModalCancel">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="promptModalConfirm">OK</button>
@@ -307,14 +303,9 @@
         const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Água", "lofi": "Lofi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Pálido", "nord": "Nórdico", "sunset": "Pôr do Sol" };
         const daisyuiThemes = Object.keys(themeNames);
         const units = [
-            { id: 'un', name: 'Unidade (un)' },
-            { id: 'kg', name: 'Quilograma (kg)' },
-            { id: 'g', name: 'Grama (g)' },
-            { id: 'l', name: 'Litro (L)' },
-            { id: 'ml', name: 'Mililitro (mL)' },
-            { id: 'dz', name: 'Dúzia (dz)' },
-            { id: 'cx', name: 'Caixa (cx)' },
-            { id: 'pct', name: 'Pacote (pct)' },
+            { id: 'un', name: 'Unidade (un)' }, { id: 'kg', name: 'Quilograma (kg)' }, { id: 'g', name: 'Grama (g)' },
+            { id: 'l', name: 'Litro (L)' }, { id: 'ml', name: 'Mililitro (mL)' }, { id: 'dz', name: 'Dúzia (dz)' },
+            { id: 'cx', name: 'Caixa (cx)' }, { id: 'pct', name: 'Pacote (pct)' },
         ];
 
         const shoppingListContainer = document.getElementById('shoppingListContainer');
@@ -349,15 +340,12 @@
         let currentManagingSubsectionId = null;
 
         const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-        const formatCompactCurrency = (value) => new Intl.NumberFormat('pt-BR', { notation: 'compact', style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(value || 0);
-        const sanitizeText = (text) => text.replace(/[^a-zA-Z0-9\u00C0-\u017F -.,()]/g, '');
+        const sanitizeText = (text) => text.replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™]/g, '');
         const sanitizeNumber = (value) => {
             let sanitized = String(value).replace(/[^0-9,.]/g, '').replace(',', '.');
             const parts = sanitized.split('.');
             if (parts.length > 1) {
-                sanitized = parts[0].slice(0, 7) + '.' + parts.slice(1).join('').slice(0, 2);
-            } else {
-                sanitized = parts[0].slice(0, 7);
+                sanitized = parts[0] + '.' + parts.slice(1).join('').slice(0, 2);
             }
             return sanitized;
         };
@@ -486,32 +474,32 @@
         
         const renderList = () => {
             shoppingListContainer.innerHTML = '';
-            if (shoppingList.length === 0 && sections.filter(s => !s.parent).length > 0) {
-                shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">🛒</div><h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3><p class="text-base-content/60">Use o formulário acima para adicionar seu primeiro item!</p></div></div>`;
-                return;
-            }
-            if (sections.length === 0) {
+            if (shoppingList.length === 0 && sections.filter(s => !s.parent).length === 0) {
                  shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">📂</div><h3 class="text-lg font-semibold mb-2">Nenhuma seção criada</h3><p class="text-base-content/60">Vá em <i class="fa-solid fa-gear"></i> > Gerenciar Seções para criar sua primeira seção.</p></div></div>`;
                 return;
+            }
+            if (shoppingList.length === 0 && sections.filter(s => !s.parent).length > 0) {
+                 shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">🛒</div><h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3><p class="text-base-content/60">Use o formulário acima para adicionar seu primeiro item!</p></div></div>`;
             }
 
             const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
             mainSections.forEach(section => {
-                const itemsInSection = shoppingList.filter(item => item.section === section.id && !item.subsection);
-                const subsections = getSubsections(section.id);
-                const hasContent = itemsInSection.length > 0 || subsections.some(sub => shoppingList.some(item => item.subsection === sub.id));
-                if (!hasContent) return;
-                const sectionElement = createSectionElement(section, itemsInSection, subsections);
+                const allItemsInSection = shoppingList.filter(item => item.section === section.id);
+                if (allItemsInSection.length === 0) return;
+
+                const sectionElement = createSectionElement(section);
                 shoppingListContainer.appendChild(sectionElement);
             });
             initItemSortable();
         };
 
-        function createSectionElement(section, items, subsections) {
+        function createSectionElement(section) {
             const isCollapsed = collapsedState.sections.includes(section.id);
             const allItems = shoppingList.filter(item => item.section === section.id);
             const sectionTotal = allItems.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const completedItems = allItems.filter(item => item.inCart).length;
+            const itemsInSection = allItems.filter(item => !item.subsection);
+            const subsections = getSubsections(section.id);
             
             const sectionElement = document.createElement('div');
             sectionElement.className = 'bg-base-100 rounded-lg shadow-md section-card';
@@ -525,9 +513,10 @@
                     <span class="text-3xl">${section.icon}</span>
                     <div class="min-w-0">
                         <div class="font-bold text-lg">${section.name}</div>
-                        <div class="flex items-center gap-2 mt-1">
+                        <div class="flex items-center gap-2 mt-1 flex-wrap">
                             <span class="badge badge-sm section-badge">${completedItems}/${allItems.length} itens</span>
-                            ${sectionTotal > 0 ? `<span class="badge badge-sm badge-primary currency-display">${formatCompactCurrency(sectionTotal)}</span>` : ''}
+                            ${sectionTotal > 0 ? `<span class="badge badge-sm badge-primary currency-display">${formatCurrency(sectionTotal)}</span>` : ''}
+                            <button class="btn btn-xs btn-outline btn-primary" data-action="open-subsection-modal-from-section" data-id="${section.id}">+ Subseção</button>
                         </div>
                     </div>
                 </div>
@@ -544,13 +533,14 @@
             const contentWrapper = document.createElement('div');
             contentWrapper.className = `px-4 space-y-4 ${isCollapsed ? 'hidden' : 'pb-4'}`;
             
-            if (items.length > 0) {
+            if (itemsInSection.length > 0) {
                 const itemList = document.createElement('div');
                 itemList.className = 'space-y-3 item-list';
                 itemList.dataset.sectionId = section.id;
-                items.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
+                itemsInSection.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
                 contentWrapper.appendChild(itemList);
             }
+            
             subsections.forEach(subsection => {
                 const subsectionItems = shoppingList.filter(item => item.subsection === subsection.id);
                 if (subsectionItems.length > 0) {
@@ -576,7 +566,7 @@
                             <div class="font-semibold">${subsection.name}</div>
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="badge badge-xs subsection-badge">${completedItems}/${items.length} itens</span>
-                                ${subsectionTotal > 0 ? `<span class="badge badge-xs badge-secondary currency-display">${formatCompactCurrency(subsectionTotal)}</span>` : ''}
+                                ${subsectionTotal > 0 ? `<span class="badge badge-xs badge-secondary currency-display">${formatCurrency(subsectionTotal)}</span>` : ''}
                             </div>
                         </div>
                     </div>
@@ -584,12 +574,15 @@
                         <i class="fa-solid fa-sliders"></i>
                     </button>
                 </div>`;
-            const itemList = document.createElement('div');
-            itemList.className = 'space-y-3 item-list';
-            itemList.dataset.sectionId = subsection.parent;
-            itemList.dataset.subsectionId = subsection.id;
-            items.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
-            subsectionContainer.appendChild(itemList);
+            
+            if (items.length > 0) {
+                const itemList = document.createElement('div');
+                itemList.className = 'space-y-3 item-list';
+                itemList.dataset.sectionId = subsection.parent;
+                itemList.dataset.subsectionId = subsection.id;
+                items.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
+                subsectionContainer.appendChild(itemList);
+            }
             return subsectionContainer;
         }
 
@@ -666,12 +659,12 @@
                 nameLabel.textContent = 'Nome da Nova Subseção';
                 sectionNameInput.placeholder = 'Ex: Refrigerantes';
                 feedbackDiv.innerHTML = `
-                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-turn-up fa-rotate-90 text-lg text-secondary"></i>
-                        <div>Você está ${isEditing ? 'editando uma' : 'criando uma nova'} <strong>subseção</strong> dentro de:
-                            <div class="font-bold mt-1 badge badge-outline">${parentSection.icon} ${parentSection.name}</div>
-                        </div>
-                    </div>`;
+                       <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-turn-up fa-rotate-90 text-lg text-secondary"></i>
+                            <div>Você está ${isEditing ? 'editando uma' : 'criando uma nova'} <strong>subseção</strong> dentro de:
+                                <div class="font-bold mt-1 badge badge-outline">${parentSection.icon} ${parentSection.name}</div>
+                            </div>
+                        </div>`;
             }
         };
 
@@ -776,6 +769,15 @@
             let message = `Deseja realmente remover a seção "<b>${section.name}</b>"?`;
             if (itemsInSection.length > 0) message += `<br><br>Isso também removerá <b>${itemsInSection.length}</b> item(ns) permanentemente.`;
             showConfirmModal('Remover Seção', message, () => {
+                const selectedSectionInput = document.getElementById('itemSection');
+                if (selectedSectionInput.value === id) {
+                    selectedSectionInput.value = '';
+                    document.getElementById('itemSectionBtn').querySelector('.truncate').textContent = 'Selecione uma seção';
+                    document.getElementById('itemSubsection').value = '';
+                    document.getElementById('itemSubsectionBtn').querySelector('.truncate').textContent = 'Sem subseção';
+                    document.getElementById('itemSubsectionBtn').disabled = true;
+                }
+                
                 shoppingList = shoppingList.filter(i => i.section !== id && i.subsection !== id);
                 sections = sections.filter(s => s.id !== id && s.parent !== id);
                 saveAndRender();
@@ -794,9 +796,7 @@
             document.getElementById('itemSectionBtn').querySelector('.truncate').innerHTML = `${section.icon || ''} ${section.name}`;
             
             const subBtn = document.getElementById('itemSubsectionBtn');
-            const addSubBtn = document.getElementById('addSubsectionBtn');
             subBtn.disabled = false;
-            addSubBtn.disabled = false;
 
             const lastSubId = localStorage.getItem('lastUsedSubsection');
             if(lastSubId) {
@@ -901,7 +901,7 @@
                         document.getElementById('editItemId').value = item.id;
                         document.getElementById('editItemName').value = item.name;
                         document.getElementById('editItemQuantity').value = item.quantity;
-                        document.getElementById('editItemPrice').value = item.price || '';
+                        document.getElementById('editItemPrice').value = item.price ? String(item.price).replace('.', ',') : '';
                         document.getElementById('editItemUnit').value = item.unit;
                         document.getElementById('editItemUnitBtn').querySelector('.truncate').textContent = item.unit;
                         
@@ -931,10 +931,15 @@
                     if (item) showConfirmModal('Remover Item', `Deseja realmente remover "<b>${item.name}</b>"?`, () => removeItem(id));
                     break;
                 case 'edit-price':
-                    if (item) showPromptModal('Editar Preço', `Digite o novo preço para "${item.name}":`, item.price, 'number', (newPrice) => {
-                        const sanitizedPrice = sanitizeNumber(newPrice.replace(',', '.'));
-                        if (sanitizedPrice !== null && !isNaN(parseFloat(sanitizedPrice))) updateItem(id, { price: parseFloat(sanitizedPrice) || 0 });
-                    });
+                    if (item) {
+                        const initialPrice = String(item.price || '').replace('.', ',');
+                        showPromptModal('Editar Preço', `Digite o novo preço para "${item.name}":`, initialPrice, 'text', (newPrice) => {
+                            const sanitizedPrice = newPrice.replace(',', '.');
+                            if (sanitizedPrice !== '' && !isNaN(parseFloat(sanitizedPrice))) {
+                                updateItem(id, { price: parseFloat(sanitizedPrice) || 0 });
+                            }
+                        });
+                    }
                     break;
                 case 'toggle-cart-status':
                     if (item && item.price > 0) updateItem(id, { inCart: !item.inCart });
@@ -949,8 +954,8 @@
                     sectionModal.showModal();
                     setTimeout(() => document.getElementById('sectionName').focus(), 50);
                     break;
-                case 'open-subsection-modal-from-adder': {
-                    const parentId = document.getElementById('itemSection').value;
+                case 'open-subsection-modal-from-section': {
+                    const parentId = actionTarget.dataset.id;
                     if (!parentId) return;
                     sectionForm.reset();
                     document.getElementById('sectionId').value = '';
@@ -964,6 +969,11 @@
                 }
                 case 'edit-section':
                     if (section) {
+                        if (defaultSections.some(ds => ds.id === id)) {
+                            showConfirmModal('Ação Bloqueada', 'Não é possível editar seções padrão do sistema.', () => {});
+                            document.getElementById('confirmModalConfirm').style.display = 'none';
+                            return;
+                        }
                         document.getElementById('sectionId').value = section.id;
                         document.getElementById('sectionName').value = section.name;
                         document.getElementById('sectionIcon').value = section.icon;
@@ -1022,11 +1032,10 @@
                         const selectedSection = getSectionById(selectedId);
                         document.getElementById(targetButton).querySelector('.truncate').innerHTML = `${selectedSection.icon || ''} ${selectedSection.name}`;
                         
-                        let subSectionInput, subSectionButton, addSubSectionButton;
+                        let subSectionInput, subSectionButton;
                         if (targetInput === 'itemSection') {
                             subSectionInput = document.getElementById('itemSubsection');
                             subSectionButton = document.getElementById('itemSubsectionBtn');
-                            addSubSectionButton = document.getElementById('addSubsectionBtn');
                         } else if (targetInput === 'editItemSection') {
                             subSectionInput = document.getElementById('editItemSubsection');
                             subSectionButton = document.getElementById('editItemSubsectionBtn');
@@ -1035,7 +1044,6 @@
                             subSectionInput.value = '';
                             subSectionButton.querySelector('.truncate').textContent = 'Sem subseção';
                             subSectionButton.disabled = false;
-                            if(addSubSectionButton) addSubSectionButton.disabled = false;
                         }
                     }, currentVal);
                     break;
@@ -1068,9 +1076,9 @@
                          document.getElementById(targetInput).value = selectedId;
                          const selectedParent = getSectionById(selectedId);
                          if(selectedParent) {
-                            document.getElementById(targetButton).querySelector('.truncate').innerHTML = `${selectedParent.icon || ''} ${selectedParent.name}`;
+                             document.getElementById(targetButton).querySelector('.truncate').innerHTML = `${selectedParent.icon || ''} ${selectedParent.name}`;
                          } else {
-                            document.getElementById(targetButton).querySelector('.truncate').innerHTML = `📁 Nenhuma (Criar Seção Principal)`;
+                             document.getElementById(targetButton).querySelector('.truncate').innerHTML = `📁 Nenhuma (Criar Seção Principal)`;
                          }
                          updateSectionModalUI(selectedId, !!sectionId);
                     }, currentVal);
