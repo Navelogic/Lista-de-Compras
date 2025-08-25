@@ -3,1306 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Lista de Compras</title>
+    <title>poupe.com.br: onde cada real conta.</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Estilos -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        .sortable-ghost { 
-            opacity: 0.4; 
-            background: #e0e7ff; 
-            border-radius: 0.5rem;
+        /* Correção para evitar vazamento lateral em telas pequenas */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
         }
-        .sortable-chosen { cursor: grabbing !important; }
-        .drag-handle { cursor: grab; }
-        .drag-handle-section { cursor: grab; }
-        .drag-handle-section .fa-grip-vertical { transition: all 0.2s ease; }
-        .drag-handle-section:hover .fa-grip-vertical {
+        .hero-bg {
+            background-color: oklch(var(--b2));
+            background-image:
+                radial-gradient(at 27% 37%, oklch(var(--p)/.2) 0px, transparent 50%),
+                radial-gradient(at 97% 21%, oklch(var(--a)/.2) 0px, transparent 50%),
+                radial-gradient(at 82% 99%, oklch(var(--s)/.2) 0px, transparent 50%),
+                radial-gradient(at 35% 88%, oklch(var(--er)/.15) 0px, transparent 50%);
+        }
+        .feature-icon {
+            background-color: oklch(var(--p)/.1);
             color: oklch(var(--p));
-            transform: scale(1.1);
-        }
-        .currency-display { 
-            font-feature-settings: 'tnum' 1;
-            letter-spacing: -0.025em;
-        }
-        .section-card { transition: all 0.2s ease; }
-        .section-card:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(0,0,0,0.1); }
-        .section-badge { 
-            background: rgba(var(--p), 0.1); 
-            color: oklch(var(--p)); 
-            border: 1px solid rgba(var(--p), 0.2);
-        }
-        .subsection-badge { 
-            background: rgba(var(--s), 0.1); 
-            color: oklch(var(--s)); 
-            border: 1px solid rgba(var(--s), 0.2);
         }
     </style>
 </head>
-<body class="bg-base-200 min-h-screen transition-colors duration-500">
-    <header class="sticky top-0 z-30 bg-base-100 shadow-md">
-        <div class="navbar px-4">
+<body class="bg-base-200">
+    <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur shadow-md">
+        <div class="navbar container mx-auto px-4">
             <div class="flex-1">
-                <h1 class="text-xl font-bold text-primary truncate">Minha Lista de Compras</h1>
+                <a href="#" class="text-2xl font-bold text-primary">poupe.com.br</a>
             </div>
-            <div class="flex-none gap-2">
-                <button class="btn btn-sm btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações">
-                    <i class="fa-solid fa-gear text-lg"></i>
-                </button>
+            <div class="flex-none hidden md:flex">
+                <a href="#features" class="btn btn-ghost">Funcionalidades</a>
+                <a href="#story" class="btn btn-ghost">Nossa História</a>
+                <a href="app.html" class="btn btn-primary ml-2">Começar Agora</a>
+            </div>
+            <div class="dropdown dropdown-end md:hidden">
+                <label tabindex="0" class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="#features">Funcionalidades</a></li>
+                    <li><a href="#story">Nossa História</a></li>
+                    <li><a href="app.html">Começar Agora</a></li>
+                </ul>
             </div>
         </div>
     </header>
 
-    <main class="p-4 space-y-4 pb-24">
-        <div class="collapse collapse-arrow bg-base-100 shadow-md">
-            <input type="checkbox" id="adder-toggle" checked />
-            <div class="collapse-title text-lg font-medium">
-                Resumo e Adição Rápida
-            </div>
-            <div class="collapse-content space-y-4">
-                <div class="stats shadow w-full stats-vertical lg:stats-horizontal">
-                    <div class="stat">
-                        <div class="stat-title">Total</div>
-                        <div id="totalPrice" class="stat-value text-primary currency-display">R$ 0,00</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-title">Itens na Lista</div>
-                        <div id="itemCount" class="stat-value text-secondary">0</div>
-                    </div>
-                </div>
-                <div class="card bg-base-200">
-                    <div class="card-body p-4">
-                        <form id="addItemForm" class="space-y-3">
-                            <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required maxlength="50">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="flex gap-2">
-                                    <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required>
-                                    <button type="button" data-action="open-unit-selector" data-target-input="itemUnit" data-target-button="itemUnitBtn" class="btn btn-bordered min-w-fit" id="itemUnitBtn">
-                                        <span class="truncate">Un</span> <i class="fa-solid fa-chevron-down text-xs"></i>
-                                    </button>
-                                    <input type="hidden" id="itemUnit" value="un">
-                                </div>
-                                <div class="flex gap-2">
-                                    <button type="button" data-action="open-section-selector" data-target-input="itemSection" data-target-button="itemSectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSectionBtn">
-                                        <span class="truncate">Selecione uma seção</span> 
-                                        <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus"></i></button>
-                                    <input type="hidden" id="itemSection" required>
-                                </div>
-                                <div class="flex gap-2">
-                                     <button type="button" data-action="open-subsection-selector" data-target-input="itemSubsection" data-target-button="itemSubsectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSubsectionBtn" disabled>
-                                        <span class="truncate">Sem subseção</span> 
-                                        <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
-                                    </button>
-                                    <input type="hidden" id="itemSubsection">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-full gap-2">
-                                <i class="fa-solid fa-plus"></i> Adicionar Item
-                            </button>
-                        </form>
-                    </div>
+    <main>
+        <section class="hero min-h-[80vh] hero-bg">
+            <div class="hero-content text-center px-4">
+                <div class="max-w-2xl">
+                    <h1 class="text-5xl md:text-6xl font-extrabold">A maneira mais inteligente de fazer suas compras.</h1>
+                    <p class="py-6 text-lg">Crie listas de compras organizadas, controle seus gastos e economize tempo e dinheiro. Com o poupe.com.br, ir ao mercado nunca foi tão fácil.</p>
+                    <a href="app.html" class="btn btn-primary btn-lg gap-2">
+                        <i class="fa-solid fa-rocket"></i>
+                        Comece a Economizar Agora
+                    </a>
                 </div>
             </div>
-        </div>
+        </section>
         
-        <div id="shoppingListContainer" class="space-y-4"></div>
-    </main>
-    
-    <footer class="fixed bottom-0 left-0 right-0 z-30 bg-base-100 border-t border-base-300 shadow-inner">
-        <div class="flex justify-between items-center w-full px-4 py-2 max-w-4xl mx-auto">
-            <div class="text-left">
-                <div class="text-xs text-base-content/60">Total</div>
-                <div id="footerTotalPrice" class="text-xl sm:text-2xl font-bold text-primary currency-display">R$ 0,00</div>
-            </div>
-            <div class="text-right">
-                <div class="text-xs text-base-content/60">Itens</div>
-                <div id="footerItemCount" class="text-base sm:text-lg font-semibold">0</div>
-            </div>
-        </div>
-    </footer>
-
-    <dialog id="edit_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg mb-4">Editar Item</h3>
-            <form id="editItemForm" method="dialog" class="space-y-3">
-                <input type="hidden" id="editItemId">
-                <div class="form-control">
-                    <label class="label"><span class="label-text">Nome do Item</span></label>
-                    <input type="text" id="editItemName" class="input input-bordered w-full" required maxlength="60">
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="form-control">
-                        <label class="label"><span class="label-text">Quantidade e Unidade</span></label>
-                         <div class="flex gap-2">
-                            <input type="number" id="editItemQuantity" min="0.01" step="0.01" class="input input-bordered flex-1" required>
-                            <button type="button" data-action="open-unit-selector" data-target-input="editItemUnit" data-target-button="editItemUnitBtn" class="btn btn-bordered min-w-fit" id="editItemUnitBtn">
-                                <span class="truncate">Un</span> <i class="fa-solid fa-chevron-down text-xs"></i>
-                            </button>
-                            <input type="hidden" id="editItemUnit" value="un">
+        <section id="story" class="py-20 bg-base-200">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 lg:order-1">
+                        <h2 class="text-4xl font-bold mb-6">De um problema pessoal a uma solução para todos</h2>
+                        <div class="space-y-4 text-base-content/80">
+                            <p>A ideia nasceu daquele mini pânico que todo mundo sente no corredor do supermercado. Sabe como é? Carrinho enchendo, calculadora do celular na mão, alternando com a lista de compras em outro app, e aquela dúvida no fundo da mente: "Será que vai caber no orçamento?".</p>
+                            <p>Meu ritual era exatamente esse malabarismo digital. Eu dava check em um item na lista, abria a calculadora para somar a conta e repetia o processo. Era cansativo, ineficiente e, sinceramente, tirava toda a paz de espírito de uma tarefa que já é estressante.</p>
+                            <p>Um dia, no meio desse processo, a frustração virou a faísca. Eu pensei: "Não é possível que, com tanta tecnologia, controlar as compras do mês precise ser tão complicado". Eu não queria só um app que somasse os gastos. Eu queria chegar no caixa sabendo exatamente o valor, sem surpresas. Eu queria ter o controle do meu dinheiro de volta.</p>
+                            <p>Foi assim que nasceu a primeira versão do que hoje é o <strong>poupe.com.br</strong>. Começou como uma solução simples para a minha família: um único lugar para criar a lista e ver o orçamento em tempo real.</p>
                         </div>
                     </div>
-                    <div class="form-control">
-                        <label class="label"><span class="label-text">Preço (opcional)</span></label>
-                        <input type="text" inputmode="decimal" id="editItemPrice" class="input input-bordered w-full" placeholder="R$ 0,00">
+                    <div class="order-1 lg:order-2">
+                        <img src="img/shopping-2613984_1280.jpg" alt="Pessoa usando o celular no supermercado para controlar a lista de compras." class="rounded-lg shadow-xl w-full h-auto">
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                     <div class="form-control">
-                        <label class="label"><span class="label-text">Seção</span></label>
-                        <button type="button" data-action="open-section-selector" data-target-input="editItemSection" data-target-button="editItemSectionBtn" class="btn btn-bordered w-full justify-start font-normal" id="editItemSectionBtn">
-                            <span class="truncate">Selecione</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
-                        </button>
-                        <input type="hidden" id="editItemSection" required>
-                    </div>
-                    <div class="form-control">
-                        <label class="label"><span class="label-text">Subseção</span></label>
-                        <button type="button" data-action="open-subsection-selector" data-target-input="editItemSubsection" data-target-button="editItemSubsectionBtn" class="btn btn-bordered w-full justify-start font-normal" id="editItemSubsectionBtn">
-                           <span class="truncate">Sem subseção</span> <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
-                        </button>
-                        <input type="hidden" id="editItemSubsection">
-                    </div>
-                </div>
-                <div class="modal-action">
-                    <button type="button" class="btn" onclick="edit_modal.close()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
-        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
-    </dialog>
+            </div>
+        </section>
 
-    <dialog id="section_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg mb-4" id="sectionModalTitle">Adicionar Seção/Subseção</h3>
-            <form id="sectionForm" method="dialog" class="space-y-4">
-                <input type="hidden" id="sectionId">
-                <div class="form-control">
-                    <label class="label"><span class="label-text">Onde você quer criar?</span></label>
-                    <button type="button" data-action="open-parent-selector" data-target-input="sectionParent" data-target-button="sectionParentBtn" class="btn btn-bordered w-full justify-start font-normal" id="sectionParentBtn">
-                       <span class="truncate">Nenhuma (Será uma seção principal)</span> 
-                       <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
-                    </button>
-                    <input type="hidden" id="sectionParent">
+        <section id="features" class="py-20 bg-base-100">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold">Tudo que você precisa em um só lugar</h2>
+                    <p class="text-base-content/70 mt-2">Ferramentas pensadas para otimizar sua rotina.</p>
                 </div>
-                <div id="sectionTypeFeedback" class="p-3 rounded-lg bg-base-200 text-sm text-base-content/80 transition-all duration-300 ease-in-out"></div>
-                <div class="form-control">
-                    <label class="label"><span class="label-text" id="sectionNameLabel">Nome</span></label>
-                    <input type="text" id="sectionName" class="input input-bordered w-full" required maxlength="50">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
+                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-sitemap text-3xl"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Organização Inteligente</h3>
+                        <p>Crie seções e subseções (Hortifrúti, Padaria, Limpeza) para encontrar tudo rapidamente no mercado.</p>
+                    </div>
+                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
+                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-brazilian-real-sign text-3xl"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Controle de Gastos</h3>
+                        <p>Adicione preços aos itens e veja o total da sua compra em tempo real. Evite surpresas no caixa!</p>
+                    </div>
+                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
+                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-palette text-3xl"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Totalmente Personalizável</h3>
+                        <p>Reordene itens e seções como quiser e escolha entre dezenas de temas para deixar o app com a sua cara.</p>
+                    </div>
+                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
+                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-sliders text-3xl"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Gerenciamento Fácil</h3>
+                        <p>Mova, edite ou apague múltiplos itens de uma vez com nossas ferramentas de gerenciamento avançado.</p>
+                    </div>
                 </div>
-                <div class="form-control">
-                    <label class="label"><span class="label-text">Ícone (emoji)</span></label>
-                    <input type="text" id="sectionIcon" class="input input-bordered w-full" placeholder="🛒" maxlength="11">
-                </div>
-                <div class="modal-action">
-                    <button type="button" class="btn" onclick="section_modal.close()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                </div>
-            </form>
-        </div>
-        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
-    </dialog>
-    
-    <dialog id="settings_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg">Configurações</h3>
-            <div class="py-4 space-y-4">
-                <div>
-                    <h4 class="font-semibold mb-2">Aparência do Aplicativo</h4>
-                    <div id="theme-selector-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2"></div>
-                </div>
-                <div class="divider"></div>
-                <div>
-                    <h4 class="font-semibold mb-2">Gerenciar Seções</h4>
-                    <p class="text-xs text-base-content/60 mb-2">Arraste as seções principais para reordenar.</p>
-                    <div id="section-manager-container" class="max-h-60 overflow-y-auto rounded-lg bg-base-200 p-2 space-y-2"></div>
-                    <button class="btn btn-sm btn-outline mt-3 w-full" data-action="open-section-modal">
-                        <i class="fa-solid fa-plus"></i> Adicionar Nova Seção
+            </div>
+        </section>
+
+        <!-- Nova Seção de Feedback -->
+        <section id="feedback" class="py-20 bg-base-200">
+            <div class="container mx-auto px-4 text-center">
+                <div class="max-w-2xl mx-auto">
+                    <h2 class="text-4xl font-bold">Sua opinião constrói o futuro do Poupe</h2>
+                    <p class="text-lg mt-4 mb-8">Estamos sempre ouvindo. Seus comentários e sugestões são essenciais para tornarmos o aplicativo ainda melhor. Participe da nossa pesquisa!</p>
+                    <button class="btn btn-secondary btn-lg gap-2" id="openFeedbackModalBtn">
+                        <i class="fa-solid fa-comments"></i>
+                        Quero dar meu feedback
                     </button>
                 </div>
+            </div>
+        </section>
+
+        <section id="cta" class="py-20 hero-bg">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-4xl font-bold">Pronto para transformar suas compras?</h2>
+                <p class="text-lg mt-4 mb-8 max-w-xl mx-auto">É gratuito, fácil de usar e funciona diretamente no seu navegador. Sem downloads, sem complicações.</p>
+                <a class="btn btn-primary btn-lg" href="app.html">
+                    Criar minha primeira lista grátis
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer p-10 bg-base-300 text-base-content">
+        <aside>
+            <p class="text-2xl font-bold">poupe.com.br</p>
+            <p>onde cada real conta.</p>
+        </aside>
+        <nav>
+            <h6 class="footer-title">Navegação</h6>
+            <a href="#" class="link link-hover">Início</a>
+            <a href="#features" class="link link-hover">Funcionalidades</a>
+            <a href="#story" class="link link-hover">Nossa História</a>
+            <a href="#feedback" class="link link-hover">Feedback</a>
+        </nav>
+        <nav>
+            <h6 class="footer-title">Legal</h6>
+            <a href="termosdeuso.html" class="link link-hover">Termos de uso</a>
+            <a href="privacidade.html" class="link link-hover">Política de privacidade</a>
+        </nav>
+    </footer>
+
+    <dialog id="feedback_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-3xl">
+            <h3 class="font-bold text-2xl text-center">Ajude-nos a melhorar o poupe.com.br!</h3>
+            <p class="py-4 text-center">Sua opinião é muito importante. Responda nossa rápida pesquisa de feedback e nos ajude a construir a melhor ferramenta de lista de compras para você.</p>
+            <div class="aspect-w-16 aspect-h-9">
+                <iframe 
+                    src="https://docs.google.com/forms/d/e/1FAIpQLScwiDNL8aGKqxZLE5uF0zWhZlf0dssz4xZmwfsMXlnVFa_WsA/viewform?embedded=true" 
+                    width="100%" 
+                    height="450" 
+                    frameborder="0" 
+                    marginheight="0" 
+                    marginwidth="0">
+                    Carregando…
+                </iframe>
             </div>
             <div class="modal-action">
-                <form method="dialog"><button class="btn">Fechar</button></form>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
-    </dialog>
-    
-    <dialog id="confirm_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg" id="confirmModalTitle">Confirmar Ação</h3>
-            <p class="py-4" id="confirmModalMessage">Você tem certeza?</p>
-            <div class="modal-action">
-                <button class="btn" id="confirmModalCancel">Cancelar</button>
-                <button class="btn btn-error" id="confirmModalConfirm">Confirmar</button>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
-    </dialog>
-
-    <dialog id="prompt_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg" id="promptModalTitle">Entrada de Dados</h3>
-            <p class="py-2" id="promptModalMessage">Digite um valor:</p>
-            <form id="promptForm" method="dialog">
-                <input id="promptModalInput" type="text" inputmode="decimal" class="input input-bordered w-full">
-                <div class="modal-action">
-                    <button type="button" class="btn" id="promptModalCancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="promptModalConfirm">OK</button>
-                </div>
-            </form>
-        </div>
-        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
-    </dialog>
-
-    <dialog id="selection_modal" class="modal">
-        <div class="modal-box">
-            <h3 class="font-bold text-lg" id="selectionModalTitle">Selecione uma opção</h3>
-            <form method="dialog" class="absolute top-2 right-2">
-                <button class="btn btn-sm btn-circle btn-ghost">✕</button>
-            </form>
-            <div class="py-4 space-y-4">
-                <input type="text" id="selectionModalSearch" placeholder="Buscar..." class="input input-bordered w-full sticky top-0">
-                <div id="selectionModalList" class="max-h-64 overflow-y-auto space-y-2">
-                </div>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
-    </dialog>
-
-    <dialog id="manage_items_modal" class="modal">
-        <div class="modal-box w-11/12 max-w-2xl">
-            <h3 class="font-bold text-lg" id="manageItemsModalTitle">Gerenciar Itens</h3>
-            <form method="dialog" class="absolute top-2 right-2">
-                <button class="btn btn-sm btn-circle btn-ghost">✕</button>
-            </form>
-            <div class="py-4 space-y-4">
-                <div class="flex flex-wrap gap-2 border-b border-base-300 pb-4">
-                    <button class="btn btn-sm btn-outline btn-error" data-action="delete-all-items-in-section" aria-label="Apagar todos os itens desta seção">
-                        <i class="fa-solid fa-bomb"></i> Apagar Tudo
-                    </button>
-                    <button class="btn btn-sm btn-outline btn-warning" data-action="delete-selected-items" aria-label="Apagar itens selecionados">
-                        <i class="fa-solid fa-trash-can"></i> Excluir Selecionados
-                    </button>
-                    <button class="btn btn-sm btn-outline btn-info" data-action="move-selected-items" aria-label="Mover itens selecionados">
-                        <i class="fa-solid fa-right-left"></i> Mover Selecionados
-                    </button>
-                </div>
-                <div id="manageItemsModalList" class="max-h-72 overflow-y-auto space-y-2">
-                </div>
+                <form method="dialog">
+                    <button class="btn">Fechar</button>
+                </form>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const APP_VERSION = 'V9';
-        const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Água", "lofi": "Lofi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Pálido", "nord": "Nórdico", "sunset": "Pôr do Sol" };
-        const daisyuiThemes = Object.keys(themeNames);
-        const units = [
-            { id: 'un', name: 'Unidade (un)' }, { id: 'kg', name: 'Quilograma (kg)' }, { id: 'g', name: 'Grama (g)' },
-            { id: 'l', name: 'Litro (L)' }, { id: 'ml', name: 'Mililitro (mL)' }, { id: 'dz', name: 'Dúzia (dz)' },
-            { id: 'cx', name: 'Caixa (cx)' }, { id: 'pct', name: 'Pacote (pct)' },
-        ];
+        document.addEventListener('DOMContentLoaded', () => {
+            const feedbackModal = document.getElementById('feedback_modal');
+            const openFeedbackBtn = document.getElementById('openFeedbackModalBtn');
 
-        const shoppingListContainer = document.getElementById('shoppingListContainer');
-        const totalPriceElements = [document.getElementById('totalPrice'), document.getElementById('footerTotalPrice')];
-        const itemCountElements = [document.getElementById('itemCount'), document.getElementById('footerItemCount')];
-        const addItemForm = document.getElementById('addItemForm');
-        const editModal = document.getElementById('edit_modal');
-        const editItemForm = document.getElementById('editItemForm');
-        const sectionModal = document.getElementById('section_modal');
-        const sectionForm = document.getElementById('sectionForm');
-        const settingsModal = document.getElementById('settings_modal');
-        const themeSelectorContainer = document.getElementById('theme-selector-container');
-        const confirmModal = document.getElementById('confirm_modal');
-        const promptModal = document.getElementById('prompt_modal');
-        const selectionModal = document.getElementById('selection_modal');
-        const manageItemsModal = document.getElementById('manage_items_modal');
-
-        const defaultSections = [
-            { id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef', name: 'Alimentos Gerais', icon: '🛒', parent: null, order: 0 },
-            { id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef1', name: 'Hortifrúti', icon: '🥕', parent: null, order: 1 },
-            { id: 'c3d4e5f6-a7b8-9012-3456-7890abcdef12', name: 'Padaria', icon: '🍞', parent: null, order: 2 },
-            { id: 'd4e5f6a7-b8c9-0123-4567-890abcdef123', name: 'Frios e Laticínios', icon: '🧀', parent: null, order: 3 },
-            { id: 'e5f6a7b8-c9d0-1234-5678-90abcdef1234', name: 'Açougue e Peixaria', icon: '🍖', parent: null, order: 4 },
-            { id: 'f6a7b8c9-d0e1-2345-6789-0abcdef12345', name: 'Produtos de Limpeza', icon: '🧽', parent: null, order: 5 },
-            { id: 'a7b8c9d0-e1f2-3456-7890-bcdef1234567', name: 'Higiene Pessoal', icon: '🧴', parent: null, order: 6 }
-        ];
-
-        let shoppingList = [];
-        let sections = [];
-        let collapsedState = { sections: [], adder: true };
-        let currentManagingSectionId = null;
-        let currentManagingSubsectionId = null;
-
-        const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-        const sanitizeText = (text) => text.replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™]/g, '');
-        const sanitizeNumber = (value) => {
-            let sanitized = String(value).replace(/[^0-9,.]/g, '').replace(',', '.');
-            const parts = sanitized.split('.');
-            if (parts.length > 1) {
-                sanitized = parts[0] + '.' + parts.slice(1).join('').slice(0, 2);
-            }
-            return sanitized;
-        };
-
-        const showConfirmModal = (title, message, onConfirm) => {
-            document.getElementById('confirmModalTitle').textContent = title;
-            document.getElementById('confirmModalMessage').innerHTML = message;
-            const confirmBtn = document.getElementById('confirmModalConfirm');
-            const cancelBtn = document.getElementById('confirmModalCancel');
-            confirmBtn.style.display = 'inline-flex';
-            const confirmHandler = () => { onConfirm(); confirmModal.close(); cleanup(); };
-            const cancelHandler = () => { confirmModal.close(); cleanup(); };
-            const cleanup = () => {
-                confirmBtn.removeEventListener('click', confirmHandler);
-                cancelBtn.removeEventListener('click', cancelHandler);
-            };
-            confirmBtn.addEventListener('click', confirmHandler);
-            cancelBtn.addEventListener('click', cancelHandler);
-            confirmModal.showModal();
-        };
-
-        const showPromptModal = (title, message, initialValue, inputType, onConfirm) => {
-            document.getElementById('promptModalTitle').textContent = title;
-            document.getElementById('promptModalMessage').textContent = message;
-            const input = document.getElementById('promptModalInput');
-            input.value = initialValue;
-            input.type = inputType;
-            input.placeholder = (inputType === 'number') ? '0,00' : '...';
-            const form = document.getElementById('promptForm');
-            const cancelBtn = document.getElementById('promptModalCancel');
-            const submitHandler = (e) => { e.preventDefault(); onConfirm(input.value); promptModal.close(); cleanup(); };
-            const cancelHandler = () => { promptModal.close(); cleanup(); };
-            const cleanup = () => {
-                form.removeEventListener('submit', submitHandler);
-                cancelBtn.removeEventListener('click', cancelHandler);
-            };
-            form.addEventListener('submit', submitHandler);
-            cancelBtn.addEventListener('click', cancelHandler);
-            promptModal.showModal();
-            setTimeout(() => input.focus(), 50);
-        };
-
-        const selectionModalSearchInput = document.getElementById('selectionModalSearch');
-        let currentSearchHandler = null;
-
-        const showSelectionModal = (title, items, onSelect, currentValue) => {
-            const modalTitle = document.getElementById('selectionModalTitle');
-            const listContainer = document.getElementById('selectionModalList');
-            
-            modalTitle.textContent = title;
-            selectionModalSearchInput.value = '';
-
-            const renderItems = (filter = '') => {
-                listContainer.innerHTML = '';
-                const filteredItems = items.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
-                
-                if (filteredItems.length === 0) {
-                    listContainer.innerHTML = `<div class="text-center p-4 text-base-content/60">Nenhum item encontrado.</div>`;
-                }
-
-                filteredItems.forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = `btn w-full justify-start ${item.id === currentValue ? 'btn-primary' : ''}`;
-                    btn.dataset.id = item.id;
-                    btn.innerHTML = `${item.icon || ''} <span class="truncate ml-2">${item.name}</span>`;
-                    btn.onclick = () => {
-                        onSelect(item.id);
-                        selectionModal.close();
-                    };
-                    listContainer.appendChild(btn);
-                });
-            };
-            
-            if (currentSearchHandler) {
-                selectionModalSearchInput.removeEventListener('input', currentSearchHandler);
-            }
-            currentSearchHandler = (e) => renderItems(e.target.value);
-            selectionModalSearchInput.addEventListener('input', currentSearchHandler);
-
-            renderItems();
-            selectionModal.showModal();
-        };
-
-        const loadState = () => {
-            try {
-                const savedList = localStorage.getItem(`shoppingListApp${APP_VERSION}`);
-                const savedSections = localStorage.getItem(`sections${APP_VERSION}`);
-                const savedCollapsed = localStorage.getItem(`collapsedState${APP_VERSION}`);
-                if (savedList) shoppingList = JSON.parse(savedList);
-                if (savedSections) {
-                    sections = JSON.parse(savedSections);
-                    sections.forEach((s, index) => { 
-                        if (!s.id) s.id = crypto.randomUUID();
-                        if (s.order === undefined) s.order = index;
-                    });
-                } else {
-                    sections = defaultSections.map(s => ({...s}));
-                }
-                if (savedCollapsed) collapsedState = JSON.parse(savedCollapsed);
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                shoppingList = [];
-                sections = defaultSections.map(s => ({...s}));
-                collapsedState = { sections: [], adder: true };
-            }
-        };
-
-        const saveState = () => {
-            try {
-                localStorage.setItem(`shoppingListApp${APP_VERSION}`, JSON.stringify(shoppingList));
-                localStorage.setItem(`sections${APP_VERSION}`, JSON.stringify(sections));
-                localStorage.setItem(`collapsedState${APP_VERSION}`, JSON.stringify(collapsedState));
-            } catch (error) {
-                console.error('Erro ao salvar dados:', error);
-            }
-        };
-
-        const saveAndRender = () => {
-            saveState();
-            renderList();
-            updateStats();
-        };
-
-        const getSectionById = (id) => sections.find(s => s.id === id);
-        const getSubsections = (parentId) => sections.filter(s => s.parent === parentId).sort((a,b) => a.order - b.order);
-        
-        const renderList = () => {
-            shoppingListContainer.innerHTML = '';
-            if (shoppingList.length === 0 && sections.filter(s => !s.parent).length === 0) {
-                 shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">📂</div><h3 class="text-lg font-semibold mb-2">Nenhuma seção criada</h3><p class="text-base-content/60">Vá em <i class="fa-solid fa-gear"></i> > Gerenciar Seções para criar sua primeira seção.</p></div></div>`;
-                return;
-            }
-            if (shoppingList.length === 0 && sections.filter(s => !s.parent).length > 0) {
-                 shoppingListContainer.innerHTML = `<div class="card bg-base-100 shadow-md"><div class="card-body text-center py-12"><div class="text-6xl mb-4">🛒</div><h3 class="text-lg font-semibold mb-2">Sua lista está vazia</h3><p class="text-base-content/60">Use o formulário acima para adicionar seu primeiro item!</p></div></div>`;
-            }
-
-            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
-            mainSections.forEach(section => {
-                const allItemsInSection = shoppingList.filter(item => item.section === section.id);
-                if (allItemsInSection.length === 0) return;
-
-                const sectionElement = createSectionElement(section);
-                shoppingListContainer.appendChild(sectionElement);
-            });
-            initItemSortable();
-        };
-
-        function createSectionElement(section) {
-            const isCollapsed = collapsedState.sections.includes(section.id);
-            const allItems = shoppingList.filter(item => item.section === section.id);
-            const sectionTotal = allItems.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
-            const completedItems = allItems.filter(item => item.inCart).length;
-            const itemsInSection = allItems.filter(item => !item.subsection);
-            const subsections = getSubsections(section.id);
-            
-            const sectionElement = document.createElement('div');
-            sectionElement.className = 'bg-base-100 rounded-lg shadow-md section-card';
-            sectionElement.dataset.sectionId = section.id;
-
-            const header = document.createElement('div');
-            header.className = 'p-4 flex justify-between items-center gap-2';
-            header.innerHTML = `
-                <div class="flex items-center gap-3 min-w-0 flex-1 drag-handle-section">
-                    <i class="fa-solid fa-grip-vertical text-base-content/30 cursor-grab" aria-hidden="true"></i>
-                    <span class="text-3xl">${section.icon}</span>
-                    <div class="min-w-0">
-                        <div class="font-bold text-lg">${section.name}</div>
-                        <div class="flex items-center gap-2 mt-1 flex-wrap">
-                            <span class="badge badge-sm section-badge">${completedItems}/${allItems.length} itens</span>
-                            ${sectionTotal > 0 ? `<span class="badge badge-sm badge-primary currency-display">${formatCurrency(sectionTotal)}</span>` : ''}
-                            <button class="btn btn-xs btn-outline btn-primary" data-action="open-subsection-modal-from-section" data-id="${section.id}">+ Subseção</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-1 flex-shrink-0">
-                    <button class="btn btn-sm btn-ghost btn-circle" data-action="open-manage-items-modal" data-section-id="${section.id}" aria-label="Gerenciar itens em ${section.name}">
-                        <i class="fa-solid fa-sliders"></i>
-                    </button>
-                    <button class="btn btn-sm btn-ghost btn-circle" data-action="toggle-section-collapse-btn" data-id="${section.id}" aria-label="Expandir ou recolher seção">
-                        <i class="fa-solid fa-chevron-down transition-transform duration-300 ${isCollapsed ? '' : 'rotate-180'}"></i>
-                    </button>
-                </div>
-            `;
-
-            const contentWrapper = document.createElement('div');
-            contentWrapper.className = `px-4 space-y-4 ${isCollapsed ? 'hidden' : 'pb-4'}`;
-            
-            if (itemsInSection.length > 0) {
-                const itemList = document.createElement('div');
-                itemList.className = 'space-y-3 item-list';
-                itemList.dataset.sectionId = section.id;
-                itemsInSection.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
-                contentWrapper.appendChild(itemList);
-            }
-            
-            subsections.forEach(subsection => {
-                const subsectionItems = shoppingList.filter(item => item.subsection === subsection.id);
-                if (subsectionItems.length > 0) {
-                    contentWrapper.appendChild(createSubsectionElement(subsection, subsectionItems));
-                }
-            });
-            
-            sectionElement.appendChild(header);
-            sectionElement.appendChild(contentWrapper);
-            return sectionElement;
-        }
-
-        function createSubsectionElement(subsection, items) {
-            const subsectionTotal = items.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
-            const completedItems = items.filter(item => item.inCart).length;
-            const subsectionContainer = document.createElement('div');
-            subsectionContainer.className = 'ml-2 sm:ml-6 mt-4';
-            subsectionContainer.innerHTML = `
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-3 mb-3 p-3 bg-base-200 rounded-lg border border-base-300">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                        <span class="text-xl">${subsection.icon}</span>
-                        <div class="min-w-0">
-                            <div class="font-semibold">${subsection.name}</div>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="badge badge-xs subsection-badge">${completedItems}/${items.length} itens</span>
-                                ${subsectionTotal > 0 ? `<span class="badge badge-xs badge-secondary currency-display">${formatCurrency(subsectionTotal)}</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-xs btn-ghost" data-action="open-manage-items-modal" data-section-id="${subsection.parent}" data-subsection-id="${subsection.id}" aria-label="Gerenciar itens em ${subsection.name}">
-                        <i class="fa-solid fa-sliders"></i>
-                    </button>
-                </div>`;
-            
-            if (items.length > 0) {
-                const itemList = document.createElement('div');
-                itemList.className = 'space-y-3 item-list';
-                itemList.dataset.sectionId = subsection.parent;
-                itemList.dataset.subsectionId = subsection.id;
-                items.sort((a, b) => a.order - b.order).map(createItemCard).forEach(card => itemList.appendChild(card));
-                subsectionContainer.appendChild(itemList);
-            }
-            return subsectionContainer;
-        }
-
-        function createItemCard(item) {
-            const isCompleted = item.inCart;
-            const hasPrice = item.price > 0;
-            const itemTotal = item.price * item.quantity;
-            const card = document.createElement('div');
-            card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200';
-            card.dataset.id = item.id;
-            card.innerHTML = `
-                <div class="card-body p-3 sm:p-4">
-                    <div class="flex justify-between items-start gap-3">
-                        <div class="flex items-start gap-3 flex-1 min-w-0">
-                            <button class="drag-handle text-base-content/30 pt-1 hover:text-primary transition-colors focus:outline-none" aria-label="Reordenar item">
-                                <i class="fa-solid fa-grip-vertical"></i>
-                            </button>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-semibold text-base break-words ${isCompleted ? 'line-through opacity-60' : ''}">${item.name}</h4>
-                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-3">
-                                    <div class="flex items-center gap-2">
-                                        <span class="badge badge-outline">${item.quantity} ${item.unit}</span>
-                                    </div>
-                                    ${hasPrice ? `
-                                    <div class="cursor-pointer hover:bg-base-300 p-2 rounded-lg transition-colors" data-action="edit-price" data-id="${item.id}">
-                                        <div class="text-xs text-base-content/60">Preço unit.</div>
-                                        <div class="font-bold text-primary currency-display">${formatCurrency(item.price)}</div>
-                                        ${item.quantity > 1 ? `<div class="text-xs text-base-content/60">Total: ${formatCurrency(itemTotal)}</div>` : ''}
-                                    </div>` : `
-                                    <div class="join">
-                                        <span class="join-item btn btn-xs btn-disabled bg-base-300">R$</span>
-                                        <input type="text" inputmode="decimal" placeholder="0,00" data-action="update-price-input" data-id="${item.id}" class="join-item input input-xs input-bordered w-24" />
-                                    </div>`}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-2 items-center pt-1">
-                            <div class="dropdown dropdown-end dropdown-bottom">
-                                <button tabindex="0" class="btn btn-xs btn-circle btn-ghost hover:btn-primary" aria-label="Mais opções para ${item.name}"><i class="fa-solid fa-ellipsis-v"></i></button>
-                                <ul tabindex="0" class="dropdown-content z-[40] menu p-2 shadow bg-base-100 rounded-box w-32 border border-base-300">
-                                    <li><a data-action="edit-item" data-id="${item.id}"><i class="fa-solid fa-pen w-4"></i> Editar</a></li>
-                                    <li><a data-action="remove-item" data-id="${item.id}"><i class="fa-solid fa-trash w-4 text-error"></i> Remover</a></li>
-                                </ul>
-                            </div>
-                            ${hasPrice ? `
-                            <button class="btn btn-xs ${isCompleted ? 'btn-success' : 'btn-primary btn-outline'} gap-1" data-action="toggle-cart-status" data-id="${item.id}">
-                                ${isCompleted ? '<i class="fa-solid fa-check"></i><span class="hidden sm:inline">No Carrinho</span>' : '<i class="fa-solid fa-cart-plus"></i><span class="hidden sm:inline">Pôr no Carrinho</span>'}
-                            </button>` : `<div class="h-6 w-6"></div>`}
-                        </div>
-                    </div>
-                </div>`;
-            return card;
-        }
-        
-        const updateSectionModalUI = (parentId, isEditing = false) => {
-            const modalTitle = document.getElementById('sectionModalTitle');
-            const nameLabel = document.getElementById('sectionNameLabel');
-            const feedbackDiv = document.getElementById('sectionTypeFeedback');
-            const sectionNameInput = document.getElementById('sectionName');
-            const editingPrefix = isEditing ? 'Editar' : 'Criar';
-
-            if (!parentId) {
-                modalTitle.textContent = `${editingPrefix} Seção Principal`;
-                nameLabel.textContent = 'Nome da Nova Seção';
-                sectionNameInput.placeholder = 'Ex: Bebidas';
-                feedbackDiv.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-folder-plus text-lg text-primary"></i>
-                        <div>Você está ${isEditing ? 'editando uma' : 'criando uma nova'} <strong>seção principal</strong>.</div>
-                    </div>`;
-            } else {
-                const parentSection = getSectionById(parentId);
-                modalTitle.textContent = `${editingPrefix} Subseção`;
-                nameLabel.textContent = 'Nome da Nova Subseção';
-                sectionNameInput.placeholder = 'Ex: Refrigerantes';
-                feedbackDiv.innerHTML = `
-                       <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-turn-up fa-rotate-90 text-lg text-secondary"></i>
-                            <div>Você está ${isEditing ? 'editando uma' : 'criando uma nova'} <strong>subseção</strong> dentro de:
-                                <div class="font-bold mt-1 badge badge-outline">${parentSection.icon} ${parentSection.name}</div>
-                            </div>
-                        </div>`;
-            }
-        };
-
-        const initItemSortable = () => {
-            document.querySelectorAll('.item-list').forEach(list => {
-                new Sortable(list, {
-                    group: 'shopping-list', animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost',
-                    onEnd: (evt) => {
-                        const itemEl = evt.item;
-                        const id = itemEl.dataset.id;
-                        const newSectionId = itemEl.closest('.item-list').dataset.sectionId;
-                        const newSubsectionId = itemEl.closest('.item-list').dataset.subsectionId || null;
-                        
-                        const movedItem = shoppingList.find(i => i.id === id);
-                        if(movedItem) {
-                            movedItem.section = newSectionId;
-                            movedItem.subsection = newSubsectionId;
-                        }
-
-                        const targetListEl = evt.to;
-                        const orderedIdsInList = Array.from(targetListEl.children).map(el => el.dataset.id);
-                        
-                        shoppingList.forEach(item => {
-                           const newIndex = orderedIdsInList.indexOf(item.id);
-                           if (newIndex > -1) {
-                               item.order = newIndex;
-                           }
-                        });
-
-                        saveAndRender();
-                    }
-                });
-            });
-        };
-        
-        const initSectionSortable = (container) => {
-            if (!container) return;
-            new Sortable(container, {
-                animation: 150, handle: '.drag-handle-section', ghostClass: 'sortable-ghost',
-                onEnd: (evt) => {
-                    const orderedIds = Array.from(container.children).map(el => el.dataset.sectionId);
-                    orderedIds.forEach((id, index) => {
-                        const section = getSectionById(id);
-                        if (section) section.order = index;
-                    });
-                    saveAndRender();
-                    if (settingsModal.open) renderSectionManager();
-                }
-            });
-        };
-
-        const updateStats = () => {
-            const total = shoppingList.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
-            totalPriceElements.forEach(el => el && (el.textContent = formatCurrency(total)));
-            itemCountElements.forEach(el => el && (el.textContent = shoppingList.length));
-        };
-
-        const addItem = (name, quantity, unit, sectionId, subsectionId) => {
-            const order = shoppingList.filter(i => i.section === sectionId && i.subsection === subsectionId).length;
-            shoppingList.push({ id: crypto.randomUUID(), name: sanitizeText(name).trim(), quantity, unit, section: sectionId, subsection: subsectionId || null, price: 0, inCart: false, order });
-            localStorage.setItem('lastUsedSection', sectionId);
-            localStorage.setItem('lastUsedSubsection', subsectionId || '');
-            saveAndRender();
-        };
-
-        const updateItem = (id, updates) => {
-            const item = shoppingList.find(i => i.id === id);
-            if (item) { 
-                if (updates.name) updates.name = sanitizeText(updates.name).trim();
-                Object.assign(item, updates); 
-                saveAndRender(); 
-            }
-        };
-
-        const removeItem = (id) => {
-            shoppingList = shoppingList.filter(i => i.id !== id);
-            saveAndRender();
-        };
-
-        const addOrUpdateSection = (id, name, icon, parentId) => {
-            const sanitizedName = sanitizeText(name).trim();
-            if (id) {
-                const section = getSectionById(id);
-                if (section) { Object.assign(section, { name: sanitizedName, icon, parent: parentId }); }
-            } else {
-                const newId = crypto.randomUUID();
-                const order = sections.filter(s => s.parent === parentId).length;
-                sections.push({ id: newId, name: sanitizedName, icon: icon || '📦', parent: parentId, order });
-            }
-            saveAndRender();
-        };
-
-        const removeSection = (id) => {
-            const section = getSectionById(id);
-            if (!section) return;
-            if (defaultSections.some(ds => ds.id === id)) {
-                showConfirmModal('Ação Bloqueada', 'Não é possível remover seções padrão do sistema.', () => {});
-                document.getElementById('confirmModalConfirm').style.display = 'none';
-                return;
-            }
-            const itemsInSection = shoppingList.filter(i => i.section === id || i.subsection === id);
-            let message = `Deseja realmente remover a seção "<b>${section.name}</b>"?`;
-            if (itemsInSection.length > 0) message += `<br><br>Isso também removerá <b>${itemsInSection.length}</b> item(ns) permanentemente.`;
-            showConfirmModal('Remover Seção', message, () => {
-                const selectedSectionInput = document.getElementById('itemSection');
-                if (selectedSectionInput.value === id) {
-                    selectedSectionInput.value = '';
-                    document.getElementById('itemSectionBtn').querySelector('.truncate').textContent = 'Selecione uma seção';
-                    document.getElementById('itemSubsection').value = '';
-                    document.getElementById('itemSubsectionBtn').querySelector('.truncate').textContent = 'Sem subseção';
-                    document.getElementById('itemSubsectionBtn').disabled = true;
-                }
-                
-                shoppingList = shoppingList.filter(i => i.section !== id && i.subsection !== id);
-                sections = sections.filter(s => s.id !== id && s.parent !== id);
-                saveAndRender();
-                if (settingsModal.open) renderSectionManager();
-            });
-        };
-
-        const applyLastUsedSelection = () => {
-            const lastSectionId = localStorage.getItem('lastUsedSection');
-            if (!lastSectionId) return;
-
-            const section = getSectionById(lastSectionId);
-            if (!section) return;
-
-            document.getElementById('itemSection').value = lastSectionId;
-            document.getElementById('itemSectionBtn').querySelector('.truncate').innerHTML = `${section.icon || ''} ${section.name}`;
-            
-            const subBtn = document.getElementById('itemSubsectionBtn');
-            subBtn.disabled = false;
-
-            const lastSubId = localStorage.getItem('lastUsedSubsection');
-            if(lastSubId) {
-                const subsection = getSectionById(lastSubId);
-                if(subsection && subsection.parent === lastSectionId) {
-                    document.getElementById('itemSubsection').value = lastSubId;
-                    subBtn.querySelector('.truncate').innerHTML = `${subsection.icon || ''} ${subsection.name}`;
-                }
-            }
-        };
-
-        addItemForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const itemName = document.getElementById('itemName').value;
-            const itemQuantity = parseFloat(document.getElementById('itemQuantity').value);
-            const itemUnit = document.getElementById('itemUnit').value;
-            const itemSection = document.getElementById('itemSection').value;
-            const itemSubsection = document.getElementById('itemSubsection').value;
-            if (sanitizeText(itemName).trim() && !isNaN(itemQuantity) && itemQuantity > 0 && itemSection) {
-                addItem(itemName, itemQuantity, itemUnit, itemSection, itemSubsection);
-                
-                document.getElementById('itemName').value = '';
-                document.getElementById('itemQuantity').value = '1';
-                document.getElementById('itemName').focus();
-
-                saveAndRender();
-            } else {
-                const submitButton = addItemForm.querySelector('button[type="submit"]');
-                submitButton.classList.add('btn-error');
-                setTimeout(() => submitButton.classList.remove('btn-error'), 2000);
-            }
-        });
-
-        editItemForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = document.getElementById('editItemId').value;
-            updateItem(id, {
-                name: document.getElementById('editItemName').value,
-                quantity: parseFloat(document.getElementById('editItemQuantity').value),
-                unit: document.getElementById('editItemUnit').value,
-                price: parseFloat(document.getElementById('editItemPrice').value.replace(',', '.')) || 0,
-                section: document.getElementById('editItemSection').value,
-                subsection: document.getElementById('editItemSubsection').value || null
-            });
-            editModal.close();
-        });
-
-        sectionForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = document.getElementById('sectionId').value;
-            const name = document.getElementById('sectionName').value;
-            const icon = document.getElementById('sectionIcon').value.trim();
-            const parentId = document.getElementById('sectionParent').value || null;
-            if (sanitizeText(name).trim()) {
-                addOrUpdateSection(id, name, icon, parentId);
-                sectionModal.close();
-                if (settingsModal.open) renderSectionManager();
-            }
-        });
-
-        document.body.addEventListener('input', (e) => {
-            const target = e.target;
-            if (target.matches('#itemName, #editItemName, #sectionName')) {
-                target.value = sanitizeText(target.value);
-            }
-            if (target.matches('#itemQuantity, #editItemQuantity, [data-action="update-price-input"], #editItemPrice')) {
-                target.value = sanitizeNumber(target.value);
-            }
-        });
-        
-        document.body.addEventListener('keydown', (e) => {
-            const target = e.target.closest('[data-action="update-price-input"]');
-            if (target && e.key === 'Enter') {
-                e.preventDefault();
-                target.blur(); 
-            }
-        });
-
-        document.body.addEventListener('blur', (e) => {
-            const target = e.target.closest('[data-action="update-price-input"]');
-            if (target) {
-                const { id } = target.dataset;
-                const value = e.target.value.replace(',', '.');
-                if (value && !isNaN(parseFloat(value))) {
-                    updateItem(id, { price: parseFloat(value) });
-                } else {
-                    renderList();
-                }
-            }
-        }, true);
-
-        document.body.addEventListener('click', (e) => {
-            const actionTarget = e.target.closest('[data-action]');
-            if (!actionTarget) return;
-            const { action, id, targetInput, targetButton, sectionId, subsectionId } = actionTarget.dataset;
-            const item = id ? shoppingList.find(i => i.id === id) : null;
-            const section = id ? getSectionById(id) : null;
-            
-            switch (action) {
-                case 'edit-item':
-                    if (item) {
-                        document.getElementById('editItemId').value = item.id;
-                        document.getElementById('editItemName').value = item.name;
-                        document.getElementById('editItemQuantity').value = item.quantity;
-                        document.getElementById('editItemPrice').value = item.price ? String(item.price).replace('.', ',') : '';
-                        document.getElementById('editItemUnit').value = item.unit;
-                        document.getElementById('editItemUnitBtn').querySelector('.truncate').textContent = item.unit;
-                        
-                        const editSectionBtn = document.getElementById('editItemSectionBtn');
-                        const editSubsectionBtn = document.getElementById('editItemSubsectionBtn');
-                        const editItemSectionInput = document.getElementById('editItemSection');
-                        const editItemSubsectionInput = document.getElementById('editItemSubsection');
-
-                        editItemSectionInput.value = item.section;
-                        editItemSubsectionInput.value = item.subsection;
-                        
-                        const currentSection = getSectionById(item.section);
-                        editSectionBtn.querySelector('.truncate').innerHTML = `${currentSection.icon || ''} ${currentSection.name}`;
-
-                        if (item.subsection) {
-                            const currentSub = getSectionById(item.subsection);
-                            editSubsectionBtn.querySelector('.truncate').innerHTML = `${currentSub.icon || ''} ${currentSub.name}`;
-                        } else {
-                            editSubsectionBtn.querySelector('.truncate').textContent = 'Sem subseção';
-                        }
-                        editSubsectionBtn.disabled = !item.section;
-
-                        editModal.showModal();
-                    }
-                    break;
-                case 'remove-item':
-                    if (item) showConfirmModal('Remover Item', `Deseja realmente remover "<b>${item.name}</b>"?`, () => removeItem(id));
-                    break;
-                case 'edit-price':
-                    if (item) {
-                        const initialPrice = String(item.price || '').replace('.', ',');
-                        showPromptModal('Editar Preço', `Digite o novo preço para "${item.name}":`, initialPrice, 'text', (newPrice) => {
-                            const sanitizedPrice = newPrice.replace(',', '.');
-                            if (sanitizedPrice !== '' && !isNaN(parseFloat(sanitizedPrice))) {
-                                updateItem(id, { price: parseFloat(sanitizedPrice) || 0 });
-                            }
-                        });
-                    }
-                    break;
-                case 'toggle-cart-status':
-                    if (item && item.price > 0) updateItem(id, { inCart: !item.inCart });
-                    break;
-                case 'open-section-modal':
-                case 'open-section-modal-from-adder':
-                    sectionForm.reset();
-                    document.getElementById('sectionId').value = '';
-                    document.getElementById('sectionParent').value = '';
-                    document.getElementById('sectionParentBtn').querySelector('.truncate').innerHTML = `📁 Nenhuma (Criar Seção Principal)`;
-                    updateSectionModalUI(null, false);
-                    sectionModal.showModal();
-                    setTimeout(() => document.getElementById('sectionName').focus(), 50);
-                    break;
-                case 'open-subsection-modal-from-section': {
-                    const parentId = actionTarget.dataset.id;
-                    if (!parentId) return;
-                    sectionForm.reset();
-                    document.getElementById('sectionId').value = '';
-                    document.getElementById('sectionParent').value = parentId;
-                    const parentSection = getSectionById(parentId);
-                    document.getElementById('sectionParentBtn').querySelector('.truncate').innerHTML = `${parentSection.icon || ''} ${parentSection.name}`;
-                    updateSectionModalUI(parentId, false);
-                    sectionModal.showModal();
-                    setTimeout(() => document.getElementById('sectionName').focus(), 50);
-                    break;
-                }
-                case 'edit-section':
-                    if (section) {
-                        if (defaultSections.some(ds => ds.id === id)) {
-                            showConfirmModal('Ação Bloqueada', 'Não é possível editar seções padrão do sistema.', () => {});
-                            document.getElementById('confirmModalConfirm').style.display = 'none';
-                            return;
-                        }
-                        document.getElementById('sectionId').value = section.id;
-                        document.getElementById('sectionName').value = section.name;
-                        document.getElementById('sectionIcon').value = section.icon;
-                        const parentId = section.parent || '';
-                        document.getElementById('sectionParent').value = parentId;
-                        const parentSection = getSectionById(parentId);
-                        if (parentSection) {
-                             document.getElementById('sectionParentBtn').querySelector('.truncate').innerHTML = `${parentSection.icon || ''} ${parentSection.name}`;
-                        } else {
-                             document.getElementById('sectionParentBtn').querySelector('.truncate').innerHTML = `📁 Nenhuma (Tornar Seção Principal)`;
-                        }
-                        updateSectionModalUI(parentId, true);
-                        sectionModal.showModal();
-                        setTimeout(() => document.getElementById('sectionName').focus(), 50);
-                    }
-                    break;
-                case 'remove-section':
-                    if (section) removeSection(id);
-                    break;
-                case 'toggle-section-collapse-btn': {
-                    const sectionCard = actionTarget.closest('.section-card');
-                    const content = sectionCard.querySelector('.px-4.space-y-4');
-                    const icon = actionTarget.querySelector('i');
-                    
-                    const isNowCollapsed = content.classList.toggle('hidden');
-                    content.classList.toggle('pb-4', !isNowCollapsed);
-                    icon.classList.toggle('rotate-180', !isNowCollapsed);
-
-                    const index = collapsedState.sections.indexOf(id);
-                    if (isNowCollapsed) {
-                        if (index === -1) collapsedState.sections.push(id);
-                    } else {
-                        if (index > -1) collapsedState.sections.splice(index, 1);
-                    }
-                    saveState();
-                    break;
-                }
-                case 'open-settings-modal':
-                    renderThemeSelector();
-                    renderSectionManager();
-                    settingsModal.showModal();
-                    break;
-                case 'open-unit-selector': {
-                    const currentVal = document.getElementById(targetInput).value;
-                    showSelectionModal('Selecione uma Unidade', units, (selectedId) => {
-                        document.getElementById(targetInput).value = selectedId;
-                        document.getElementById(targetButton).querySelector('.truncate').textContent = selectedId;
-                    }, currentVal);
-                    break;
-                }
-                case 'open-section-selector': {
-                    const mainSections = sections.filter(s => !s.parent).sort((a,b) => a.order - b.order);
-                    const currentVal = document.getElementById(targetInput).value;
-                    showSelectionModal('Selecione uma Seção', mainSections, (selectedId) => {
-                        document.getElementById(targetInput).value = selectedId;
-                        const selectedSection = getSectionById(selectedId);
-                        document.getElementById(targetButton).querySelector('.truncate').innerHTML = `${selectedSection.icon || ''} ${selectedSection.name}`;
-                        
-                        let subSectionInput, subSectionButton;
-                        if (targetInput === 'itemSection') {
-                            subSectionInput = document.getElementById('itemSubsection');
-                            subSectionButton = document.getElementById('itemSubsectionBtn');
-                        } else if (targetInput === 'editItemSection') {
-                            subSectionInput = document.getElementById('editItemSubsection');
-                            subSectionButton = document.getElementById('editItemSubsectionBtn');
-                        }
-                        if(subSectionInput) {
-                            subSectionInput.value = '';
-                            subSectionButton.querySelector('.truncate').textContent = 'Sem subseção';
-                            subSectionButton.disabled = false;
-                        }
-                    }, currentVal);
-                    break;
-                }
-                case 'open-subsection-selector': {
-                    const parentInputId = (targetInput === 'itemSubsection') ? 'itemSection' : 'editItemSection';
-                    const parentId = document.getElementById(parentInputId).value;
-                    if (!parentId) { return; }
-                    
-                    const subsections = getSubsections(parentId);
-                    const items = [{id: '', name: 'Sem subseção', icon: '➖'}].concat(subsections);
-                    const currentVal = document.getElementById(targetInput).value;
-
-                    showSelectionModal('Selecione uma Subseção', items, (selectedId) => {
-                        document.getElementById(targetInput).value = selectedId;
-                        const selectedSub = getSectionById(selectedId);
-                        if (selectedSub) {
-                            document.getElementById(targetButton).querySelector('.truncate').innerHTML = `${selectedSub.icon || ''} ${selectedSub.name}`;
-                        } else {
-                            document.getElementById(targetButton).querySelector('.truncate').textContent = 'Sem subseção';
-                        }
-                    }, currentVal);
-                    break;
-                }
-                case 'open-parent-selector': {
-                    const sectionId = document.getElementById('sectionId').value;
-                    const availableParents = [{id: '', name: 'Nenhuma (Criar Seção Principal)', icon: '📁'}].concat(sections.filter(s => !s.parent && s.id !== sectionId));
-                    const currentVal = document.getElementById(targetInput).value;
-                    showSelectionModal('Vincular a', availableParents, (selectedId) => {
-                         document.getElementById(targetInput).value = selectedId;
-                         const selectedParent = getSectionById(selectedId);
-                         if(selectedParent) {
-                             document.getElementById(targetButton).querySelector('.truncate').innerHTML = `${selectedParent.icon || ''} ${selectedParent.name}`;
-                         } else {
-                             document.getElementById(targetButton).querySelector('.truncate').innerHTML = `📁 Nenhuma (Criar Seção Principal)`;
-                         }
-                         updateSectionModalUI(selectedId, !!sectionId);
-                    }, currentVal);
-                    break;
-                }
-                case 'open-manage-items-modal':
-                    openManageItemsModal(sectionId, subsectionId);
-                    break;
-                case 'delete-all-items-in-section':
-                    deleteAllItemsInSection();
-                    break;
-                case 'delete-selected-items':
-                    deleteSelectedItems();
-                    break;
-                case 'move-selected-items':
-                    moveSelectedItems();
-                    break;
-            }
-        });
-        
-        function openManageItemsModal(sectionId, subsectionId = null) {
-            currentManagingSectionId = sectionId;
-            currentManagingSubsectionId = subsectionId;
-
-            const titleEl = document.getElementById('manageItemsModalTitle');
-            const listEl = document.getElementById('manageItemsModalList');
-            
-            const currentSection = getSectionById(sectionId);
-            let title = `Gerenciar Itens de "${currentSection.name}"`;
-            
-            let itemsToManage;
-            if (subsectionId) {
-                const currentSub = getSectionById(subsectionId);
-                title += ` > "${currentSub.name}"`;
-                itemsToManage = shoppingList.filter(i => i.subsection === subsectionId);
-            } else {
-                itemsToManage = shoppingList.filter(i => i.section === sectionId && !i.subsection);
-            }
-
-            titleEl.textContent = title;
-            listEl.innerHTML = '';
-
-            if (itemsToManage.length === 0) {
-                listEl.innerHTML = `<p class="text-center text-base-content/60 p-4">Não há itens aqui para gerenciar.</p>`;
-                manageItemsModal.showModal();
-                return;
-            }
-
-            itemsToManage.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'form-control';
-                itemDiv.innerHTML = `
-                    <label class="label cursor-pointer p-2 hover:bg-base-200 rounded-lg">
-                        <span class="label-text">${item.name}</span> 
-                        <input type="checkbox" class="checkbox" data-item-id="${item.id}" />
-                    </label>
-                `;
-                listEl.appendChild(itemDiv);
-            });
-            manageItemsModal.showModal();
-        }
-
-        function getSelectedItemsFromManager() {
-            const checkedBoxes = manageItemsModal.querySelectorAll('#manageItemsModalList input[type="checkbox"]:checked');
-            return Array.from(checkedBoxes).map(box => box.dataset.itemId);
-        }
-
-        function deleteAllItemsInSection() {
-            const itemsToRemove = shoppingList.filter(item => {
-                return currentManagingSubsectionId 
-                    ? item.subsection === currentManagingSubsectionId
-                    : item.section === currentManagingSectionId && !item.subsection;
-            });
-
-            if (itemsToRemove.length === 0) return;
-
-            showConfirmModal('Apagar Todos os Itens?', `Você tem certeza que quer apagar <b>${itemsToRemove.length}</b> item(ns) desta seção? Esta ação não pode ser desfeita.`, () => {
-                const idsToRemove = itemsToRemove.map(i => i.id);
-                shoppingList = shoppingList.filter(i => !idsToRemove.includes(i.id));
-                manageItemsModal.close();
-                saveAndRender();
-            });
-        }
-
-        function deleteSelectedItems() {
-            const selectedIds = getSelectedItemsFromManager();
-            if (selectedIds.length === 0) {
-                alert("Nenhum item selecionado.");
-                return;
-            }
-            showConfirmModal('Excluir Itens?', `Você tem certeza que quer excluir <b>${selectedIds.length}</b> item(ns) selecionado(s)?`, () => {
-                shoppingList = shoppingList.filter(i => !selectedIds.includes(i.id));
-                manageItemsModal.close();
-                saveAndRender();
-            });
-        }
-
-        function getSectionHierarchyForSelection() {
-            const hierarchy = [];
-            const mainSections = sections.filter(s => !s.parent).sort((a,b) => a.order - b.order);
-            mainSections.forEach(sec => {
-                hierarchy.push({ id: `${sec.id}:`, name: `${sec.icon} ${sec.name}` });
-                const subsections = getSubsections(sec.id);
-                subsections.forEach(sub => {
-                    hierarchy.push({ id: `${sec.id}:${sub.id}`, name: `↳ ${sub.icon} ${sub.name}` });
-                });
-            });
-            return hierarchy;
-        }
-
-        function moveSelectedItems() {
-            const selectedIds = getSelectedItemsFromManager();
-            if (selectedIds.length === 0) {
-                alert("Nenhum item selecionado.");
-                return;
-            }
-
-            const hierarchy = getSectionHierarchyForSelection();
-            showSelectionModal('Mover para...', hierarchy, (targetId) => {
-                const [newSectionId, newSubsectionId] = targetId.split(':');
-                
-                selectedIds.forEach(itemId => {
-                    const item = shoppingList.find(i => i.id === itemId);
-                    if (item) {
-                        item.section = newSectionId;
-                        item.subsection = newSubsectionId || null;
-                    }
-                });
-                manageItemsModal.close();
-                saveAndRender();
-            });
-        }
-
-        const renderThemeSelector = () => {
-            const currentTheme = localStorage.getItem('theme') || 'cupcake';
-            themeSelectorContainer.innerHTML = '';
-            const themeJoin = document.createElement('div');
-            themeJoin.className = 'join join-vertical w-full';
-            daisyuiThemes.forEach(theme => {
-                const button = document.createElement('button');
-                button.className = `btn join-item ${theme === currentTheme ? 'btn-active' : ''}`;
-                button.textContent = themeNames[theme];
-                button.onclick = () => {
-                    document.documentElement.setAttribute('data-theme', theme);
-                    localStorage.setItem('theme', theme);
-                    renderThemeSelector();
-                };
-                themeJoin.appendChild(button);
-            });
-            themeSelectorContainer.appendChild(themeJoin);
-        };
-        
-        const renderSectionManager = () => {
-            const container = document.getElementById('section-manager-container');
-            container.innerHTML = '';
-            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
-            if (sections.length === 0) {
-                container.textContent = 'Nenhuma seção criada.';
-                return;
-            }
-            mainSections.forEach(section => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'p-2 bg-base-100 rounded-lg border border-base-300';
-                sectionDiv.dataset.sectionId = section.id;
-                let sectionHTML = `
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2 font-semibold truncate">
-                            <i class="fa-solid fa-grip-vertical drag-handle-section text-base-content/30 hover:text-primary transition-colors"></i>
-                            <span class="text-lg">${section.icon}</span>
-                            <span class="truncate">${section.name}</span>
-                        </div>
-                        <div class="join">
-                            <button class="btn btn-xs join-item" title="Editar Seção" data-action="edit-section" data-id="${section.id}"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-xs join-item" title="Remover Seção" data-action="remove-section" data-id="${section.id}"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
-                const subsections = getSubsections(section.id);
-                if (subsections.length > 0) {
-                    let subHTML = '<div class="ml-10 mt-2 space-y-1 border-l-2 border-base-300 pl-3">';
-                    subsections.forEach(sub => {
-                        subHTML += `
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-2 text-sm truncate">
-                                    <span class="text-base">${sub.icon}</span>
-                                    <span class="truncate">${sub.name}</span>
-                                </div>
-                                <div class="join">
-                                    <button class="btn btn-xs join-item" title="Editar Subseção" data-action="edit-section" data-id="${sub.id}"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-xs join-item" title="Remover Subseção" data-action="remove-section" data-id="${sub.id}"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>`;
-                    });
-                    subHTML += '</div>';
-                    sectionHTML += subHTML;
-                }
-                sectionDiv.innerHTML = sectionHTML;
-                container.appendChild(sectionDiv);
-            });
-
-            initSectionSortable(container);
-        };
-
-        const init = () => {
-            loadState();
-            const currentTheme = localStorage.getItem('theme') || 'cupcake';
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            
-            const adderToggle = document.getElementById('adder-toggle');
-            if (adderToggle) {
-                adderToggle.checked = collapsedState.adder;
-                adderToggle.addEventListener('change', (e) => {
-                    collapsedState.adder = e.target.checked;
-                    saveState();
+            // Adiciona evento para o novo botão abrir o modal a qualquer momento
+            if (openFeedbackBtn && feedbackModal) {
+                openFeedbackBtn.addEventListener('click', () => {
+                    feedbackModal.showModal();
                 });
             }
-            
-            saveAndRender();
-            applyLastUsedSelection();
-            initSectionSortable(shoppingListContainer);
-            document.getElementById('itemName')?.focus();
-        };
-
-        init();
-    });
+        });
     </script>
 </body>
 </html>
