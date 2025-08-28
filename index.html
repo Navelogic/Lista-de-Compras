@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>poupe.com.br: onde cada real conta.</title>
 
-    <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
@@ -14,12 +13,10 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 
-    <!-- Estilos -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
     <style>
-        /* Correção para evitar vazamento lateral em telas pequenas */
         html, body {
             overflow-x: hidden;
             width: 100%;
@@ -126,7 +123,6 @@
             </div>
         </section>
 
-        <!-- Nova Seção de Feedback -->
         <section id="feedback" class="py-20 bg-base-200">
             <div class="container mx-auto px-4 text-center">
                 <div class="max-w-2xl mx-auto">
@@ -199,7 +195,6 @@
             const feedbackModal = document.getElementById('feedback_modal');
             const openFeedbackBtn = document.getElementById('openFeedbackModalBtn');
 
-            // Adiciona evento para o novo botão abrir o modal a qualquer momento
             if (openFeedbackBtn && feedbackModal) {
                 openFeedbackBtn.addEventListener('click', () => {
                     feedbackModal.showModal();

@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minhas Listas - poupe.com.br</title>
-    <!-- DaisyUI e Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
-    <!-- Estilos customizados -->
     <style>
-        /* Estilo para o card de template com borda tracejada */
         .card-template {
             border: 2px dashed oklch(var(--b3));
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -22,7 +18,6 @@
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 10px 25px -8px oklch(var(--p)/.2);
         }
-        /* Fundo gradiente para a seção hero */
         .hero-bg-gradient {
             background-color: oklch(var(--b2));
             background-image:
@@ -30,7 +25,6 @@
                 radial-gradient(at 85% 90%, oklch(var(--a)/.1) 0px, transparent 50%),
                 radial-gradient(at 50% 50%, oklch(var(--b1)/.05) 0px, transparent 50%);
         }
-        /* Efeito de hover para os cards de lista */
         .list-card {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
@@ -41,7 +35,6 @@
     </style>
 </head>
 <body class="bg-base-200 min-h-screen font-sans">
-    <!-- Cabeçalho -->
     <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur-md shadow-sm">
         <div class="navbar container mx-auto px-4">
             <div class="flex-1">
@@ -54,10 +47,7 @@
             </div>
         </div>
     </header>
-
-    <!-- Conteúdo Principal -->
     <main class="container mx-auto p-4 md:p-8 space-y-16">
-        <!-- Seção de Boas-Vindas -->
         <div class="hero rounded-2xl hero-bg-gradient shadow-lg overflow-hidden">
           <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-8 md:p-12">
             <i class="fa-solid fa-cart-shopping text-primary/20 text-8xl lg:text-9xl -rotate-12 hidden lg:block"></i>
@@ -71,30 +61,22 @@
             </div>
           </div>
         </div>
-
-        <!-- Seção Minhas Listas -->
         <div>
             <div class="flex items-center gap-4 mb-6">
                 <span class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-list-check text-primary text-xl"></i></span>
                 <h2 class="text-3xl font-bold">Minhas Listas</h2>
             </div>
             <div id="listsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- As listas do usuário serão inseridas aqui -->
             </div>
         </div>
-
-        <!-- Seção de Modelos -->
         <div>
             <div class="flex items-center gap-4 mb-6">
                 <span class="bg-secondary/10 p-3 rounded-full"><i class="fa-solid fa-wand-magic-sparkles text-secondary text-xl"></i></span>
                 <h2 class="text-3xl font-bold">Comece com um Modelo</h2>
             </div>
             <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Templates serão inseridos aqui -->
             </div>
         </div>
-
-        <!-- Seção de Feedback -->
         <div class="card bg-base-100 shadow-lg mt-12">
             <div class="card-body flex-col md:flex-row items-center gap-6 p-8">
                 <div class="text-5xl text-secondary">
@@ -110,8 +92,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Rodapé -->
     <footer class="footer p-10 bg-base-300 text-base-content mt-16">
         <aside>
             <p class="text-2xl font-bold">poupe.com.br</p>
@@ -124,8 +104,6 @@
             <a href="privacidade.html" class="link link-hover">Política de privacidade</a>
         </nav>
     </footer>
-
-    <!-- Modals -->
     <dialog id="list_name_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg" id="listNameModalTitle">Criar Nova Lista</h3>

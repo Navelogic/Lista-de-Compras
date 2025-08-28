@@ -9,7 +9,6 @@
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        /* Estilos para arrastar e soltar */
         .sortable-ghost {
             opacity: 0.4;
             background: oklch(var(--b3));
@@ -23,16 +22,13 @@
             color: oklch(var(--p));
             transform: scale(1.1);
         }
-        /* Estilo para valores monetários */
         .currency-display {
             font-feature-settings: 'tnum' 1;
             letter-spacing: -0.025em;
         }
-        /* Efeitos de hover nos cards de seção */
         .section-card { transition: all 0.2s ease; }
         .section-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -8px rgba(0,0,0,0.08); }
         
-        /* Estilos para badges */
         .section-badge {
             background-color: oklch(var(--p)/.1);
             color: oklch(var(--p));
@@ -46,7 +42,6 @@
     </style>
 </head>
 <body class="bg-base-200 min-h-screen transition-colors duration-500 font-sans">
-    <!-- Cabeçalho Fixo -->
     <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur-md shadow-sm">
         <div class="navbar container mx-auto px-4">
             <div class="flex-1">
@@ -62,15 +57,10 @@
             </div>
         </div>
     </header>
-
-    <!-- Conteúdo Principal -->
     <main class="container mx-auto p-4 md:p-8 space-y-8 pb-28">
-        <!-- Seção do Título da Lista -->
         <div>
             <h1 id="listTitle" class="text-4xl font-bold text-base-content break-words">Carregando...</h1>
         </div>
-
-        <!-- Seção de Resumo e Adição Rápida -->
         <div class="collapse collapse-arrow bg-base-100 shadow-md" id="adder-collapse">
             <input type="checkbox" id="adder-toggle" />
             <div class="collapse-title text-lg font-medium">
@@ -125,12 +115,8 @@
                 </div>
             </div>
         </div>
-
-        <!-- Container da Lista de Compras -->
         <div id="shoppingListContainer" class="space-y-4"></div>
     </main>
-
-    <!-- Rodapé Fixo com Resumo -->
     <footer class="fixed bottom-0 left-0 right-0 z-30 bg-base-100/80 backdrop-blur-md border-t border-base-300/50 shadow-inner">
         <div class="flex justify-between items-center w-full px-4 py-2 container mx-auto">
             <div class="text-left">
@@ -144,7 +130,6 @@
         </div>
     </footer>
 
-    <!-- Modals -->
     <dialog id="edit_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg mb-4">Editar Item</h3>
@@ -309,7 +294,6 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- CONFIGURAÇÃO INICIAL ---
         const urlParams = new URLSearchParams(window.location.search);
         const LIST_ID = urlParams.get('listId');
         const LISTS_KEY = 'poupe_all_lists_V1';
@@ -1172,7 +1156,6 @@
         function deleteSelectedItems() {
             const selectedIds = getSelectedItemsFromManager();
             if (selectedIds.length === 0) {
-                // Usar um modal customizado em vez de alert
                 return;
             }
             showConfirmModal('Excluir Itens?', `Você tem certeza que quer excluir <b>${selectedIds.length}</b> item(ns) selecionado(s)?`, () => {
@@ -1198,7 +1181,6 @@
         function moveSelectedItems() {
             const selectedIds = getSelectedItemsFromManager();
             if (selectedIds.length === 0) {
-                // Usar um modal customizado em vez de alert
                 return;
             }
 
