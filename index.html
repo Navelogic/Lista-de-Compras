@@ -28,50 +28,102 @@
             width: 100%;
         }
         .hero-bg {
-            background-color: oklch(var(--b2));
-            background-image:
-                radial-gradient(at 27% 37%, oklch(var(--p)/.2) 0px, transparent 50%),
-                radial-gradient(at 97% 21%, oklch(var(--a)/.2) 0px, transparent 50%),
-                radial-gradient(at 82% 99%, oklch(var(--s)/.2) 0px, transparent 50%),
-                radial-gradient(at 35% 88%, oklch(var(--er)/.15) 0px, transparent 50%);
+            background: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
         }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .feature-icon {
-            background-color: oklch(var(--p)/.1);
-            color: oklch(var(--p));
+            background: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
+            color: white;
+        }
+
+        /* Microinterações e feedback visual */
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .card:hover {
+            animation: cardPulse 0.6s ease;
+        }
+        
+        @keyframes cardPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1.02); }
+        }
+        
+        .modal-box {
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success-pulse {
+            animation: successPulse 0.8s ease;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body class="bg-base-200">
-    <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur shadow-md">
-        <div class="navbar container mx-auto px-4">
+    <header class="sticky top-0 z-30 bg-base-100 border-b border-base-300">
+        <div class="navbar container mx-auto px-3 sm:px-4 md:px-8">
             <div class="flex-1">
-                <a href="#" class="text-2xl font-bold text-primary">poupe.com.br</a>
+                <a href="#" class="text-xl sm:text-2xl font-bold text-primary hover:opacity-80 transition-all duration-200 hover:scale-105">poupe.com.br</a>
             </div>
-            <div class="flex-none hidden md:flex">
-                <a href="#features" class="btn btn-ghost">Funcionalidades</a>
-                <a href="#story" class="btn btn-ghost">Nossa História</a>
-                <a href="app.html" class="btn btn-primary ml-2">Começar Agora</a>
+            <div class="flex-none hidden md:flex gap-2">
+                <a href="#features" class="btn btn-ghost hover:btn-primary hover:scale-105 transition-all duration-200">Funcionalidades</a>
+                <a href="#story" class="btn btn-ghost hover:btn-primary hover:scale-105 transition-all duration-200">Nossa História</a>
+                <a href="app.html" class="btn btn-primary hover:scale-105 hover:shadow-lg transition-all duration-200 font-semibold">Começar Agora</a>
             </div>
             <div class="dropdown dropdown-end md:hidden">
-                <label tabindex="0" class="btn btn-ghost btn-circle">
+                <label tabindex="0" class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                 </label>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                    <li><a href="#features">Funcionalidades</a></li>
-                    <li><a href="#story">Nossa História</a></li>
-                    <li><a href="app.html">Começar Agora</a></li>
+                    <li><a href="#features" class="hover:bg-primary/10 transition-colors duration-200">Funcionalidades</a></li>
+                    <li><a href="#story" class="hover:bg-primary/10 transition-colors duration-200">Nossa História</a></li>
+                    <li><a href="app.html" class="hover:bg-primary/10 transition-colors duration-200">Começar Agora</a></li>
                 </ul>
             </div>
         </div>
     </header>
 
-    <main>
-        <section class="hero min-h-[80vh] hero-bg">
+    <main class="px-3 sm:px-4 md:px-8 py-4 md:py-6 space-y-12 md:space-y-16">
+        <section class="hero min-h-[80vh] hero-bg transition-all duration-300">
             <div class="hero-content text-center px-4">
-                <div class="max-w-2xl">
-                    <h1 class="text-5xl md:text-6xl font-extrabold">A maneira mais inteligente de fazer suas compras.</h1>
-                    <p class="py-6 text-lg">Crie listas de compras organizadas, controle seus gastos e economize tempo e dinheiro. Com o poupe.com.br, ir ao mercado nunca foi tão fácil.</p>
-                    <a href="app.html" class="btn btn-primary btn-lg gap-2">
+                <div class="max-w-2xl p-6 sm:p-8 md:p-12">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-4">A maneira mais inteligente de fazer suas compras.</h1>
+                    <p class="py-4 sm:py-6 text-base sm:text-lg leading-relaxed">Crie listas de compras organizadas, controle seus gastos e economize tempo e dinheiro. Com o poupe.com.br, ir ao mercado nunca foi tão fácil.</p>
+                    <a href="app.html" class="btn btn-primary btn-lg gap-2 hover:scale-105 transition-all duration-200 text-base font-semibold">
                         <i class="fa-solid fa-rocket"></i>
                         Comece a Economizar Agora
                     </a>
@@ -79,16 +131,14 @@
             </div>
         </section>
         
-        <section id="story" class="py-20 bg-base-200">
+        <section id="story" class="py-12 md:py-20 bg-base-200 hover:bg-base-200/80 transition-all duration-300">
             <div class="container mx-auto px-4">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
                     <div class="order-2 lg:order-1">
-                        <h2 class="text-4xl font-bold mb-6">De um problema pessoal a uma solução para todos</h2>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 leading-tight tracking-tight">De um problema pessoal a uma solução para todos</h2>
                         <div class="space-y-4 text-base-content/80">
-                            <p>A ideia nasceu daquele mini pânico que todo mundo sente no corredor do supermercado. Sabe como é? Carrinho enchendo, calculadora do celular na mão, alternando com a lista de compras em outro app, e aquela dúvida no fundo da mente: "Será que vai caber no orçamento?".</p>
-                            <p>Meu ritual era exatamente esse malabarismo digital. Eu dava check em um item na lista, abria a calculadora para somar a conta e repetia o processo. Era cansativo, ineficiente e, sinceramente, tirava toda a paz de espírito de uma tarefa que já é estressante.</p>
-                            <p>Um dia, no meio desse processo, a frustração virou a faísca. Eu pensei: "Não é possível que, com tanta tecnologia, controlar as compras do mês precise ser tão complicado". Eu não queria só um app que somasse os gastos. Eu queria chegar no caixa sabendo exatamente o valor, sem surpresas. Eu queria ter o controle do meu dinheiro de volta.</p>
-                            <p>Foi assim que nasceu a primeira versão do que hoje é o <strong>poupe.com.br</strong>. Começou como uma solução simples para a minha família: um único lugar para criar a lista e ver o orçamento em tempo real.</p>
+                            <p>Cansado de fazer malabarismos entre lista de compras e calculadora no supermercado? Nós também. Por isso criamos uma solução simples: um lugar para organizar sua lista e controlar gastos em tempo real.</p>
+                            <p>O <strong>poupe.com.br</strong> nasceu da necessidade de ter controle total sobre o orçamento das compras, sem surpresas no caixa.</p>
                         </div>
                     </div>
                     <div class="order-1 lg:order-2">
@@ -98,43 +148,43 @@
             </div>
         </section>
 
-        <section id="features" class="py-20 bg-base-100">
+        <section id="features" class="py-12 md:py-20 bg-base-100 hover:bg-base-100/80 transition-all duration-300">
             <div class="container mx-auto px-4">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold">Tudo que você precisa em um só lugar</h2>
-                    <p class="text-base-content/70 mt-2">Ferramentas pensadas para otimizar sua rotina.</p>
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight">Tudo que você precisa em um só lugar</h2>
+                    <p class="text-base-content/70 mt-2 text-sm sm:text-base">Ferramentas pensadas para otimizar sua rotina.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
-                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-sitemap text-3xl"></i></div>
-                        <h3 class="text-xl font-bold mb-2">Organização Inteligente</h3>
-                        <p>Crie seções e subseções (Hortifrúti, Padaria, Limpeza) para encontrar tudo rapidamente no mercado.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                    <div class="card bg-base-200 text-center p-4 sm:p-6 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+                        <div class="feature-icon w-12 sm:w-16 h-12 sm:h-16 rounded-full mx-auto flex items-center justify-center mb-3 sm:mb-4 transition-transform duration-300 hover:rotate-12"><i class="fa-solid fa-sitemap text-2xl sm:text-3xl"></i></div>
+                        <h3 class="text-lg sm:text-xl font-bold mb-2 leading-tight">Organização Inteligente</h3>
+                        <p class="text-sm sm:text-base leading-relaxed">Crie seções e subseções (Hortifrúti, Padaria, Limpeza) para encontrar tudo rapidamente no mercado.</p>
                     </div>
-                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
-                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-brazilian-real-sign text-3xl"></i></div>
-                        <h3 class="text-xl font-bold mb-2">Controle de Gastos</h3>
-                        <p>Adicione preços aos itens e veja o total da sua compra em tempo real. Evite surpresas no caixa!</p>
+                    <div class="card bg-base-200 text-center p-4 sm:p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:scale-105">
+                        <div class="feature-icon w-12 sm:w-16 h-12 sm:h-16 rounded-full mx-auto flex items-center justify-center mb-3 sm:mb-4 transition-transform duration-300 hover:rotate-12"><i class="fa-solid fa-brazilian-real-sign text-2xl sm:text-3xl"></i></div>
+                        <h3 class="text-lg sm:text-xl font-bold mb-2 leading-tight">Controle de Gastos</h3>
+                        <p class="text-sm sm:text-base leading-relaxed">Adicione preços aos itens e veja o total da sua compra em tempo real. Evite surpresas no caixa!</p>
                     </div>
-                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
-                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-palette text-3xl"></i></div>
-                        <h3 class="text-xl font-bold mb-2">Totalmente Personalizável</h3>
-                        <p>Reordene itens e seções como quiser e escolha entre dezenas de temas para deixar o app com a sua cara.</p>
+                    <div class="card bg-base-200 text-center p-4 sm:p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:scale-105">
+                        <div class="feature-icon w-12 sm:w-16 h-12 sm:h-16 rounded-full mx-auto flex items-center justify-center mb-3 sm:mb-4 transition-transform duration-300 hover:rotate-12"><i class="fa-solid fa-palette text-2xl sm:text-3xl"></i></div>
+                        <h3 class="text-lg sm:text-xl font-bold mb-2 leading-tight">Totalmente Personalizável</h3>
+                        <p class="text-sm sm:text-base leading-relaxed">Reordene itens e seções como quiser e escolha entre dezenas de temas para deixar o app com a sua cara.</p>
                     </div>
-                    <div class="card bg-base-200 text-center p-6 transition-transform hover:-translate-y-2">
-                        <div class="feature-icon w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"><i class="fa-solid fa-sliders text-3xl"></i></div>
-                        <h3 class="text-xl font-bold mb-2">Gerenciamento Fácil</h3>
-                        <p>Mova, edite ou apague múltiplos itens de uma vez com nossas ferramentas de gerenciamento avançado.</p>
+                    <div class="card bg-base-200 text-center p-4 sm:p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:scale-105">
+                        <div class="feature-icon w-12 sm:w-16 h-12 sm:h-16 rounded-full mx-auto flex items-center justify-center mb-3 sm:mb-4 transition-transform duration-300 hover:rotate-12"><i class="fa-solid fa-sliders text-2xl sm:text-3xl"></i></div>
+                        <h3 class="text-lg sm:text-xl font-bold mb-2 leading-tight">Gerenciamento Fácil</h3>
+                        <p class="text-sm sm:text-base leading-relaxed">Mova, edite ou apague múltiplos itens de uma vez com nossas ferramentas de gerenciamento avançado.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="feedback" class="py-20 bg-base-200">
+        <section id="feedback" class="py-12 md:py-20 bg-base-200 hover:bg-base-200/80 transition-all duration-300">
             <div class="container mx-auto px-4 text-center">
                 <div class="max-w-2xl mx-auto">
-                    <h2 class="text-4xl font-bold">Sua opinião constrói o futuro do Poupe</h2>
-                    <p class="text-lg mt-4 mb-8">Estamos sempre ouvindo. Seus comentários e sugestões são essenciais para tornarmos o aplicativo ainda melhor. Participe da nossa pesquisa!</p>
-                    <button class="btn btn-secondary btn-lg gap-2" id="openFeedbackModalBtn">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight">Sua opinião constrói o futuro do Poupe</h2>
+                    <p class="text-base sm:text-lg mt-4 mb-6 md:mb-8 leading-relaxed">Estamos sempre ouvindo. Seus comentários e sugestões são essenciais para tornarmos o aplicativo ainda melhor. Participe da nossa pesquisa!</p>
+                    <button class="btn btn-secondary btn-lg gap-2 hover:scale-105 transition-all duration-200 font-semibold" id="openFeedbackModalBtn">
                         <i class="fa-solid fa-comments"></i>
                         Quero dar meu feedback
                     </button>
@@ -142,11 +192,11 @@
             </div>
         </section>
 
-        <section id="cta" class="py-20 hero-bg">
+        <section id="cta" class="py-12 md:py-20 hero-bg transition-all duration-300">
             <div class="container mx-auto px-4 text-center">
-                <h2 class="text-4xl font-bold">Pronto para transformar suas compras?</h2>
-                <p class="text-lg mt-4 mb-8 max-w-xl mx-auto">É gratuito, fácil de usar e funciona diretamente no seu navegador. Sem downloads, sem complicações.</p>
-                <a class="btn btn-primary btn-lg" href="app.html">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight">Pronto para transformar suas compras?</h2>
+                <p class="text-base sm:text-lg mt-4 mb-6 md:mb-8 max-w-xl mx-auto leading-relaxed">É gratuito, fácil de usar e funciona diretamente no seu navegador. Sem downloads, sem complicações.</p>
+                <a class="btn btn-primary btn-lg hover:scale-105 transition-all duration-200 font-semibold" href="app.html">
                     Criar minha primeira lista grátis
                 </a>
             </div>
@@ -173,9 +223,9 @@
     </footer>
 
     <dialog id="feedback_modal" class="modal">
-        <div class="modal-box w-11/12 max-w-3xl">
-            <h3 class="font-bold text-2xl text-center">Ajude-nos a melhorar o poupe.com.br!</h3>
-            <p class="py-4 text-center">Sua opinião é muito importante. Responda nossa rápida pesquisa de feedback e nos ajude a construir a melhor ferramenta de lista de compras para você.</p>
+        <div class="modal-box w-11/12 max-w-3xl transition-all duration-300">
+            <h3 class="font-bold text-xl sm:text-2xl text-center leading-tight">Ajude-nos a melhorar o poupe.com.br!</h3>
+            <p class="py-4 text-center text-base leading-relaxed">Sua opinião é muito importante. Responda nossa rápida pesquisa de feedback e nos ajude a construir a melhor ferramenta de lista de compras para você.</p>
             <div class="aspect-w-16 aspect-h-9">
                 <iframe 
                     src="https://docs.google.com/forms/d/e/1FAIpQLScwiDNL8aGKqxZLE5uF0zWhZlf0dssz4xZmwfsMXlnVFa_WsA/viewform?embedded=true" 
@@ -189,7 +239,7 @@
             </div>
             <div class="modal-action">
                 <form method="dialog">
-                    <button class="btn">Fechar</button>
+                    <button class="btn hover:scale-105 transition-all duration-200 font-semibold">Fechar</button>
                 </form>
             </div>
         </div>

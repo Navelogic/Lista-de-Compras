@@ -25,7 +25,6 @@
             border-color: oklch(var(--p));
             border-style: solid;
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 25px -8px oklch(var(--p)/.2);
         }
         .hero-bg-gradient {
             background-color: oklch(var(--b2));
@@ -39,7 +38,6 @@
         }
         .list-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
         }
         .input-error {
             border-color: oklch(var(--er)) !important;
@@ -49,32 +47,77 @@
             border-color: oklch(var(--er)) !important;
             box-shadow: 0 0 0 2px oklch(var(--er)/.2) !important;
         }
+        
+        /* Microinterações e feedback visual */
+        .btn {
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .modal-box {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-success {
+            animation: pulseSuccess 0.6s ease-out;
+        }
+        
+        @keyframes pulseSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen font-sans">
-    <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur-md shadow-sm">
-        <div class="navbar container mx-auto px-4">
+    <header class="sticky top-0 z-30 bg-base-100 border-b border-base-300">
+        <div class="navbar container mx-auto px-3 sm:px-4 md:px-8">
             <div class="flex-1">
-                <a href="index.html" class="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">poupe.com.br</a>
+                <a href="index.html" class="text-xl sm:text-2xl font-bold text-primary hover:opacity-80 transition-all duration-200 hover:scale-105">poupe.com.br</a>
             </div>
             <div class="flex-none gap-2">
-                <button class="btn btn-ghost btn-circle" data-action="open-backup-modal" aria-label="Backup e Restauração">
-                    <i class="fa-solid fa-download text-lg"></i>
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="open-backup-modal" aria-label="Backup e Restauração">
+                    <i class="fa-solid fa-download text-base sm:text-lg"></i>
                 </button>
-                <button class="btn btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações">
-                    <i class="fa-solid fa-gear text-lg"></i>
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="open-settings-modal" aria-label="Abrir configurações">
+                    <i class="fa-solid fa-gear text-base sm:text-lg"></i>
                 </button>
             </div>
         </div>
     </header>
-    <main class="container mx-auto p-4 md:p-8 space-y-16">
-        <div class="hero rounded-2xl hero-bg-gradient shadow-lg overflow-hidden">
-          <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-8 md:p-12">
-            <i class="fa-solid fa-cart-shopping text-primary/20 text-8xl lg:text-9xl -rotate-12 hidden lg:block"></i>
+    <main class="container mx-auto px-3 sm:px-4 md:px-8 py-4 md:py-6 space-y-12 md:space-y-16">
+        <div class="hero rounded-2xl hero-bg-gradient transition-all duration-300 overflow-hidden">
+          <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-6 sm:p-8 md:p-12">
+            <i class="fa-solid fa-cart-shopping text-primary/20 text-6xl sm:text-8xl lg:text-9xl -rotate-12 hidden lg:block transition-transform duration-500 hover:rotate-0"></i>
             <div class="max-w-xl">
-              <h1 class="text-4xl md:text-5xl font-bold">Suas Listas de Compras</h1>
-              <p class="py-6 text-base-content/80">Organize suas compras, planeje seus gastos e poupe. Crie uma nova lista ou comece com um de nossos modelos.</p>
-              <button class="btn btn-primary btn-wide gap-2 shadow-md" id="createNewListBtn">
+              <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-4">Suas Listas de Compras</h1>
+              <p class="py-4 sm:py-6 text-base-content/80 text-base sm:text-lg leading-relaxed">Organize suas compras, planeje seus gastos e poupe. Crie uma nova lista ou comece com um de nossos modelos.</p>
+              <button class="btn btn-primary btn-wide gap-2 hover:scale-105 transition-all duration-200 text-base font-semibold" id="createNewListBtn">
                 <i class="fa-solid fa-plus"></i>
                 Criar Nova Lista
               </button>
@@ -82,22 +125,22 @@
           </div>
         </div>
         <div>
-            <div class="flex items-center gap-4 mb-6">
-                <span class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-list-check text-primary text-xl"></i></span>
-                <h2 class="text-3xl font-bold">Minhas Listas</h2>
+            <div class="flex items-center gap-4 mb-6 sm:mb-8">
+                <span class="bg-primary/10 p-3 rounded-full hover:bg-primary/20 transition-all duration-200 hover:scale-110"><i class="fa-solid fa-list-check text-primary text-lg sm:text-xl"></i></span>
+                <h2 class="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">Minhas Listas</h2>
             </div>
-            <div id="listsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="listsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             </div>
         </div>
         <div>
-            <div class="flex items-center gap-4 mb-6">
-                <span class="bg-secondary/10 p-3 rounded-full"><i class="fa-solid fa-wand-magic-sparkles text-secondary text-xl"></i></span>
-                <h2 class="text-3xl font-bold">Comece com um Modelo</h2>
+            <div class="flex items-center gap-4 mb-6 sm:mb-8">
+                <span class="bg-secondary/10 p-3 rounded-full hover:bg-secondary/20 transition-all duration-200 hover:scale-110"><i class="fa-solid fa-wand-magic-sparkles text-secondary text-lg sm:text-xl"></i></span>
+                <h2 class="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">Comece com um Modelo</h2>
             </div>
-            <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             </div>
         </div>
-        <div class="card bg-base-100 shadow-lg mt-12">
+        <div class="card bg-base-100 mt-12">
             <div class="card-body flex-col md:flex-row items-center gap-6 p-8">
                 <div class="text-5xl text-secondary">
                     <i class="fa-solid fa-comments"></i>
@@ -128,10 +171,10 @@
         <div class="modal-box">
             <h3 class="font-bold text-lg" id="listNameModalTitle">Criar Nova Lista</h3>
             <form id="listNameForm" method="dialog" class="py-4">
-                <input type="text" id="listNameInput" placeholder="Ex: Compras do Mês" class="input input-bordered w-full" required maxlength="50">
+                <input type="text" id="listNameInput" placeholder="Ex: Compras do Mês" class="input input-bordered w-full focus:input-primary focus:scale-105 transition-all duration-200 text-base" required maxlength="50">
                 <div class="modal-action mt-6">
-                    <button type="button" class="btn" id="cancelListName">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn hover:scale-105 transition-all duration-200" id="cancelListName">Cancelar</button>
+                    <button type="submit" class="btn btn-primary hover:scale-105 transition-all duration-200 font-semibold">Salvar</button>
                 </div>
             </form>
         </div>
@@ -140,10 +183,10 @@
     <dialog id="confirm_delete_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg">Excluir Lista</h3>
-            <p class="py-4" id="confirmDeleteMessage">Você tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.</p>
+            <p class="py-4 text-base leading-relaxed" id="confirmDeleteMessage">Você tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.</p>
             <div class="modal-action">
-                <button class="btn" id="confirmDeleteCancel">Cancelar</button>
-                <button class="btn btn-error" id="confirmDeleteConfirm">Excluir</button>
+                <button class="btn hover:scale-105 transition-all duration-200" id="confirmDeleteCancel">Cancelar</button>
+                <button class="btn btn-error hover:scale-105 transition-all duration-200 font-semibold" id="confirmDeleteConfirm">Excluir</button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
@@ -197,11 +240,11 @@
                 
                 <div class="divider">Exportar Dados</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button class="btn btn-outline" id="exportJsonBtn">
+                    <button class="btn btn-outline hover:btn-primary hover:scale-105 transition-all duration-200" id="exportJsonBtn">
                         <i class="fas fa-download"></i>
                         Exportar JSON
                     </button>
-                    <button class="btn btn-outline" id="exportCsvBtn">
+                    <button class="btn btn-outline hover:btn-secondary hover:scale-105 transition-all duration-200" id="exportCsvBtn">
                         <i class="fas fa-file-csv"></i>
                         Exportar CSV
                     </button>
@@ -210,14 +253,14 @@
                 <div class="divider">Importar Dados</div>
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Selecione um arquivo de backup (JSON)</span>
+                        <span class="label-text font-medium">Selecione um arquivo de backup (JSON)</span>
                     </label>
-                    <input type="file" id="importFileInput" accept=".json" class="file-input file-input-bordered w-full" />
+                    <input type="file" id="importFileInput" accept=".json" class="file-input file-input-bordered w-full focus:file-input-primary transition-all duration-200" />
                     <label class="label">
-                        <span class="label-text-alt text-warning">⚠️ Isso substituirá todas as suas listas atuais</span>
+                        <span class="label-text-alt text-warning font-medium">⚠️ Isso substituirá todas as suas listas atuais</span>
                     </label>
                 </div>
-                <button class="btn btn-warning w-full" id="importDataBtn" disabled>
+                <button class="btn btn-warning w-full hover:scale-105 hover:shadow-lg transition-all duration-200 font-semibold" id="importDataBtn" disabled>
                     <i class="fas fa-upload"></i>
                     Importar e Substituir Dados
                 </button>

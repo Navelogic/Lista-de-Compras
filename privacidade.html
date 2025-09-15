@@ -9,56 +9,111 @@
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
     <style>
         .terms-content h2 {
-            font-size: 1.875rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-top: 2.5rem;
+            margin-top: 2rem;
             margin-bottom: 1rem;
             border-bottom: 1px solid oklch(var(--b3));
             padding-bottom: 0.5rem;
+            transition: all 0.3s ease;
         }
+        
+        @media (min-width: 640px) {
+            .terms-content h2 {
+                font-size: 1.875rem;
+                margin-top: 2.5rem;
+            }
+        }
+        
         .terms-content h3 {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
             margin-top: 1.5rem;
             margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
         }
+        
+        @media (min-width: 640px) {
+            .terms-content h3 {
+                font-size: 1.25rem;
+            }
+        }
+        
         .terms-content p, .terms-content li {
             color: oklch(var(--bc) / 0.8);
             line-height: 1.75;
+            font-size: 0.875rem;
         }
+        
+        @media (min-width: 640px) {
+            .terms-content p, .terms-content li {
+                font-size: 1rem;
+            }
+        }
+        
         .terms-content ul {
             list-style-position: inside;
             list-style-type: disc;
             padding-left: 1rem;
         }
+        
         .terms-content a {
             color: oklch(var(--p));
             text-decoration: underline;
+            transition: all 0.2s ease;
+        }
+        
+        .terms-content a:hover {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+        
+        /* Microinterações e feedback visual */
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .card:hover {
+            animation: pulse 0.6s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1.01); }
         }
     </style>
 </head>
 <body class="bg-base-200">
 
-    <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur shadow-md">
-        <div class="navbar container mx-auto px-4">
+    <header class="sticky top-0 z-30 bg-base-100 border-b border-base-300">
+        <div class="navbar container mx-auto px-3 sm:px-4 md:px-8">
             <div class="flex-1">
-                <a href="index.html" class="text-2xl font-bold text-primary">poupe.com.br</a>
+                <a href="index.html" class="text-xl sm:text-2xl font-bold text-primary hover:opacity-80 transition-all duration-200 hover:scale-105">poupe.com.br</a>
             </div>
             <div class="flex-none">
-                <a href="index.html" class="btn btn-primary ml-2">Voltar ao Início</a>
+                <a href="index.html" class="btn btn-primary hover:scale-105 transition-all duration-200 font-semibold">Voltar ao Início</a>
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-12 md:py-20">
-        <div class="bg-base-100 p-6 md:p-10 rounded-lg shadow-lg">
+    <main class="px-3 sm:px-4 md:px-8 py-4 md:py-6">
+        <div class="bg-base-100 p-4 sm:p-6 md:p-10 rounded-lg transition-all duration-300">
             <div class="prose max-w-none terms-content">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-4">Política de Privacidade</h1>
-                <p class="text-center text-base-content/70">Última atualização: 25 de agosto de 2025</p>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight tracking-tight">Política de Privacidade</h1>
+                <p class="text-center text-base-content/70 text-sm sm:text-base">Última atualização: 25 de agosto de 2025</p>
 
-                <div class="card bg-base-200 my-10">
-                    <div class="card-body">
-                        <h2 class="card-title !mt-0 !border-0 !text-2xl"><i class="fa-solid fa-shield-halved text-primary mr-2"></i>Sua privacidade em primeiro lugar</h2>
+                <div class="card bg-base-200 my-6 md:my-10 transition-all duration-300 hover:scale-[1.01]">
+                    <div class="card-body p-4 sm:p-6">
+                        <h2 class="card-title !mt-0 !border-0 text-lg sm:text-xl md:text-2xl leading-tight"><i class="fa-solid fa-shield-halved text-primary mr-2 transition-transform duration-300 hover:scale-110"></i>Sua privacidade em primeiro lugar</h2>
                         <p>Sua confiança é o mais importante para nós. Por isso, criamos esta política para ser o mais transparente possível. Aqui está um resumo rápido:</p>
                         <ul class="space-y-2 mt-4">
                             <li><strong>Seus dados ficam com você:</strong> Suas listas de compras, seções e configurações são salvas <strong>apenas no seu navegador</strong>. Nós não temos acesso a elas em nossos servidores.</li>
