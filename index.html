@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="cupcake">
+<html lang="pt-BR" data-theme="emerald">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>poupe.com.br: onde cada real conta.</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -91,6 +94,70 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        
+        /* Animações personalizadas para hero */
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+        }
+        
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+        
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+        
+        .delay-500 {
+            animation-delay: 0.5s;
+        }
+        
+        .delay-600 {
+            animation-delay: 0.6s;
+        }
+        
+        .delay-700 {
+            animation-delay: 0.7s;
+        }
+        
+        .delay-800 {
+            animation-delay: 0.8s;
+        }
+        
+        .delay-1000 {
+            animation-delay: 1s;
+        }
+        
+        /* Efeito de brilho no texto */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+        
+        .text-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
     </style>
 </head>
 <body class="bg-base-200">
@@ -118,14 +185,20 @@
     </header>
 
     <main class="px-3 sm:px-4 md:px-8 py-4 md:py-6 space-y-12 md:space-y-16">
-        <section class="hero min-h-[80vh] hero-bg transition-all duration-300">
+        <section class="hero min-h-[80vh] hero-bg">
             <div class="hero-content text-center px-4">
-                <div class="max-w-2xl p-6 sm:p-8 md:p-12">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-4">A maneira mais inteligente de fazer suas compras.</h1>
-                    <p class="py-4 sm:py-6 text-base sm:text-lg leading-relaxed">Crie listas de compras organizadas, controle seus gastos e economize tempo e dinheiro. Com o poupe.com.br, ir ao mercado nunca foi tão fácil.</p>
-                    <a href="app.html" class="btn btn-primary btn-lg gap-2 hover:scale-105 transition-all duration-200 text-base font-semibold">
-                        <i class="fa-solid fa-rocket"></i>
-                        Comece a Economizar Agora
+                <div class="max-w-3xl">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-6">
+                        Organize suas compras de forma simples
+                    </h1>
+                    
+                    <p class="text-lg sm:text-xl leading-relaxed mb-8 opacity-90">
+                        Crie listas de compras, controle seus gastos e economize tempo no mercado.
+                    </p>
+                    
+                    <a href="app.html" class="btn btn-primary btn-lg gap-3 hover:scale-105 transition-all duration-200">
+                        <i class="fa-solid fa-list-check"></i>
+                        Começar Agora
                     </a>
                 </div>
             </div>
@@ -142,7 +215,7 @@
                         </div>
                     </div>
                     <div class="order-1 lg:order-2">
-                        <img src="img/shopping-2613984_1280.jpg" alt="Pessoa usando o celular no supermercado para controlar a lista de compras." class="rounded-lg shadow-xl w-full h-auto">
+                        <img src="img/poupinho-celular.jpg" alt="Pessoa usando o celular no supermercado para controlar a lista de compras." class="rounded-lg shadow-xl w-full h-auto">
                     </div>
                 </div>
             </div>

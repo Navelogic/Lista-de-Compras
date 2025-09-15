@@ -22,7 +22,7 @@ Um aplicativo web simples e elegante para gerenciar suas listas de compras, dese
 
 ## 🎨 Tema Padrão
 
-O aplicativo utiliza o tema **"cupcake"** do DaisyUI como padrão, oferecendo uma paleta de cores suave e agradável:
+O aplicativo utiliza o tema **"emerald"** do DaisyUI como padrão, oferecendo uma paleta de cores suave e agradável:
 - Cores claras e neutras para melhor legibilidade
 - Design minimalista sem sombras
 - Interface limpa e moderna
