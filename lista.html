@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Lista de Compras</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="poupe.com.br">
+    <meta name="theme-color" content="#570df8">
+    
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
@@ -33,6 +42,16 @@
             background-color: oklch(var(--p)/.1);
             color: oklch(var(--p));
             border-color: oklch(var(--p)/.2);
+        }
+        
+        /* Estilos para validação de erro */
+        .input-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 1px #ef4444 !important;
+        }
+        .input-error:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
         }
         .subsection-badge {
             background-color: oklch(var(--s)/.1);
@@ -81,35 +100,44 @@
                 </div>
                 <div class="card bg-base-200/50">
                     <div class="card-body p-4">
-                        <form id="addItemForm" class="space-y-3">
-                            <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required maxlength="50">
+                        <form id="addItemForm" class="space-y-3" role="form" aria-label="Formulário para adicionar novo item">
+                            <div class="form-control">
+                                <label for="itemName" class="label sr-only"><span class="label-text">Nome do item</span></label>
+                                <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required maxlength="50" aria-describedby="itemName-help" autocomplete="off">
+                                <div id="itemName-help" class="sr-only">Digite o nome do item que deseja adicionar à lista</div>
+                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <div class="flex gap-2">
-                                    <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required>
-                                    <button type="button" data-action="open-unit-selector" data-target-input="itemUnit" data-target-button="itemUnitBtn" class="btn btn-bordered min-w-fit" id="itemUnitBtn">
-                                        <span class="truncate">Un</span> <i class="fa-solid fa-chevron-down text-xs"></i>
+                                    <div class="form-control flex-1">
+                                        <label for="itemQuantity" class="label sr-only"><span class="label-text">Quantidade</span></label>
+                                        <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required aria-describedby="quantity-help">
+                                        <div id="quantity-help" class="sr-only">Quantidade do item</div>
+                                    </div>
+                                    <button type="button" data-action="open-unit-selector" data-target-input="itemUnit" data-target-button="itemUnitBtn" class="btn btn-bordered min-w-fit" id="itemUnitBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar unidade de medida">
+                                        <span class="truncate">Un</span> <i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i>
                                     </button>
                                     <input type="hidden" id="itemUnit" value="un">
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="button" data-action="open-section-selector" data-target-input="itemSection" data-target-button="itemSectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSectionBtn">
+                                    <button type="button" data-action="open-section-selector" data-target-input="itemSection" data-target-button="itemSectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSectionBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar seção">
                                         <span class="truncate">Selecione uma seção</span>
-                                        <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                                        <i class="fa-solid fa-chevron-down text-xs ml-auto" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus"></i></button>
+                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
                                     <input type="hidden" id="itemSection" required>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="button" data-action="open-subsection-selector" data-target-input="itemSubsection" data-target-button="itemSubsectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSubsectionBtn" disabled>
+                                    <button type="button" data-action="open-subsection-selector" data-target-input="itemSubsection" data-target-button="itemSubsectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSubsectionBtn" disabled aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar subseção">
                                         <span class="truncate">Sem subseção</span>
-                                        <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                                        <i class="fa-solid fa-chevron-down text-xs ml-auto" aria-hidden="true"></i>
                                     </button>
                                     <input type="hidden" id="itemSubsection">
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-full gap-2">
-                                <i class="fa-solid fa-plus"></i> Adicionar Item
+                            <button type="submit" class="btn btn-primary w-full gap-2" aria-describedby="add-item-help">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Item
                             </button>
+                            <div id="add-item-help" class="sr-only">Pressione Enter ou clique para adicionar o item à lista</div>
                         </form>
                     </div>
                 </div>
@@ -335,14 +363,62 @@
         let currentManagingSubsectionId = null;
 
         const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-        const sanitizeText = (text) => text.replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™]/g, '');
+        
+        // Funções de validação e sanitização melhoradas
+        const sanitizeText = (text) => {
+            if (!text || typeof text !== 'string') return '';
+            return text
+                .replace(/[<>"'&]/g, '') // Remove caracteres perigosos
+                .replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™°%/]/g, '') // Permite mais caracteres úteis
+                .trim()
+                .substring(0, 100); // Limita tamanho
+        };
+        
         const sanitizeNumber = (value) => {
+            if (!value) return '';
             let sanitized = String(value).replace(/[^0-9,.]/g, '').replace(',', '.');
             const parts = sanitized.split('.');
             if (parts.length > 1) {
                 sanitized = parts[0] + '.' + parts.slice(1).join('').slice(0, 2);
             }
+            // Limita a 10 dígitos antes da vírgula
+            const beforeDecimal = sanitized.split('.')[0];
+            if (beforeDecimal.length > 10) {
+                sanitized = beforeDecimal.substring(0, 10) + (sanitized.includes('.') ? '.' + sanitized.split('.')[1] : '');
+            }
             return sanitized;
+        };
+        
+        const validateItemName = (name) => {
+            const sanitized = sanitizeText(name);
+            return {
+                isValid: sanitized.length >= 2 && sanitized.length <= 60,
+                sanitized,
+                error: sanitized.length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : 
+                       sanitized.length > 60 ? 'Nome muito longo (máximo 60 caracteres)' : null
+            };
+        };
+        
+        const validateQuantity = (quantity) => {
+            const num = parseFloat(quantity);
+            return {
+                isValid: !isNaN(num) && num > 0 && num <= 9999,
+                value: num,
+                error: isNaN(num) || num <= 0 ? 'Quantidade deve ser maior que zero' :
+                       num > 9999 ? 'Quantidade muito alta (máximo 9999)' : null
+            };
+        };
+        
+        const validatePrice = (price) => {
+            if (!price || price === '') return { isValid: true, value: 0, error: null };
+            const sanitized = sanitizeNumber(price);
+            const num = parseFloat(sanitized);
+            return {
+                isValid: !isNaN(num) && num >= 0 && num <= 999999,
+                value: num,
+                error: isNaN(num) || num < 0 ? 'Preço deve ser um valor válido' :
+                       num > 999999 ? 'Preço muito alto (máximo R$ 999.999)' : null
+            };
         };
 
         const showConfirmModal = (title, message, onConfirm) => {
@@ -807,38 +883,100 @@
         addItemForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const itemName = document.getElementById('itemName').value;
-            const itemQuantity = parseFloat(document.getElementById('itemQuantity').value);
+            const itemQuantity = document.getElementById('itemQuantity').value;
             const itemUnit = document.getElementById('itemUnit').value;
             const itemSection = document.getElementById('itemSection').value;
             const itemSubsection = document.getElementById('itemSubsection').value;
-            if (sanitizeText(itemName).trim() && !isNaN(itemQuantity) && itemQuantity > 0 && itemSection) {
-                addItem(itemName, itemQuantity, itemUnit, itemSection, itemSubsection);
-                
-                document.getElementById('itemName').value = '';
-                document.getElementById('itemQuantity').value = '1';
-                document.getElementById('itemName').focus();
-
-                saveAndRender();
-            } else {
-                const submitButton = addItemForm.querySelector('button[type="submit"]');
-                submitButton.classList.add('btn-error');
-                setTimeout(() => submitButton.classList.remove('btn-error'), 2000);
+            
+            // Validação do nome
+            const nameValidation = validateItemName(itemName);
+            if (!nameValidation.isValid) {
+                showError(nameValidation.error);
+                return;
             }
+            
+            // Validação da quantidade
+            const quantityValidation = validateQuantity(itemQuantity);
+            if (!quantityValidation.isValid) {
+                showError(quantityValidation.error);
+                return;
+            }
+            
+            // Validação da seção
+            if (!itemSection) {
+                showError('Por favor, selecione uma seção');
+                return;
+            }
+            
+            addItem(nameValidation.sanitized, quantityValidation.value, itemUnit, itemSection, itemSubsection);
+            
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemQuantity').value = '1';
+            document.getElementById('itemName').focus();
+
+            saveAndRender();
         });
+        
+        const showError = (message) => {
+            const submitButton = addItemForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
         editItemForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('editItemId').value;
+            const itemName = document.getElementById('editItemName').value;
+            const itemQuantity = document.getElementById('editItemQuantity').value;
+            const itemPrice = document.getElementById('editItemPrice').value;
+            
+            // Validação do nome
+            const nameValidation = validateItemName(itemName);
+            if (!nameValidation.isValid) {
+                showEditError(nameValidation.error);
+                return;
+            }
+            
+            // Validação da quantidade
+            const quantityValidation = validateQuantity(itemQuantity);
+            if (!quantityValidation.isValid) {
+                showEditError(quantityValidation.error);
+                return;
+            }
+            
+            // Validação do preço
+            const priceValidation = validatePrice(itemPrice);
+            if (!priceValidation.isValid) {
+                showEditError(priceValidation.error);
+                return;
+            }
+            
             updateItem(id, {
-                name: document.getElementById('editItemName').value,
-                quantity: parseFloat(document.getElementById('editItemQuantity').value),
+                name: nameValidation.sanitized,
+                quantity: quantityValidation.value,
                 unit: document.getElementById('editItemUnit').value,
-                price: parseFloat(document.getElementById('editItemPrice').value.replace(',', '.')) || 0,
+                price: priceValidation.value,
                 section: document.getElementById('editItemSection').value,
                 subsection: document.getElementById('editItemSubsection').value || null
             });
             editModal.close();
         });
+        
+        const showEditError = (message) => {
+            const submitButton = editItemForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
         sectionForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -846,17 +984,64 @@
             const name = document.getElementById('sectionName').value;
             const icon = document.getElementById('sectionIcon').value.trim();
             const parentId = document.getElementById('sectionParent').value || null;
-            if (sanitizeText(name).trim()) {
-                addOrUpdateSection(id, name, icon, parentId);
-                sectionModal.close();
-                if (settingsModal.open) renderSectionManager();
+            
+            // Validação do nome da seção
+            const nameValidation = validateItemName(name); // Reutiliza a validação de nome
+            if (!nameValidation.isValid) {
+                showSectionError(nameValidation.error);
+                return;
             }
+            
+            addOrUpdateSection(id, nameValidation.sanitized, icon, parentId);
+            sectionModal.close();
+            if (settingsModal.open) renderSectionManager();
         });
+        
+        const showSectionError = (message) => {
+            const submitButton = sectionForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
+        // Validação em tempo real
         document.body.addEventListener('input', (e) => {
             const target = e.target;
-            if (target.matches('#itemName, #editItemName, #sectionName')) {
-                target.value = sanitizeText(target.value);
+            
+            // Validação do nome do item
+            if (target.id === 'itemName' || target.id === 'editItemName') {
+                const validation = validateItemName(target.value);
+                target.setCustomValidity(validation.isValid ? '' : validation.error);
+                target.classList.toggle('input-error', !validation.isValid);
+            }
+            
+            // Validação da quantidade
+            if (target.id === 'itemQuantity' || target.id === 'editItemQuantity') {
+                const validation = validateQuantity(target.value);
+                target.setCustomValidity(validation.isValid ? '' : validation.error);
+                target.classList.toggle('input-error', !validation.isValid);
+            }
+            
+            // Validação do preço
+             if (target.id === 'editItemPrice') {
+                 const validation = validatePrice(target.value);
+                 target.setCustomValidity(validation.isValid ? '' : validation.error);
+                 target.classList.toggle('input-error', !validation.isValid);
+             }
+             
+             // Validação do nome da seção
+             if (target.id === 'sectionName') {
+                 const validation = validateItemName(target.value);
+                 target.setCustomValidity(validation.isValid ? '' : validation.error);
+                 target.classList.toggle('input-error', !validation.isValid);
+             }
+             
+             if (target.matches('#itemName, #editItemName, #sectionName')) {
+                 target.value = sanitizeText(target.value);
             }
             if (target.matches('#itemQuantity, #editItemQuantity, [data-action="update-price-input"], #editItemPrice')) {
                 target.value = sanitizeNumber(target.value);
@@ -1271,6 +1456,19 @@
             initSectionSortable(shoppingListContainer);
             document.getElementById('itemName')?.focus();
         };
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registrado com sucesso:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Falha ao registrar SW:', error);
+                    });
+            });
+        }
 
         init();
     });

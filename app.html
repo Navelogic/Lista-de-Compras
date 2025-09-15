@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minhas Listas - poupe.com.br</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="poupe.com.br">
+    <meta name="theme-color" content="#570df8">
+    
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
@@ -32,6 +41,14 @@
             transform: translateY(-5px);
             box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
         }
+        .input-error {
+            border-color: oklch(var(--er)) !important;
+            box-shadow: 0 0 0 1px oklch(var(--er)) !important;
+        }
+        .input-error:focus {
+            border-color: oklch(var(--er)) !important;
+            box-shadow: 0 0 0 2px oklch(var(--er)/.2) !important;
+        }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen font-sans">
@@ -40,8 +57,11 @@
             <div class="flex-1">
                 <a href="index.html" class="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">poupe.com.br</a>
             </div>
-            <div class="flex-none">
-                 <button class="btn btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações">
+            <div class="flex-none gap-2">
+                <button class="btn btn-ghost btn-circle" data-action="open-backup-modal" aria-label="Backup e Restauração">
+                    <i class="fa-solid fa-download text-lg"></i>
+                </button>
+                <button class="btn btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações">
                     <i class="fa-solid fa-gear text-lg"></i>
                 </button>
             </div>
@@ -164,7 +184,51 @@
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
-
+    
+    <!-- Modal de Backup/Export -->
+    <dialog id="backup_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Backup e Restauração</h3>
+            <div class="py-4 space-y-4">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Seus dados ficam apenas no seu dispositivo. Use essas opções para fazer backup ou transferir suas listas.</span>
+                </div>
+                
+                <div class="divider">Exportar Dados</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="btn btn-outline" id="exportJsonBtn">
+                        <i class="fas fa-download"></i>
+                        Exportar JSON
+                    </button>
+                    <button class="btn btn-outline" id="exportCsvBtn">
+                        <i class="fas fa-file-csv"></i>
+                        Exportar CSV
+                    </button>
+                </div>
+                
+                <div class="divider">Importar Dados</div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Selecione um arquivo de backup (JSON)</span>
+                    </label>
+                    <input type="file" id="importFileInput" accept=".json" class="file-input file-input-bordered w-full" />
+                    <label class="label">
+                        <span class="label-text-alt text-warning">⚠️ Isso substituirá todas as suas listas atuais</span>
+                    </label>
+                </div>
+                <button class="btn btn-warning w-full" id="importDataBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    Importar e Substituir Dados
+                </button>
+            </div>
+            <div class="modal-action">
+                <form method="dialog"><button class="btn">Fechar</button></form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
+    </dialog>
+    
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const LISTS_KEY = 'poupe_all_lists_V1';
@@ -179,8 +243,28 @@
         const settingsModal = document.getElementById('settings_modal');
         const themeSelectorContainer = document.getElementById('theme-selector-container');
         
-        const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Água", "lofi": "Lofi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Pálido", "nord": "Nórdico", "sunset": "Pôr do Sol" };
+        const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Aqua", "lofi": "Lo-fi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Escuro Suave", "nord": "Nord", "sunset": "Pôr do Sol" };
         const daisyuiThemes = Object.keys(themeNames);
+        
+        // Funções de validação e sanitização
+        const sanitizeText = (text) => {
+            if (!text || typeof text !== 'string') return '';
+            return text
+                .replace(/[<>"'&]/g, '') // Remove caracteres perigosos
+                .replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™°%/]/g, '') // Permite mais caracteres úteis
+                .trim()
+                .substring(0, 100); // Limita tamanho
+        };
+        
+        const validateListName = (name) => {
+            const sanitized = sanitizeText(name);
+            return {
+                isValid: sanitized.length >= 2 && sanitized.length <= 60,
+                sanitized,
+                error: sanitized.length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : 
+                       sanitized.length > 60 ? 'Nome muito longo (máximo 60 caracteres)' : null
+            };
+        };
 
         const templates = [
             {
@@ -342,23 +426,48 @@
         listNameForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = listNameInput.value;
-            if (!name.trim()) return;
+            
+            // Validação do nome da lista
+            const nameValidation = validateListName(name);
+            if (!nameValidation.isValid) {
+                showListNameError(nameValidation.error);
+                return;
+            }
 
             if (currentEditingListId) {
                 const listToUpdate = allLists.find(l => l.id === currentEditingListId);
                 if (listToUpdate) {
-                    listToUpdate.name = name.trim();
+                    listToUpdate.name = nameValidation.sanitized;
                     saveLists();
                     render();
                 }
                 currentEditingListId = null;
             } else {
-                handleCreateList(name);
+                handleCreateList(nameValidation.sanitized);
             }
             listNameModal.close();
         });
+        
+        const showListNameError = (message) => {
+            const submitButton = listNameForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
         cancelListNameBtn.addEventListener('click', () => listNameModal.close());
+        
+        // Validação em tempo real para nome da lista
+        listNameInput.addEventListener('input', (e) => {
+            const validation = validateListName(e.target.value);
+            e.target.setCustomValidity(validation.isValid ? '' : validation.error);
+            e.target.classList.toggle('input-error', !validation.isValid);
+            e.target.value = sanitizeText(e.target.value);
+        });
 
         document.body.addEventListener('click', (e) => {
             const target = e.target.closest('[data-action]');
@@ -421,6 +530,94 @@
                     renderThemeSelector();
                     settingsModal.showModal();
                     break;
+                case 'open-backup-modal':
+                    document.getElementById('backup_modal').showModal();
+                    break;
+            }
+        });
+
+        // Funcionalidades de Backup/Export/Import
+        const exportToJson = () => {
+            const data = {
+                lists: allLists,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poupe-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        const exportToCsv = () => {
+            let csvContent = 'Lista,Seção,Item,Quantidade,Preço,Comprado\n';
+            allLists.forEach(list => {
+                list.sections.forEach(section => {
+                    section.items.forEach(item => {
+                        const row = [
+                            `"${list.name}"`,
+                            `"${section.name}"`,
+                            `"${item.name}"`,
+                            item.quantity || 1,
+                            item.price || '',
+                            item.purchased ? 'Sim' : 'Não'
+                        ].join(',');
+                        csvContent += row + '\n';
+                    });
+                });
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poupe-listas-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        const importFromJson = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.lists && Array.isArray(data.lists)) {
+                        allLists = data.lists;
+                        saveLists();
+                        render();
+                        alert('Dados importados com sucesso!');
+                        document.getElementById('backup_modal').close();
+                    } else {
+                        alert('Arquivo inválido. Certifique-se de que é um backup válido do poupe.com.br');
+                    }
+                } catch (error) {
+                    alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo JSON válido.');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // Event listeners para backup/export/import
+        document.getElementById('exportJsonBtn').addEventListener('click', exportToJson);
+        document.getElementById('exportCsvBtn').addEventListener('click', exportToCsv);
+        
+        const importFileInput = document.getElementById('importFileInput');
+        const importDataBtn = document.getElementById('importDataBtn');
+        
+        importFileInput.addEventListener('change', (e) => {
+            importDataBtn.disabled = !e.target.files.length;
+        });
+        
+        importDataBtn.addEventListener('click', () => {
+            const file = importFileInput.files[0];
+            if (file && confirm('Isso substituirá todas as suas listas atuais. Tem certeza?')) {
+                importFromJson(file);
             }
         });
 
@@ -430,6 +627,19 @@
             loadLists();
             render();
         };
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registrado com sucesso:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Falha ao registrar SW:', error);
+                    });
+            });
+        }
 
         init();
     });
