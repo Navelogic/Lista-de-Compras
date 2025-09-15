@@ -334,6 +334,107 @@
                         { name: 'Arroz', quantity: 5, unit: 'kg' }, { name: 'Feijão', quantity: 2, unit: 'kg' }, { name: 'Óleo de Soja', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'kg' }, { name: 'Macarrão', quantity: 2, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 2, unit: 'un' }, { name: 'Sabão em Pó', quantity: 1, unit: 'cx' }, { name: 'Detergente', quantity: 2, unit: 'un' }, { name: 'Papel Higiênico', quantity: 1, unit: 'pct' }, { name: 'Creme Dental', quantity: 1, unit: 'un' },
                     ]
                 }
+            },
+            // Templates por Tamanho de Família
+            {
+                id: 'template_solteiro', name: 'Compras para Solteiro(a)', icon: '👤', description: 'Porções individuais e práticas para quem mora sozinho.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Básicos', icon: '🛒', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Proteínas', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Lanches', icon: '🥪', parent: null, order: 2 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 1, unit: 'kg' }, { name: 'Feijão', quantity: 500, unit: 'g' }, { name: 'Óleo', quantity: 1, unit: 'un' }, { name: 'Sal', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Leite', quantity: 1, unit: 'l' }, { name: 'Ovos', quantity: 6, unit: 'un' }, { name: 'Frango', quantity: 1, unit: 'kg' }, { name: 'Pão de Forma', quantity: 1, unit: 'un' }, { name: 'Queijo', quantity: 200, unit: 'g' }, { name: 'Presunto', quantity: 200, unit: 'g' }, { name: 'Iogurte', quantity: 4, unit: 'un' }, { name: 'Banana', quantity: 6, unit: 'un' }
+                    ]
+                }
+            },
+            {
+                id: 'template_casal', name: 'Compras para Casal', icon: '👫', description: 'Quantidades ideais para duas pessoas.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Mercearia', icon: '🛒', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Carnes', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Hortifruti', icon: '🥬', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Laticínios', icon: '🥛', parent: null, order: 3 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 2, unit: 'kg' }, { name: 'Feijão', quantity: 1, unit: 'kg' }, { name: 'Macarrão', quantity: 2, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 2, unit: 'un' }, { name: 'Óleo', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'un' }, { name: 'Frango', quantity: 2, unit: 'kg' }, { name: 'Carne Moída', quantity: 1, unit: 'kg' }, { name: 'Ovos', quantity: 12, unit: 'un' }, { name: 'Leite', quantity: 2, unit: 'l' }, { name: 'Queijo', quantity: 300, unit: 'g' }, { name: 'Iogurte', quantity: 6, unit: 'un' }, { name: 'Tomate', quantity: 1, unit: 'kg' }, { name: 'Cebola', quantity: 1, unit: 'kg' }, { name: 'Alface', quantity: 2, unit: 'un' }, { name: 'Banana', quantity: 1, unit: 'kg' }, { name: 'Maçã', quantity: 1, unit: 'kg' }
+                    ]
+                }
+            },
+            {
+                id: 'template_familia', name: 'Família (4 pessoas)', icon: '👨‍👩‍👧‍👦', description: 'Compras completas para família de 4 pessoas.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Mercearia', icon: '🛒', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Carnes', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Hortifruti', icon: '🥬', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Laticínios', icon: '🥛', parent: null, order: 3 },
+                        { id: crypto.randomUUID(), name: 'Limpeza', icon: '🧽', parent: null, order: 4 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 5, unit: 'kg' }, { name: 'Feijão', quantity: 2, unit: 'kg' }, { name: 'Macarrão', quantity: 4, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 4, unit: 'un' }, { name: 'Óleo', quantity: 2, unit: 'un' }, { name: 'Açúcar', quantity: 2, unit: 'kg' }, { name: 'Café', quantity: 2, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'kg' }, { name: 'Farinha de Trigo', quantity: 1, unit: 'kg' }, { name: 'Frango', quantity: 3, unit: 'kg' }, { name: 'Carne Bovina', quantity: 2, unit: 'kg' }, { name: 'Peixe', quantity: 1, unit: 'kg' }, { name: 'Ovos', quantity: 24, unit: 'un' }, { name: 'Leite', quantity: 4, unit: 'l' }, { name: 'Queijo', quantity: 500, unit: 'g' }, { name: 'Iogurte', quantity: 12, unit: 'un' }, { name: 'Pão', quantity: 2, unit: 'un' }, { name: 'Tomate', quantity: 2, unit: 'kg' }, { name: 'Cebola', quantity: 2, unit: 'kg' }, { name: 'Batata', quantity: 2, unit: 'kg' }, { name: 'Cenoura', quantity: 1, unit: 'kg' }, { name: 'Alface', quantity: 3, unit: 'un' }, { name: 'Banana', quantity: 2, unit: 'kg' }, { name: 'Maçã', quantity: 2, unit: 'kg' }, { name: 'Laranja', quantity: 2, unit: 'kg' }, { name: 'Detergente', quantity: 2, unit: 'un' }, { name: 'Sabão em Pó', quantity: 1, unit: 'cx' }, { name: 'Papel Higiênico', quantity: 1, unit: 'pct' }
+                    ]
+                }
+            },
+            // Templates de Refeições e Cardápio
+            {
+                id: 'template_italiana', name: 'Semana Italiana', icon: '🍝', description: 'Ingredientes para pratos italianos deliciosos.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Massas', icon: '🍝', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Molhos', icon: '🍅', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Queijos', icon: '🧀', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Temperos', icon: '🌿', parent: null, order: 3 }
+                    ],
+                    items: [
+                        { name: 'Espaguete', quantity: 2, unit: 'pct' }, { name: 'Penne', quantity: 1, unit: 'pct' }, { name: 'Lasanha', quantity: 1, unit: 'cx' }, { name: 'Molho de Tomate', quantity: 3, unit: 'un' }, { name: 'Molho Pesto', quantity: 1, unit: 'un' }, { name: 'Molho Branco', quantity: 1, unit: 'un' }, { name: 'Queijo Parmesão', quantity: 200, unit: 'g' }, { name: 'Mussarela', quantity: 300, unit: 'g' }, { name: 'Ricota', quantity: 250, unit: 'g' }, { name: 'Manjericão', quantity: 1, unit: 'mç' }, { name: 'Orégano', quantity: 1, unit: 'un' }, { name: 'Alho', quantity: 1, unit: 'un' }, { name: 'Azeite Extra Virgem', quantity: 1, unit: 'un' }, { name: 'Tomate Cereja', quantity: 300, unit: 'g' }, { name: 'Cebola Roxa', quantity: 2, unit: 'un' }
+                    ]
+                }
+            },
+            {
+                id: 'template_mexicana', name: 'Semana Mexicana', icon: '🌮', description: 'Sabores picantes e ingredientes mexicanos autênticos.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Base', icon: '🌮', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Proteínas', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Vegetais', icon: '🌶️', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Temperos', icon: '🧄', parent: null, order: 3 }
+                    ],
+                    items: [
+                        { name: 'Tortillas', quantity: 2, unit: 'pct' }, { name: 'Feijão Preto', quantity: 1, unit: 'lata' }, { name: 'Arroz', quantity: 1, unit: 'kg' }, { name: 'Carne Moída', quantity: 1, unit: 'kg' }, { name: 'Frango Desfiado', quantity: 500, unit: 'g' }, { name: 'Pimentão Vermelho', quantity: 2, unit: 'un' }, { name: 'Pimentão Verde', quantity: 2, unit: 'un' }, { name: 'Cebola', quantity: 2, unit: 'un' }, { name: 'Tomate', quantity: 1, unit: 'kg' }, { name: 'Pimenta Jalapeño', quantity: 100, unit: 'g' }, { name: 'Abacate', quantity: 2, unit: 'un' }, { name: 'Limão', quantity: 6, unit: 'un' }, { name: 'Coentro', quantity: 1, unit: 'mç' }, { name: 'Cominho', quantity: 1, unit: 'un' }, { name: 'Páprica', quantity: 1, unit: 'un' }, { name: 'Queijo Cheddar', quantity: 200, unit: 'g' }
+                    ]
+                }
+            },
+            {
+                id: 'template_caseira', name: 'Comida Caseira', icon: '🍛', description: 'Ingredientes para pratos tradicionais brasileiros.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Básicos', icon: '🍚', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Carnes', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Legumes', icon: '🥕', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Temperos', icon: '🧄', parent: null, order: 3 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 2, unit: 'kg' }, { name: 'Feijão Carioca', quantity: 1, unit: 'kg' }, { name: 'Farinha de Mandioca', quantity: 500, unit: 'g' }, { name: 'Carne de Panela', quantity: 1, unit: 'kg' }, { name: 'Frango Inteiro', quantity: 1, unit: 'un' }, { name: 'Linguiça Calabresa', quantity: 500, unit: 'g' }, { name: 'Batata', quantity: 2, unit: 'kg' }, { name: 'Cenoura', quantity: 1, unit: 'kg' }, { name: 'Abobrinha', quantity: 2, unit: 'un' }, { name: 'Chuchu', quantity: 3, unit: 'un' }, { name: 'Cebola', quantity: 1, unit: 'kg' }, { name: 'Alho', quantity: 1, unit: 'un' }, { name: 'Tomate', quantity: 1, unit: 'kg' }, { name: 'Cheiro Verde', quantity: 1, unit: 'mç' }, { name: 'Louro', quantity: 1, unit: 'pct' }, { name: 'Colorau', quantity: 1, unit: 'un' }
+                    ]
+                }
+            },
+            // Template Ingredientes para Bolo
+            {
+                id: 'template_bolo', name: 'Ingredientes para Bolo', icon: '🎂', description: 'Tudo que você precisa para fazer bolos caseiros deliciosos.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Básicos', icon: '🥄', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Laticínios', icon: '🥛', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Sabores', icon: '🍫', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Decoração', icon: '🌈', parent: null, order: 3 }
+                    ],
+                    items: [
+                        { name: 'Farinha de Trigo', quantity: 1, unit: 'kg' }, { name: 'Açúcar Cristal', quantity: 1, unit: 'kg' }, { name: 'Açúcar Confeiteiro', quantity: 500, unit: 'g' }, { name: 'Fermento em Pó', quantity: 1, unit: 'un' }, { name: 'Ovos', quantity: 12, unit: 'un' }, { name: 'Manteiga', quantity: 200, unit: 'g' }, { name: 'Leite', quantity: 1, unit: 'l' }, { name: 'Creme de Leite', quantity: 2, unit: 'cx' }, { name: 'Leite Condensado', quantity: 2, unit: 'lata' }, { name: 'Chocolate em Pó', quantity: 200, unit: 'g' }, { name: 'Cacau em Pó', quantity: 100, unit: 'g' }, { name: 'Essência de Baunilha', quantity: 1, unit: 'un' }, { name: 'Coco Ralado', quantity: 100, unit: 'g' }, { name: 'Nozes', quantity: 100, unit: 'g' }, { name: 'Granulado Colorido', quantity: 1, unit: 'pct' }, { name: 'Chantilly', quantity: 1, unit: 'un' }, { name: 'Frutas Vermelhas', quantity: 200, unit: 'g' }
+                    ]
+                }
             }
         ];
 
