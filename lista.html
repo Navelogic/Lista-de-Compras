@@ -245,7 +245,12 @@
                         <form id="addItemForm" class="space-y-3" role="form" aria-label="Formulário para adicionar novo item">
                             <div class="form-control">
                                 <label for="itemName" class="label sr-only"><span class="label-text">Nome do item</span></label>
-                                <input type="text" id="itemName" placeholder="Digite o nome do item..." class="input input-bordered w-full focus:input-primary focus:scale-105 transition-all duration-200 text-base" required maxlength="50" aria-describedby="itemName-help" autocomplete="off">
+                                <div class="flex gap-2">
+                                    <input type="text" id="itemName" placeholder="Digite o nome do item..." class="input input-bordered flex-1 focus:input-primary focus:scale-105 transition-all duration-200 text-base" required maxlength="50" aria-describedby="itemName-help" autocomplete="off">
+                                    <button type="button" id="barcodeBtn" class="btn btn-primary btn-square hover:scale-110 transition-all duration-200 shadow-lg hover:shadow-xl" aria-label="Escanear código de barras">
+                                        <i class="fa-solid fa-barcode" aria-hidden="true"></i>
+                                    </button>
+                                </div>
                                 <div id="itemName-help" class="sr-only">Digite o nome do item que deseja adicionar à lista</div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -266,7 +271,7 @@
                                         <i class="fa-solid fa-chevron-down text-xs ml-auto" aria-hidden="true"></i>
                                     </button>
                                     <button type="button" class="btn btn-primary btn-square hover:scale-110 transition-all duration-200 shadow-lg hover:shadow-xl" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
-                                    <input type="hidden" id="itemSection" required>
+                                    <input type="hidden" id="itemSection">
                                 </div>
                                 <div class="flex gap-2">
                                     <button type="button" data-action="open-subsection-selector" data-target-input="itemSubsection" data-target-button="itemSubsectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSubsectionBtn" disabled aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar subseção">
@@ -1959,11 +1964,7 @@
                 return;
             }
             
-            // Validação da seção
-            if (!itemSection) {
-                showError('Por favor, selecione uma seção');
-                return;
-            }
+            // Seção é opcional - não há validação necessária
             
             addItem(nameValidation.sanitized, quantityValidation.value, itemUnit, itemSection, itemSubsection);
             
@@ -2648,8 +2649,334 @@
             });
         }
 
+        // Variáveis globais para o scanner
+        let barcodeStream = null;
+        let barcodeScanning = false;
+        let currentProductData = null;
+
+        // Função para inicializar o scanner de código de barras
+        const initBarcodeScanner = async () => {
+            const video = document.getElementById('barcodeVideo');
+            const status = document.getElementById('barcodeStatus');
+            
+            try {
+                // Solicitar acesso à câmera
+                barcodeStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment', // Câmera traseira
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                });
+                
+                video.srcObject = barcodeStream;
+                barcodeScanning = true;
+                
+                status.innerHTML = '<p class="text-sm text-base-content/60">Posicione o código de barras dentro do quadro</p>';
+                
+                // Iniciar detecção de código de barras
+                startBarcodeDetection();
+                
+            } catch (error) {
+                console.error('Erro ao acessar câmera:', error);
+                status.innerHTML = '<p class="text-sm text-error">Erro ao acessar a câmera. Verifique as permissões.</p>';
+            }
+        };
+
+        // Função para detectar código de barras usando BarcodeDetector API
+        const startBarcodeDetection = () => {
+            const video = document.getElementById('barcodeVideo');
+            
+            // Fallback para navegadores que não suportam BarcodeDetector
+            if (!('BarcodeDetector' in window)) {
+                // Usar detecção manual simples
+                startManualBarcodeDetection();
+                return;
+            }
+            
+            const barcodeDetector = new BarcodeDetector({
+                formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e']
+            });
+            
+            const detectBarcode = async () => {
+                if (!barcodeScanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
+                    if (barcodeScanning) {
+                        requestAnimationFrame(detectBarcode);
+                    }
+                    return;
+                }
+                
+                try {
+                    const barcodes = await barcodeDetector.detect(video);
+                    
+                    if (barcodes.length > 0) {
+                        const barcode = barcodes[0].rawValue;
+                        console.log('Código de barras detectado:', barcode);
+                        await searchProductByBarcode(barcode);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Erro na detecção:', error);
+                }
+                
+                requestAnimationFrame(detectBarcode);
+            };
+            
+            video.addEventListener('loadeddata', () => {
+                detectBarcode();
+            });
+        };
+
+        // Função de detecção manual para navegadores sem BarcodeDetector
+        const startManualBarcodeDetection = () => {
+            const status = document.getElementById('barcodeStatus');
+            status.innerHTML = `
+                <p class="text-sm text-base-content/60 mb-2">Posicione o código de barras dentro do quadro</p>
+                <div class="form-control">
+                    <input type="text" id="manualBarcode" placeholder="Ou digite o código manualmente" class="input input-bordered input-sm">
+                    <button type="button" id="searchManualBarcode" class="btn btn-sm btn-primary mt-2">
+                        <i class="fa-solid fa-search mr-1"></i> Buscar
+                    </button>
+                </div>
+            `;
+            
+            // Event listener para busca manual
+            document.getElementById('searchManualBarcode').addEventListener('click', () => {
+                const barcode = document.getElementById('manualBarcode').value.trim();
+                if (barcode) {
+                    searchProductByBarcode(barcode);
+                }
+            });
+            
+            document.getElementById('manualBarcode').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const barcode = e.target.value.trim();
+                    if (barcode) {
+                        searchProductByBarcode(barcode);
+                    }
+                }
+            });
+        };
+
+        // Função para sugerir seção baseada no produto
+        const suggestSectionForProduct = (productName, categories) => {
+            const name = productName.toLowerCase();
+            
+            // Mapeamento de palavras-chave para seções
+            const sectionKeywords = {
+                'frutas': ['banana', 'maçã', 'laranja', 'uva', 'pêra', 'abacaxi', 'manga', 'mamão', 'melancia', 'melão', 'morango', 'kiwi', 'limão', 'fruta'],
+                'verduras': ['alface', 'tomate', 'cebola', 'cenoura', 'batata', 'abobrinha', 'pepino', 'pimentão', 'brócolis', 'couve', 'espinafre', 'verdura', 'legume'],
+                'carnes': ['carne', 'frango', 'peixe', 'porco', 'boi', 'linguiça', 'salsicha', 'presunto', 'bacon', 'costela', 'filé'],
+                'laticínios': ['leite', 'queijo', 'iogurte', 'manteiga', 'cream cheese', 'requeijão', 'nata', 'creme de leite'],
+                'padaria': ['pão', 'bolo', 'biscoito', 'torrada', 'croissant', 'sonho', 'donut'],
+                'bebidas': ['água', 'refrigerante', 'suco', 'cerveja', 'vinho', 'café', 'chá', 'energético'],
+                'limpeza': ['detergente', 'sabão', 'amaciante', 'desinfetante', 'papel higiênico', 'shampoo', 'condicionador'],
+                'mercearia': ['arroz', 'feijão', 'açúcar', 'sal', 'óleo', 'vinagre', 'macarrão', 'farinha', 'molho']
+            };
+            
+            // Verificar categorias da API do Open Food Facts
+            if (categories) {
+                const apiCategories = categories.toLowerCase();
+                if (apiCategories.includes('fruit') || apiCategories.includes('fruta')) return 'frutas';
+                if (apiCategories.includes('vegetable') || apiCategories.includes('verdura')) return 'verduras';
+                if (apiCategories.includes('meat') || apiCategories.includes('carne')) return 'carnes';
+                if (apiCategories.includes('dairy') || apiCategories.includes('laticínio')) return 'laticínios';
+                if (apiCategories.includes('beverage') || apiCategories.includes('bebida')) return 'bebidas';
+                if (apiCategories.includes('bread') || apiCategories.includes('bakery')) return 'padaria';
+            }
+            
+            // Verificar palavras-chave no nome do produto
+            for (const [section, keywords] of Object.entries(sectionKeywords)) {
+                if (keywords.some(keyword => name.includes(keyword))) {
+                    return section;
+                }
+            }
+            
+            return null;
+        };
+
+        // Função para buscar produto na API do Open Food Facts
+        const searchProductByBarcode = async (barcode) => {
+            const status = document.getElementById('barcodeStatus');
+            const result = document.getElementById('barcodeResult');
+            const productInfo = document.getElementById('productInfo');
+            const useBtn = document.getElementById('useBarcodeBtn');
+            
+            status.innerHTML = '<p class="text-sm text-primary"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Buscando produto...</p>';
+            
+            try {
+                const response = await fetch(`https://br.openfoodfacts.org/api/v2/product/${barcode}`);
+                const data = await response.json();
+                
+                if (data.status === 1 && data.product) {
+                    const product = data.product;
+                    const productName = product.product_name_pt || product.product_name || 'Produto sem nome';
+                    const brand = product.brands || '';
+                    const quantity = product.quantity || '';
+                    const categories = product.categories || '';
+                    
+                    // Sugerir seção baseada no produto
+                    const suggestedSection = suggestSectionForProduct(productName, categories);
+                    
+                    currentProductData = {
+                        name: productName,
+                        barcode: barcode,
+                        brand: brand,
+                        quantity: quantity,
+                        suggestedSection: suggestedSection
+                    };
+                    
+                    productInfo.innerHTML = `
+                        <div class="font-semibold">${productName}</div>
+                        ${brand ? `<div class="text-xs text-base-content/60">Marca: ${brand}</div>` : ''}
+                        ${quantity ? `<div class="text-xs text-base-content/60">Quantidade: ${quantity}</div>` : ''}
+                        ${suggestedSection ? `<div class="text-xs text-primary font-medium mt-1">💡 Seção sugerida: ${suggestedSection}</div>` : ''}
+                        <div class="text-xs text-base-content/60 mt-1">Código: ${barcode}</div>
+                    `;
+                    
+                    result.classList.remove('hidden');
+                    useBtn.classList.remove('hidden');
+                    status.innerHTML = '<p class="text-sm text-success"><i class="fa-solid fa-check mr-2"></i>Produto encontrado!</p>';
+                    
+                } else {
+                    status.innerHTML = '<p class="text-sm text-warning"><i class="fa-solid fa-exclamation-triangle mr-2"></i>Produto não encontrado na base de dados.</p>';
+                    result.classList.add('hidden');
+                    useBtn.classList.add('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao buscar produto:', error);
+                status.innerHTML = '<p class="text-sm text-error"><i class="fa-solid fa-times mr-2"></i>Erro ao buscar produto. Tente novamente.</p>';
+                result.classList.add('hidden');
+                useBtn.classList.add('hidden');
+            }
+        };
+
+        // Função para parar o scanner
+        const stopBarcodeScanner = () => {
+            barcodeScanning = false;
+            
+            if (barcodeStream) {
+                barcodeStream.getTracks().forEach(track => track.stop());
+                barcodeStream = null;
+            }
+            
+            const video = document.getElementById('barcodeVideo');
+            video.srcObject = null;
+            
+            // Reset do modal
+            document.getElementById('barcodeStatus').innerHTML = '<p class="text-sm text-base-content/60">Posicione o código de barras dentro do quadro</p>';
+            document.getElementById('barcodeResult').classList.add('hidden');
+            document.getElementById('useBarcodeBtn').classList.add('hidden');
+            currentProductData = null;
+        };
+
+        // Event listeners para o scanner
+        document.getElementById('barcodeBtn').addEventListener('click', () => {
+            const modal = document.getElementById('barcodeModal');
+            modal.showModal();
+            initBarcodeScanner();
+        });
+
+        document.getElementById('stopBarcodeBtn').addEventListener('click', () => {
+            stopBarcodeScanner();
+            document.getElementById('barcodeModal').close();
+        });
+
+        document.getElementById('useBarcodeBtn').addEventListener('click', () => {
+            if (currentProductData) {
+                // Preencher o campo de nome do item
+                document.getElementById('itemName').value = currentProductData.name;
+                
+                // Preencher seção sugerida se disponível
+                if (currentProductData.suggestedSection) {
+                    const sectionBtn = document.getElementById('itemSectionBtn');
+                    const sectionInput = document.getElementById('itemSection');
+                    
+                    // Procurar pela seção sugerida nas seções disponíveis
+                    const matchingSection = sections.find(section => 
+                        section.name.toLowerCase().includes(currentProductData.suggestedSection.toLowerCase()) ||
+                        currentProductData.suggestedSection.toLowerCase().includes(section.name.toLowerCase())
+                    );
+                    
+                    if (matchingSection) {
+                        sectionInput.value = matchingSection.id;
+                        sectionBtn.querySelector('.truncate').innerHTML = `${matchingSection.icon || ''} ${matchingSection.name}`;
+                        sectionBtn.disabled = false;
+                        
+                        // Habilitar o botão de subseção
+                        const subsectionBtn = document.getElementById('itemSubsectionBtn');
+                        subsectionBtn.disabled = false;
+                        
+                        announceToScreenReader(`Seção ${matchingSection.name} sugerida automaticamente - você pode alterá-la ou deixar em branco`);
+                    }
+                }
+                
+                // Fechar o modal
+                stopBarcodeScanner();
+                document.getElementById('barcodeModal').close();
+                
+                // Focar no próximo campo (quantidade)
+                document.getElementById('itemQuantity').focus();
+                
+                announceToScreenReader(`Produto ${currentProductData.name} adicionado ao formulário`);
+            }
+        });
+
+        // Fechar modal quando clicar no backdrop
+        document.getElementById('barcodeModal').addEventListener('close', () => {
+            stopBarcodeScanner();
+        });
+
         init();
     });
+
     </script>
+
+    <!-- Modal do Scanner de Código de Barras -->
+    <dialog id="barcodeModal" class="modal">
+        <div class="modal-box max-w-md">
+            <h3 class="font-bold text-lg mb-4">
+                <i class="fa-solid fa-barcode mr-2"></i>
+                Scanner de Código de Barras
+            </h3>
+            
+            <div id="barcodeScanner" class="mb-4">
+                <video id="barcodeVideo" class="w-full rounded-lg bg-black" style="aspect-ratio: 4/3;" autoplay muted playsinline></video>
+                <div id="barcodeOverlay" class="relative -mt-4 pointer-events-none">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent rounded-lg opacity-50"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="barcodeStatus" class="text-center mb-4">
+                <p class="text-sm text-base-content/60">Posicione o código de barras dentro do quadro</p>
+            </div>
+            
+            <div id="barcodeResult" class="hidden mb-4 p-3 bg-success/10 border border-success/20 rounded-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-check-circle text-success"></i>
+                    <span class="font-semibold text-success">Produto encontrado!</span>
+                </div>
+                <div id="productInfo" class="text-sm"></div>
+            </div>
+            
+            <div class="modal-action">
+                <button id="stopBarcodeBtn" class="btn btn-outline">
+                    <i class="fa-solid fa-stop mr-2"></i>
+                    Parar Scanner
+                </button>
+                <button id="useBarcodeBtn" class="btn btn-primary hidden">
+                    <i class="fa-solid fa-check mr-2"></i>
+                    Usar Produto
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>Fechar</button>
+        </form>
+    </dialog>
+
 </body>
 </html>
