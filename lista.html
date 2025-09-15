@@ -195,6 +195,179 @@
             height: 1px;
             overflow: hidden;
         }
+        
+        /* Animações suaves para modais */
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-box {
+            animation: modalSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Animações para itens da lista */
+        .item-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(0,0,0,0.12);
+        }
+        
+        .item-enter {
+            animation: itemEnter 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes itemEnter {
+            from {
+                opacity: 0;
+                transform: translateX(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        .item-remove {
+            animation: itemRemove 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        
+        @keyframes itemRemove {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                max-height: 200px;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(20px) scale(0.95);
+                max-height: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
+        /* Animações para seções */
+        .section-expand {
+            animation: sectionExpand 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes sectionExpand {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Feedback visual para ações */
+        .action-feedback {
+            animation: actionFeedback 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes actionFeedback {
+            0% {
+                transform: scale(1);
+            }
+            30% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px oklch(var(--su)/.4);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Transições suaves para estados */
+        .checkbox {
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .checkbox:checked {
+            animation: checkboxCheck 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes checkboxCheck {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Animações para toast/notificações */
+        .toast-enter {
+            animation: toastEnter 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes toastEnter {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastExit {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+        }
+        
+        /* Micro-interações para botões */
+        .btn-micro {
+            transition: all 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .btn-micro:active {
+            transform: scale(0.95);
+        }
+        
+        /* Animação de carregamento suave */
+        .loading-smooth {
+            animation: loadingSmooth 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes loadingSmooth {
+            0%, 100% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen transition-colors duration-500 font-sans">
@@ -208,6 +381,10 @@
                 </a>
             </div>
             <div class="flex-none gap-2">
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="start-tutorial" aria-label="Iniciar tutorial">
+                    <i class="fa-solid fa-question-circle text-base sm:text-lg"></i>
+                </button>
+
                 <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="open-settings-modal" aria-label="Abrir configurações da lista">
                     <i class="fa-solid fa-sliders text-base sm:text-lg"></i>
                 </button>
@@ -284,7 +461,7 @@
                             <button type="submit" class="btn btn-primary w-full gap-2 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl text-base font-semibold" aria-describedby="add-item-help">
                                 <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Item
                             </button>
-                            <div id="add-item-help" class="sr-only">Pressione Enter ou clique para adicionar o item à lista</div>
+                            <div id="add-item-help" class="sr-only">Toque para adicionar o item à lista</div>
                         </form>
                     </div>
                 </div>
@@ -356,6 +533,8 @@
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
+    
+
     <dialog id="section_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg mb-4" id="sectionModalTitle">Adicionar Seção/Subseção</h3>
@@ -390,6 +569,63 @@
         <div class="modal-box">
             <h3 class="font-bold text-lg">Configurações da Lista</h3>
             <div class="py-4 space-y-4">
+                <div>
+                    <h4 class="font-semibold mb-2">Configurações de Visualização</h4>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Modo Compacto</span>
+                            <input type="checkbox" id="compact-mode-toggle" class="toggle toggle-primary" />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Reduz o espaçamento entre itens para visualizar mais conteúdo</span>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Mostrar Quantidades</span>
+                            <input type="checkbox" id="show-quantities-toggle" class="toggle toggle-primary" checked />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Exibe as quantidades dos itens na lista</span>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Mostrar Categorias</span>
+                            <input type="checkbox" id="show-categories-toggle" class="toggle toggle-primary" checked />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Exibe as categorias dos itens na lista</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div>
+                    <h4 class="font-semibold mb-2">Feedback Háptico</h4>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Vibração Habilitada</span>
+                            <input type="checkbox" id="haptic-enabled-toggle" class="toggle toggle-primary" checked />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Ativa vibração em dispositivos móveis</span>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Intensidade</span>
+                            <select id="haptic-intensity-select" class="select select-bordered select-sm w-full max-w-xs">
+                                <option value="light">Leve</option>
+                                <option value="medium" selected>Média</option>
+                                <option value="strong">Forte</option>
+                            </select>
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Intensidade da vibração</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider"></div>
                 <div>
                     <h4 class="font-semibold mb-2">Gerenciar Seções</h4>
                     <p class="text-xs text-base-content/60 mb-2">Arraste as seções para reordenar.</p>
@@ -641,7 +877,9 @@
             selectionModalSearchInput.addEventListener('input', currentSearchHandler);
 
             renderItems();
+            selectionModal.classList.add('modal-enter');
             selectionModal.showModal();
+            setTimeout(() => selectionModal.classList.remove('modal-enter'), 50);
         };
 
         const loadState = () => {
@@ -1566,7 +1804,7 @@
             const subsections = getSubsections(section.id);
             
             const sectionElement = document.createElement('div');
-            sectionElement.className = 'bg-base-100 rounded-lg shadow-md section-card';
+            sectionElement.className = 'bg-base-100 rounded-lg shadow-md section-card section-enter';
             sectionElement.dataset.sectionId = section.id;
 
             const header = document.createElement('div');
@@ -1655,24 +1893,65 @@
             const hasPrice = item.price > 0;
             const itemTotal = item.price * item.quantity;
             const card = document.createElement('div');
-            card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200';
+            card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200 item-enter';
             card.dataset.id = item.id;
             
-            // Adicionar suporte a gestos touch (swipe)
+            // Adicionar suporte a gestos touch (swipe) melhorado
             let touchStartX = 0;
             let touchStartY = 0;
             let touchEndX = 0;
             let touchEndY = 0;
+            let isDragging = false;
             
             card.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
                 touchStartY = e.changedTouches[0].screenY;
+                isDragging = false;
+            }, { passive: true });
+            
+            card.addEventListener('touchmove', (e) => {
+                if (!isDragging) {
+                    const deltaX = e.changedTouches[0].screenX - touchStartX;
+                    const deltaY = e.changedTouches[0].screenY - touchStartY;
+                    
+                    // Verificar se é um movimento horizontal
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+                        isDragging = true;
+                        card.style.transition = 'none';
+                    }
+                }
+                
+                if (isDragging) {
+                    const deltaX = e.changedTouches[0].screenX - touchStartX;
+                    const maxSwipe = 100;
+                    const clampedDelta = Math.max(-maxSwipe, Math.min(maxSwipe, deltaX));
+                    
+                    card.style.transform = `translateX(${clampedDelta}px)`;
+                    
+                    // Feedback visual baseado na direção
+                    if (clampedDelta > 30) {
+                        card.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                    } else if (clampedDelta < -30) {
+                        card.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    } else {
+                        card.style.backgroundColor = '';
+                    }
+                }
             }, { passive: true });
             
             card.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].screenX;
                 touchEndY = e.changedTouches[0].screenY;
-                handleSwipeGesture(item.id);
+                
+                // Resetar estilos
+                card.style.transition = '';
+                card.style.transform = '';
+                card.style.backgroundColor = '';
+                
+                if (isDragging) {
+                    handleSwipeGesture(item.id);
+                }
+                isDragging = false;
             }, { passive: true });
             
             function handleSwipeGesture(itemId) {
@@ -1686,8 +1965,23 @@
                     // Swipe para esquerda = desmarcar
                     const shouldMarkAsCompleted = deltaX > 0;
                     const currentItem = shoppingList.find(i => i.id === itemId);
-                    if (currentItem && currentItem.inCart !== shouldMarkAsCompleted) {
+                    if (currentItem && currentItem.price > 0 && currentItem.inCart !== shouldMarkAsCompleted) {
+                        // Feedback háptico
+                        if (navigator.vibrate) {
+                            navigator.vibrate(50);
+                        }
+                        
+                        // Animação de feedback
+                        card.classList.add('swipe-feedback');
+                        setTimeout(() => card.classList.remove('swipe-feedback'), 300);
+                        
                         updateItem(itemId, { inCart: shouldMarkAsCompleted });
+                        
+                        // Toast de feedback
+                        const message = shouldMarkAsCompleted 
+                            ? `${currentItem.name} adicionado ao carrinho!`
+                            : `${currentItem.name} removido do carrinho!`;
+                        showToast(message, shouldMarkAsCompleted ? 'success' : 'info');
                         
                         // Anunciar mudança para leitores de tela
                         const announcement = shouldMarkAsCompleted 
@@ -1826,6 +2120,21 @@
             itemCountElements.forEach(el => el && (el.textContent = shoppingList.length));
         };
 
+        const showToast = (message, type = 'success') => {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} toast-enter fixed top-4 right-4 z-50 max-w-sm shadow-lg`;
+            toast.innerHTML = `
+                <i class="fa-solid fa-${type === 'success' ? 'check' : type === 'info' ? 'info' : 'exclamation-triangle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastExit 0.3s ease-in forwards';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        };
+
         const addItem = (name, quantity, unit, sectionId, subsectionId, price = 0) => {
             const order = shoppingList.filter(i => i.section === sectionId && i.subsection === subsectionId).length;
             const sanitizedName = sanitizeText(name).trim();
@@ -1851,6 +2160,7 @@
             localStorage.setItem('lastUsedSection', sectionId);
             localStorage.setItem('lastUsedSubsection', subsectionId || '');
             saveAndRender();
+            showToast(`${sanitizedName} adicionado à lista!`);
         };
 
         const updateItem = (id, updates) => {
@@ -1878,8 +2188,11 @@
         };
 
         const removeItem = (id) => {
+            const item = shoppingList.find(i => i.id === id);
+            const itemName = item ? item.name : 'Item';
             shoppingList = shoppingList.filter(i => i.id !== id);
             saveAndRender();
+            showToast(`${itemName} removido da lista!`, 'info');
         };
 
         const addOrUpdateSection = (id, name, icon, parentId) => {
@@ -2163,7 +2476,9 @@
                         }
                         editSubsectionBtn.disabled = !item.section;
 
+                        editModal.classList.add('modal-enter');
                         editModal.showModal();
+                        setTimeout(() => editModal.classList.remove('modal-enter'), 50);
                     }
                     break;
                 case 'remove-item':
@@ -2181,7 +2496,14 @@
                     }
                     break;
                 case 'toggle-cart-status':
-                    if (item && item.price > 0) updateItem(id, { inCart: !item.inCart });
+                    if (item && item.price > 0) {
+                        const itemCard = document.querySelector(`[data-id="${id}"]`);
+                        if (itemCard) {
+                            itemCard.classList.add('action-feedback');
+                            setTimeout(() => itemCard.classList.remove('action-feedback'), 300);
+                        }
+                        updateItem(id, { inCart: !item.inCart });
+                    }
                     break;
                 case 'open-section-modal':
                 case 'open-section-modal-from-adder':
@@ -2190,8 +2512,12 @@
                     document.getElementById('sectionParent').value = '';
                     document.getElementById('sectionParentBtn').querySelector('.truncate').innerHTML = `📁 Nenhuma (Criar Seção Principal)`;
                     updateSectionModalUI(null, false);
+                    sectionModal.classList.add('modal-enter');
                     sectionModal.showModal();
-                    setTimeout(() => document.getElementById('sectionName').focus(), 50);
+                    setTimeout(() => {
+                        document.getElementById('sectionName').focus();
+                        sectionModal.classList.remove('modal-enter');
+                    }, 50);
                     break;
                 case 'open-subsection-modal-from-section': {
                     const parentId = actionTarget.dataset.id;
@@ -2248,6 +2574,10 @@
                 case 'open-settings-modal':
                     renderSectionManager();
                     settingsModal.showModal();
+                    break;
+
+                case 'start-tutorial':
+                    startInteractiveTutorial();
                     break;
                 case 'open-unit-selector': {
                     const currentVal = document.getElementById(targetInput).value;
@@ -2493,9 +2823,33 @@
             initSectionSortable(container);
         };
 
+        const detectSystemTheme = () => {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'cupcake';
+        };
+
+        const initTheme = () => {
+            let theme = localStorage.getItem('theme');
+            
+            if (!theme) {
+                theme = detectSystemTheme();
+                localStorage.setItem('theme', theme);
+            }
+            
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Escutar mudanças na preferência do sistema
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                const savedTheme = localStorage.getItem('theme');
+                if (!savedTheme) {
+                    const newTheme = e.matches ? 'dark' : 'cupcake';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                }
+            });
+        };
+
         const init = () => {
-            const currentTheme = localStorage.getItem('theme') || 'cupcake';
-            document.documentElement.setAttribute('data-theme', currentTheme);
+            initTheme();
             
             loadState();
             
@@ -2575,8 +2929,11 @@
             // Configurar sugestões inteligentes
             setupSmartSuggestions();
             
-            // Implementar atalhos de teclado
+            // ===== ATALHOS DE TECLADO AVANÇADOS =====
             document.addEventListener('keydown', (e) => {
+                // Prevenir ações padrão apenas quando necessário
+                const isInputFocused = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
+                
                 // Ctrl+N ou Cmd+N - Focar no campo de adicionar item
                 if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
                     e.preventDefault();
@@ -2591,6 +2948,103 @@
                         }
                         itemNameInput.focus();
                         announceToScreenReader('Campo de novo item focado');
+                    }
+                }
+                
+                // Ctrl+S ou Cmd+S - Salvar lista (exportar)
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    const exportBtn = document.querySelector('[data-action="export-list"]');
+                    if (exportBtn) {
+                        exportBtn.click();
+                        showToast('Lista exportada!', 'success');
+                    }
+                }
+                
+                // Ctrl+F ou Cmd+F - Focar na busca
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                        announceToScreenReader('Campo de busca focado');
+                    }
+                }
+                
+                // Ctrl+M ou Cmd+M - Abrir gerenciador de itens
+                if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
+                    e.preventDefault();
+                    const manageBtn = document.querySelector('[data-action="open-manage-items-modal"]');
+                    if (manageBtn) {
+                        manageBtn.click();
+                        announceToScreenReader('Gerenciador de itens aberto');
+                    }
+                }
+                
+
+                
+                // Ctrl+Shift+C ou Cmd+Shift+C - Limpar lista completa
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+                    e.preventDefault();
+                    const clearBtn = document.querySelector('[data-action="clear-completed"]');
+                    if (clearBtn) {
+                        clearBtn.click();
+                        announceToScreenReader('Itens concluídos removidos');
+                    }
+                }
+                
+                // Ctrl+A ou Cmd+A - Selecionar todos os itens (marcar como concluídos)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !isInputFocused) {
+                    e.preventDefault();
+                    const uncheckedItems = document.querySelectorAll('.item-card input[type="checkbox"]:not(:checked)');
+                    uncheckedItems.forEach(checkbox => {
+                        checkbox.checked = true;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    if (uncheckedItems.length > 0) {
+                        showToast(`${uncheckedItems.length} itens marcados como concluídos`, 'success');
+                        announceToScreenReader(`${uncheckedItems.length} itens marcados como concluídos`);
+                    }
+                }
+                
+                // Ctrl+Shift+A ou Cmd+Shift+A - Desmarcar todos os itens
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
+                    e.preventDefault();
+                    const checkedItems = document.querySelectorAll('.item-card input[type="checkbox"]:checked');
+                    checkedItems.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    if (checkedItems.length > 0) {
+                        showToast(`${checkedItems.length} itens desmarcados`, 'info');
+                        announceToScreenReader(`${checkedItems.length} itens desmarcados`);
+                    }
+                }
+                
+                // Delete - Remover item focado
+                if (e.key === 'Delete' && !isInputFocused) {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && focusedElement.closest('.item-card')) {
+                        const deleteBtn = focusedElement.closest('.item-card').querySelector('[data-action="delete-item"]');
+                        if (deleteBtn) {
+                            deleteBtn.click();
+                            announceToScreenReader('Item removido');
+                        }
+                    }
+                }
+                
+                // Space - Marcar/desmarcar item focado
+                if (e.key === ' ' && !isInputFocused) {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && focusedElement.closest('.item-card') && !focusedElement.matches('button, input')) {
+                        e.preventDefault();
+                        const checkbox = focusedElement.closest('.item-card').querySelector('input[type="checkbox"]');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                            announceToScreenReader(checkbox.checked ? 'Item marcado como concluído' : 'Item desmarcado');
+                        }
                     }
                 }
                 
@@ -2618,22 +3072,46 @@
                 }
                 
                 // Navegação por teclado nos itens da lista
-                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !isInputFocused) {
                     const focusedElement = document.activeElement;
-                    if (focusedElement && focusedElement.closest('.item-card')) {
+                    if (focusedElement && (focusedElement.closest('.item-card') || focusedElement.matches('.item-card'))) {
                         e.preventDefault();
-                        const allItems = Array.from(document.querySelectorAll('.item-card [tabindex="0"], .item-card button'));
-                        const currentIndex = allItems.indexOf(focusedElement);
+                        const allItems = Array.from(document.querySelectorAll('.item-card'));
+                        const currentItem = focusedElement.closest('.item-card') || focusedElement;
+                        const currentIndex = allItems.indexOf(currentItem);
                         
                         if (currentIndex !== -1) {
                             const nextIndex = e.key === 'ArrowDown' 
                                 ? Math.min(currentIndex + 1, allItems.length - 1)
                                 : Math.max(currentIndex - 1, 0);
-                            allItems[nextIndex].focus();
+                            
+                            if (nextIndex !== currentIndex) {
+                                allItems[nextIndex].focus();
+                                allItems[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                announceToScreenReader(`Item ${nextIndex + 1} de ${allItems.length} focado`);
+                            }
                         }
                     }
                 }
+                
+                // Tab - Navegação melhorada entre elementos
+                if (e.key === 'Tab' && !e.shiftKey) {
+                    // Permitir navegação normal, mas anunciar para leitores de tela
+                    setTimeout(() => {
+                        const focused = document.activeElement;
+                        if (focused && focused.closest('.item-card')) {
+                            const itemName = focused.closest('.item-card').querySelector('.item-name')?.textContent;
+                            if (itemName) {
+                                announceToScreenReader(`Focado em: ${itemName}`);
+                            }
+                        }
+                    }, 10);
+                }
+                
+
             });
+            
+
         };
 
         // Registrar Service Worker para PWA
@@ -2977,6 +3455,762 @@
             <button>Fechar</button>
         </form>
     </dialog>
+
+    <script>
+        
+        // ===== SISTEMA DE TUTORIAL INTERATIVO =====
+        let tutorialState = {
+            isActive: false,
+            currentStep: 0,
+            overlay: null,
+            tooltip: null,
+            steps: [
+                {
+                    target: '#itemName',
+                    title: 'Bem-vindo à Lista de Compras!',
+                    content: 'Comece digitando o nome de um item aqui. A aplicação irá sugerir automaticamente produtos e categorias.',
+                    position: 'bottom',
+                    action: () => {
+                        const adderToggle = document.getElementById('adder-toggle');
+                        if (adderToggle && !adderToggle.checked) {
+                            adderToggle.checked = true;
+                        }
+                    }
+                },
+                {
+                    target: '#addItemForm button[type="submit"]',
+                    title: 'Adicionar Itens',
+                    content: 'Toque aqui para adicionar o item à sua lista de compras.',
+                    position: 'top'
+                },
+                {
+                    target: '.item-card:first-child',
+                    title: 'Gerenciar Itens',
+                    content: 'Toque na checkbox para marcar como concluído, ou use os botões para editar quantidade e remover itens. Você pode arrastar para reordenar!',
+                    position: 'right',
+                    fallback: '#sections-container'
+                },
+                {
+                    target: '#searchInput',
+                    title: 'Buscar na Lista',
+                    content: 'Use este campo para filtrar itens na sua lista de forma rápida e fácil.',
+                    position: 'bottom'
+                },
+                {
+                    target: '[data-action="open-manage-items-modal"]',
+                    title: 'Gerenciar Produtos',
+                    content: 'Aqui você pode gerenciar todos os produtos cadastrados, criar categorias e organizar sua base de dados.',
+                    position: 'bottom'
+                },
+
+                {
+                    target: '[data-action="open-settings-modal"]',
+                    title: 'Configurações',
+                    content: 'Personalize sua experiência: exporte listas, configure categorias, ajuste preferências e muito mais.',
+                    position: 'bottom'
+                },
+                {
+                    target: 'body',
+                    title: 'Funcionalidades Avançadas',
+                    content: 'Explore todas as funcionalidades: marque todos os itens de uma vez, use filtros, organize por categorias e muito mais!',
+                    position: 'center'
+                },
+                {
+                    target: 'body',
+                    title: 'Tutorial Concluído!',
+                    content: 'Agora você está pronto para usar a Lista de Compras! Explore todas as funcionalidades e aproveite a experiência otimizada.',
+                    position: 'center'
+                }
+            ]
+        };
+        
+        function startInteractiveTutorial() {
+            if (tutorialState.isActive) {
+                endTutorial();
+                return;
+            }
+            
+            tutorialState.isActive = true;
+            tutorialState.currentStep = 0;
+            createTutorialOverlay();
+            showTutorialStep(0);
+            announceToScreenReader('Tutorial interativo iniciado');
+        }
+        
+        function createTutorialOverlay() {
+            // Criar overlay escuro
+            tutorialState.overlay = document.createElement('div');
+            tutorialState.overlay.className = 'tutorial-overlay';
+            tutorialState.overlay.innerHTML = `
+                <style>
+                    .tutorial-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.7);
+                        z-index: 9998;
+                        pointer-events: none;
+                    }
+                    .tutorial-highlight {
+                        position: absolute;
+                        border: 3px solid #3b82f6;
+                        border-radius: 8px;
+                        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(59, 130, 246, 0.5);
+                        pointer-events: none;
+                        z-index: 9999;
+                        transition: all 0.3s ease;
+                    }
+                    .tutorial-tooltip {
+                        position: absolute;
+                        background: white;
+                        border-radius: 12px;
+                        padding: 20px;
+                        max-width: 320px;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                        z-index: 10000;
+                        pointer-events: auto;
+                        border: 1px solid #e5e7eb;
+                    }
+                    .tutorial-tooltip h3 {
+                        margin: 0 0 12px 0;
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #1f2937;
+                    }
+                    .tutorial-tooltip p {
+                        margin: 0 0 16px 0;
+                        color: #6b7280;
+                        line-height: 1.5;
+                    }
+                    .tutorial-tooltip .tutorial-controls {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        gap: 12px;
+                    }
+                    .tutorial-tooltip .tutorial-progress {
+                        font-size: 12px;
+                        color: #9ca3af;
+                        font-weight: 500;
+                    }
+                    .tutorial-tooltip .tutorial-buttons {
+                        display: flex;
+                        gap: 8px;
+                    }
+                    .tutorial-btn {
+                        padding: 8px 16px;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    }
+                    .tutorial-btn-primary {
+                        background: #3b82f6;
+                        color: white;
+                    }
+                    .tutorial-btn-primary:hover {
+                        background: #2563eb;
+                    }
+                    .tutorial-btn-secondary {
+                        background: #f3f4f6;
+                        color: #374151;
+                    }
+                    .tutorial-btn-secondary:hover {
+                        background: #e5e7eb;
+                    }
+                    .tutorial-btn-danger {
+                        background: #ef4444;
+                        color: white;
+                    }
+                    .tutorial-btn-danger:hover {
+                        background: #dc2626;
+                    }
+                </style>
+            `;
+            document.body.appendChild(tutorialState.overlay);
+        }
+        
+        function showTutorialStep(stepIndex) {
+            if (stepIndex >= tutorialState.steps.length) {
+                endTutorial();
+                return;
+            }
+            
+            const step = tutorialState.steps[stepIndex];
+            tutorialState.currentStep = stepIndex;
+            
+            // Executar ação do passo se existir
+            if (step.action) {
+                step.action();
+            }
+            
+            // Aguardar um pouco para elementos aparecerem
+            setTimeout(() => {
+                const target = document.querySelector(step.target);
+                if (!target && step.fallback) {
+                    target = document.querySelector(step.fallback);
+                }
+                
+                if (target || step.position === 'center') {
+                    highlightElement(target, step);
+                    showTooltip(target, step);
+                } else {
+                    // Se elemento não existe, pular para próximo
+                    showTutorialStep(stepIndex + 1);
+                }
+            }, 100);
+        }
+        
+        function highlightElement(element, step) {
+            // Remover highlight anterior
+            const oldHighlight = document.querySelector('.tutorial-highlight');
+            if (oldHighlight) {
+                oldHighlight.remove();
+            }
+            
+            if (!element || step.position === 'center') return;
+            
+            const rect = element.getBoundingClientRect();
+            const highlight = document.createElement('div');
+            highlight.className = 'tutorial-highlight';
+            highlight.style.left = (rect.left - 5) + 'px';
+            highlight.style.top = (rect.top - 5) + 'px';
+            highlight.style.width = (rect.width + 10) + 'px';
+            highlight.style.height = (rect.height + 10) + 'px';
+            
+            document.body.appendChild(highlight);
+            
+            // Scroll para o elemento
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function showTooltip(element, step) {
+            // Remover tooltip anterior
+            if (tutorialState.tooltip) {
+                tutorialState.tooltip.remove();
+            }
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tutorial-tooltip';
+            
+            const isLastStep = tutorialState.currentStep === tutorialState.steps.length - 1;
+            const isFirstStep = tutorialState.currentStep === 0;
+            
+            tooltip.innerHTML = `
+                <h3>${step.title}</h3>
+                <p>${step.content}</p>
+                <div class="tutorial-controls">
+                    <div class="tutorial-progress">
+                        ${tutorialState.currentStep + 1} de ${tutorialState.steps.length}
+                    </div>
+                    <div class="tutorial-buttons">
+                        <button class="tutorial-btn tutorial-btn-danger" onclick="endTutorial()">
+                            Pular
+                        </button>
+                        ${!isFirstStep ? '<button class="tutorial-btn tutorial-btn-secondary" onclick="previousTutorialStep()">Anterior</button>' : ''}
+                        <button class="tutorial-btn tutorial-btn-primary" onclick="${isLastStep ? 'endTutorial()' : 'nextTutorialStep()'}">
+                            ${isLastStep ? 'Concluir' : 'Próximo'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(tooltip);
+            tutorialState.tooltip = tooltip;
+            
+            // Posicionar tooltip
+            positionTooltip(tooltip, element, step.position);
+        }
+        
+        function positionTooltip(tooltip, element, position) {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            if (position === 'center' || !element) {
+                tooltip.style.left = (viewportWidth - tooltipRect.width) / 2 + 'px';
+                tooltip.style.top = (viewportHeight - tooltipRect.height) / 2 + 'px';
+                return;
+            }
+            
+            const elementRect = element.getBoundingClientRect();
+            let left, top;
+            
+            switch (position) {
+                case 'top':
+                    left = elementRect.left + (elementRect.width - tooltipRect.width) / 2;
+                    top = elementRect.top - tooltipRect.height - 15;
+                    break;
+                case 'bottom':
+                    left = elementRect.left + (elementRect.width - tooltipRect.width) / 2;
+                    top = elementRect.bottom + 15;
+                    break;
+                case 'left':
+                    left = elementRect.left - tooltipRect.width - 15;
+                    top = elementRect.top + (elementRect.height - tooltipRect.height) / 2;
+                    break;
+                case 'right':
+                    left = elementRect.right + 15;
+                    top = elementRect.top + (elementRect.height - tooltipRect.height) / 2;
+                    break;
+            }
+            
+            // Ajustar se sair da tela
+            left = Math.max(10, Math.min(left, viewportWidth - tooltipRect.width - 10));
+            top = Math.max(10, Math.min(top, viewportHeight - tooltipRect.height - 10));
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        function nextTutorialStep() {
+            showTutorialStep(tutorialState.currentStep + 1);
+        }
+        
+        function previousTutorialStep() {
+            showTutorialStep(tutorialState.currentStep - 1);
+        }
+        
+        function endTutorial() {
+            tutorialState.isActive = false;
+            
+            // Remover elementos do tutorial
+            if (tutorialState.overlay) {
+                tutorialState.overlay.remove();
+                tutorialState.overlay = null;
+            }
+            
+            if (tutorialState.tooltip) {
+                tutorialState.tooltip.remove();
+                tutorialState.tooltip = null;
+            }
+            
+            const highlight = document.querySelector('.tutorial-highlight');
+            if (highlight) {
+                highlight.remove();
+            }
+            
+            // Marcar tutorial como concluído
+            localStorage.setItem('tutorial_completed', 'true');
+            showToast('Tutorial concluído! Explore todas as funcionalidades.', 'success');
+            announceToScreenReader('Tutorial concluído');
+        }
+        
+        // Verificar se é primeira visita e mostrar tutorial
+        function checkFirstVisit() {
+            const tutorialCompleted = localStorage.getItem('tutorial_completed');
+            const hasItems = document.querySelectorAll('.item-card').length > 0;
+            
+            // Mostrar tutorial se nunca foi concluído e não há itens na lista
+            if (!tutorialCompleted && !hasItems) {
+                setTimeout(() => {
+                    if (confirm('Bem-vindo à Lista de Compras! Gostaria de fazer um tour rápido para conhecer as funcionalidades?')) {
+                        startInteractiveTutorial();
+                    } else {
+                        localStorage.setItem('tutorial_completed', 'true');
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Tornar funções globais para os botões
+        window.nextTutorialStep = nextTutorialStep;
+        window.previousTutorialStep = previousTutorialStep;
+        window.endTutorial = endTutorial;
+        
+        // Verificar primeira visita quando a página carregar
+        document.addEventListener('DOMContentLoaded', checkFirstVisit);
+        
+        // Se já carregou, verificar agora
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkFirstVisit);
+        } else {
+            checkFirstVisit();
+        }
+        
+        // ===== SISTEMA DE MODO COMPACTO =====
+        let viewSettings = {
+            compactMode: false,
+            showQuantities: true,
+            showCategories: true
+        };
+        
+        function loadViewSettings() {
+            const saved = localStorage.getItem('view_settings');
+            if (saved) {
+                viewSettings = { ...viewSettings, ...JSON.parse(saved) };
+            }
+            
+            // Aplicar configurações aos toggles
+            const compactToggle = document.getElementById('compact-mode-toggle');
+            const quantitiesToggle = document.getElementById('show-quantities-toggle');
+            const categoriesToggle = document.getElementById('show-categories-toggle');
+            
+            if (compactToggle) compactToggle.checked = viewSettings.compactMode;
+            if (quantitiesToggle) quantitiesToggle.checked = viewSettings.showQuantities;
+            if (categoriesToggle) categoriesToggle.checked = viewSettings.showCategories;
+            
+            // Aplicar estilos
+            applyViewSettings();
+        }
+        
+        function saveViewSettings() {
+            localStorage.setItem('view_settings', JSON.stringify(viewSettings));
+        }
+        
+        function applyViewSettings() {
+            const body = document.body;
+            
+            // Aplicar modo compacto
+            if (viewSettings.compactMode) {
+                body.classList.add('compact-mode');
+            } else {
+                body.classList.remove('compact-mode');
+            }
+            
+            // Aplicar visibilidade de quantidades
+            if (viewSettings.showQuantities) {
+                body.classList.remove('hide-quantities');
+            } else {
+                body.classList.add('hide-quantities');
+            }
+            
+            // Aplicar visibilidade de categorias
+            if (viewSettings.showCategories) {
+                body.classList.remove('hide-categories');
+            } else {
+                body.classList.add('hide-categories');
+            }
+        }
+        
+        function loadHapticSettingsIntoUI() {
+            const hapticSettings = loadHapticSettings();
+            const hapticEnabledToggle = document.getElementById('haptic-enabled-toggle');
+            const hapticIntensitySelect = document.getElementById('haptic-intensity-select');
+            
+            if (hapticEnabledToggle) {
+                hapticEnabledToggle.checked = hapticSettings.enabled;
+            }
+            
+            if (hapticIntensitySelect) {
+                hapticIntensitySelect.value = hapticSettings.intensity;
+            }
+        }
+        
+        function setupViewSettingsListeners() {
+            const compactToggle = document.getElementById('compact-mode-toggle');
+            const quantitiesToggle = document.getElementById('show-quantities-toggle');
+            const categoriesToggle = document.getElementById('show-categories-toggle');
+            
+            if (compactToggle) {
+                compactToggle.addEventListener('change', (e) => {
+                    viewSettings.compactMode = e.target.checked;
+                    saveViewSettings();
+                    applyViewSettings();
+                    announceToScreenReader(e.target.checked ? 'Modo compacto ativado' : 'Modo compacto desativado');
+                    showToast(e.target.checked ? 'Modo compacto ativado' : 'Modo compacto desativado', 'info');
+                });
+            }
+            
+            if (quantitiesToggle) {
+                quantitiesToggle.addEventListener('change', (e) => {
+                    viewSettings.showQuantities = e.target.checked;
+                    saveViewSettings();
+                    applyViewSettings();
+                    announceToScreenReader(e.target.checked ? 'Quantidades visíveis' : 'Quantidades ocultas');
+                });
+            }
+            
+            if (categoriesToggle) {
+                categoriesToggle.addEventListener('change', (e) => {
+                    viewSettings.showCategories = e.target.checked;
+                    saveViewSettings();
+                    applyViewSettings();
+                    announceToScreenReader(e.target.checked ? 'Categorias visíveis' : 'Categorias ocultas');
+                });
+            }
+            
+            // Event listeners para configurações de feedback háptico
+            const hapticEnabledToggle = document.getElementById('haptic-enabled-toggle');
+            const hapticIntensitySelect = document.getElementById('haptic-intensity-select');
+            
+            if (hapticEnabledToggle) {
+                hapticEnabledToggle.addEventListener('change', (e) => {
+                    const hapticSettings = loadHapticSettings();
+                    hapticSettings.enabled = e.target.checked;
+                    saveHapticSettings(hapticSettings);
+                    
+                    // Feedback háptico de teste
+                    if (e.target.checked) {
+                        hapticFeedback.success();
+                    }
+                    
+                    announceToScreenReader(e.target.checked ? 'Feedback háptico ativado' : 'Feedback háptico desativado');
+                });
+            }
+            
+            if (hapticIntensitySelect) {
+                hapticIntensitySelect.addEventListener('change', (e) => {
+                    const hapticSettings = loadHapticSettings();
+                    hapticSettings.intensity = e.target.value;
+                    saveHapticSettings(hapticSettings);
+                    
+                    // Feedback háptico de teste com nova intensidade
+                    switch (e.target.value) {
+                        case 'light':
+                            hapticFeedback.light();
+                            break;
+                        case 'medium':
+                            hapticFeedback.medium();
+                            break;
+                        case 'strong':
+                            hapticFeedback.strong();
+                            break;
+                    }
+                    
+                    announceToScreenReader(`Intensidade alterada para ${e.target.options[e.target.selectedIndex].text}`);
+                });
+            }
+        }
+        
+        // Adicionar estilos CSS para modo compacto
+        function addCompactModeStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                /* Modo Compacto */
+                .compact-mode .item-card {
+                    padding: 8px 12px !important;
+                    margin-bottom: 4px !important;
+                }
+                
+                .compact-mode .item-card .item-content {
+                    gap: 8px !important;
+                }
+                
+                .compact-mode .item-card .item-name {
+                    font-size: 14px !important;
+                    line-height: 1.3 !important;
+                }
+                
+                .compact-mode .item-card .item-quantity {
+                    font-size: 12px !important;
+                    padding: 2px 6px !important;
+                }
+                
+                .compact-mode .item-card .item-category {
+                    font-size: 11px !important;
+                    padding: 1px 4px !important;
+                }
+                
+                .compact-mode .item-card .item-actions {
+                    gap: 4px !important;
+                }
+                
+                .compact-mode .item-card .btn {
+                    padding: 4px 8px !important;
+                    font-size: 12px !important;
+                    min-height: 28px !important;
+                    height: 28px !important;
+                }
+                
+                .compact-mode .section-header {
+                    padding: 8px 12px !important;
+                    margin-bottom: 8px !important;
+                }
+                
+                .compact-mode .section-header h3 {
+                    font-size: 16px !important;
+                }
+                
+                /* Ocultar quantidades */
+                .hide-quantities .item-quantity {
+                    display: none !important;
+                }
+                
+                /* Ocultar categorias */
+                .hide-categories .item-category {
+                    display: none !important;
+                }
+                
+                /* Ajustes responsivos para modo compacto */
+                @media (max-width: 768px) {
+                    .compact-mode .item-card {
+                        padding: 6px 10px !important;
+                    }
+                    
+                    .compact-mode .item-card .item-name {
+                        font-size: 13px !important;
+                    }
+                    
+                    .compact-mode .item-card .btn {
+                        padding: 3px 6px !important;
+                        font-size: 11px !important;
+                        min-height: 24px !important;
+                        height: 24px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Inicializar configurações de visualização
+        document.addEventListener('DOMContentLoaded', () => {
+            addCompactModeStyles();
+            loadViewSettings();
+            loadHapticSettingsIntoUI();
+            setupViewSettingsListeners();
+        });
+        
+        // Se já carregou, inicializar agora
+        if (document.readyState !== 'loading') {
+            addCompactModeStyles();
+            loadViewSettings();
+            loadHapticSettingsIntoUI();
+            setupViewSettingsListeners();
+        }
+        
+        // Sistema de Feedback Háptico
+        const hapticFeedback = {
+            // Configurações de vibração
+            patterns: {
+                light: 25,      // Feedback leve
+                medium: 50,     // Feedback médio
+                strong: 100,    // Feedback forte
+                success: [50, 50, 50],  // Padrão de sucesso
+                error: [100, 50, 100],  // Padrão de erro
+                warning: [75, 25, 75],  // Padrão de aviso
+                tap: 15,        // Toque simples
+                longPress: [25, 50, 25] // Pressão longa
+            },
+            
+            // Verificar se o dispositivo suporta vibração
+            isSupported() {
+                return 'vibrate' in navigator && typeof navigator.vibrate === 'function';
+            },
+            
+            // Executar vibração
+            vibrate(pattern) {
+                if (!this.isSupported()) return;
+                
+                // Verificar configurações do usuário
+                const settings = JSON.parse(localStorage.getItem('hapticSettings') || '{}');
+                if (settings.enabled === false) return;
+                
+                try {
+                    navigator.vibrate(pattern);
+                } catch (error) {
+                    console.warn('Erro ao executar feedback háptico:', error);
+                }
+            },
+            
+            // Métodos de conveniência
+            light() { this.vibrate(this.patterns.light); },
+            medium() { this.vibrate(this.patterns.medium); },
+            strong() { this.vibrate(this.patterns.strong); },
+            success() { this.vibrate(this.patterns.success); },
+            error() { this.vibrate(this.patterns.error); },
+            warning() { this.vibrate(this.patterns.warning); },
+            tap() { this.vibrate(this.patterns.tap); },
+            longPress() { this.vibrate(this.patterns.longPress); }
+        };
+        
+        // Configurações de feedback háptico
+        function loadHapticSettings() {
+            const settings = JSON.parse(localStorage.getItem('hapticSettings') || '{}');
+            const defaultSettings = {
+                enabled: true,
+                intensity: 'medium' // light, medium, strong
+            };
+            return { ...defaultSettings, ...settings };
+        }
+        
+        function saveHapticSettings(settings) {
+            localStorage.setItem('hapticSettings', JSON.stringify(settings));
+        }
+        
+        // Adicionar feedback háptico às ações existentes
+        function enhanceWithHapticFeedback() {
+            // Sobrescrever função addItem original
+            const originalAddItem = window.addItem || addItem;
+            window.addItem = function(name, quantity, unit, sectionId, subsectionId, price = 0) {
+                hapticFeedback.success();
+                return originalAddItem.call(this, name, quantity, unit, sectionId, subsectionId, price);
+            };
+            
+            // Sobrescrever função updateItem original
+            const originalUpdateItem = window.updateItem || updateItem;
+            window.updateItem = function(id, updates) {
+                if (updates.inCart !== undefined) {
+                    // Feedback diferente para marcar/desmarcar
+                    hapticFeedback.medium();
+                } else {
+                    // Feedback leve para outras atualizações
+                    hapticFeedback.light();
+                }
+                return originalUpdateItem.call(this, id, updates);
+            };
+            
+            // Sobrescrever função removeItem original
+            const originalRemoveItem = window.removeItem || removeItem;
+            window.removeItem = function(id) {
+                hapticFeedback.warning();
+                return originalRemoveItem.call(this, id);
+            };
+            
+            // Adicionar feedback a botões importantes
+            document.addEventListener('click', (e) => {
+                const target = e.target.closest('[data-action]');
+                if (!target) return;
+                
+                const action = target.dataset.action;
+                switch (action) {
+                    case 'open-settings-modal':
+                    case 'start-tutorial':
+                        hapticFeedback.tap();
+                        break;
+                    case 'confirm-action':
+                        hapticFeedback.success();
+                        break;
+                    case 'cancel-action':
+                        hapticFeedback.light();
+                        break;
+                }
+            });
+            
+            // Feedback para formulários
+            document.addEventListener('submit', (e) => {
+                if (e.target.id === 'addItemForm') {
+                    hapticFeedback.success();
+                }
+            });
+            
+            // Feedback para gestos de toque (já existe, mas vamos padronizar)
+            document.addEventListener('touchend', (e) => {
+                const card = e.target.closest('.item-card');
+                if (card && e.changedTouches) {
+                    const touch = e.changedTouches[0];
+                    if (touch && touch.screenX !== undefined) {
+                        // Este feedback já existe no código de swipe, mas garantimos consistência
+                        // hapticFeedback.medium(); // Já implementado no código de swipe
+                    }
+                }
+            });
+        }
+        
+        // Inicializar sistema de feedback háptico
+        document.addEventListener('DOMContentLoaded', () => {
+            enhanceWithHapticFeedback();
+        });
+        
+        // Se já carregou, inicializar agora
+        if (document.readyState !== 'loading') {
+            enhanceWithHapticFeedback();
+        }
+    </script>
 
 </body>
 </html>
