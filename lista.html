@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="cupcake">
+<html lang="pt-BR" data-theme="emerald">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Minha Lista de Compras</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="poupe.com.br">
+    <meta name="theme-color" content="#570df8">
+    
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
@@ -26,47 +38,373 @@
             font-feature-settings: 'tnum' 1;
             letter-spacing: -0.025em;
         }
-        .section-card { transition: all 0.2s ease; }
-        .section-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -8px rgba(0,0,0,0.08); }
+        .section-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid oklch(var(--b3));
+        }
+        .section-card:hover { 
+            transform: translateY(-4px) scale(1.02); 
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.12), 0 8px 16px -8px rgba(0,0,0,0.08);
+            border-color: oklch(var(--p)/.3);
+        }
+        
+        /* Melhorias de responsividade */
+        @media (max-width: 768px) {
+            .section-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px -8px rgba(0,0,0,0.08);
+            }
+        }
+        
+        /* Microinterações e feedback visual */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .input:focus {
+            box-shadow: 0 0 0 3px oklch(var(--p)/.2);
+        }
+        
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success-feedback {
+            animation: successPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 20px oklch(var(--su)/.3);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
         
         .section-badge {
             background-color: oklch(var(--p)/.1);
             color: oklch(var(--p));
             border-color: oklch(var(--p)/.2);
         }
+        
+        /* Estilos para validação de erro */
+        .input-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 1px #ef4444 !important;
+        }
+        .input-error:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+        }
         .subsection-badge {
             background-color: oklch(var(--s)/.1);
             color: oklch(var(--s));
             border-color: oklch(var(--s)/.2);
         }
+        
+        /* Estilos de acessibilidade */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Melhor foco para navegação por teclado */
+        .btn:focus-visible,
+        .input:focus-visible,
+        button:focus-visible {
+            outline: 2px solid oklch(var(--p));
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px oklch(var(--p)/.2);
+        }
+        
+        /* Indicador visual para elementos focáveis */
+        [tabindex]:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid oklch(var(--p));
+            outline-offset: 2px;
+        }
+        
+        /* Melhor contraste para elementos interativos */
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            transition: transform 0.1s ease;
+        }
+        
+        /* Indicador de estado para leitores de tela */
+        .aria-live-region {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        
+        /* Animações suaves para modais */
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-box {
+            animation: modalSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Animações para itens da lista */
+        .item-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(0,0,0,0.12);
+        }
+        
+        .item-enter {
+            animation: itemEnter 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes itemEnter {
+            from {
+                opacity: 0;
+                transform: translateX(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        .item-remove {
+            animation: itemRemove 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        
+        @keyframes itemRemove {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                max-height: 200px;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(20px) scale(0.95);
+                max-height: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
+        /* Animações para seções */
+        .section-expand {
+            animation: sectionExpand 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes sectionExpand {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Feedback visual para ações */
+        .action-feedback {
+            animation: actionFeedback 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes actionFeedback {
+            0% {
+                transform: scale(1);
+            }
+            30% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px oklch(var(--su)/.4);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Transições suaves para estados */
+        .checkbox {
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .checkbox:checked {
+            animation: checkboxCheck 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes checkboxCheck {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Animações para toast/notificações */
+        .toast-enter {
+            animation: toastEnter 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        @keyframes toastEnter {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastExit {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+        }
+        
+        /* Micro-interações para botões */
+        .btn-micro {
+            transition: all 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .btn-micro:active {
+            transform: scale(0.95);
+        }
+        
+        /* Animação de carregamento suave */
+        .loading-smooth {
+            animation: loadingSmooth 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes loadingSmooth {
+            0%, 100% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen transition-colors duration-500 font-sans">
-    <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur-md shadow-sm">
-        <div class="navbar container mx-auto px-4">
+    <header class="sticky top-0 z-30 bg-base-100/95 backdrop-blur-md shadow-sm border-b border-base-300/30">
+        <div class="navbar container mx-auto px-3 sm:px-4 py-2">
             <div class="flex-1">
-                <a href="app.html" class="btn btn-ghost">
+                <a href="app.html" class="btn btn-ghost hover:btn-primary hover:scale-105 transition-all duration-200 text-sm sm:text-base">
                     <i class="fa-solid fa-chevron-left"></i>
-                    Voltar para Listas
+                    <span class="hidden sm:inline">Voltar para Listas</span>
+                    <span class="sm:hidden">Voltar</span>
                 </a>
             </div>
             <div class="flex-none gap-2">
-                <button class="btn btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações da lista">
-                    <i class="fa-solid fa-sliders text-lg"></i>
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="start-tutorial" aria-label="Iniciar tutorial">
+                    <i class="fa-solid fa-question-circle text-base sm:text-lg"></i>
+                </button>
+
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="open-settings-modal" aria-label="Abrir configurações da lista">
+                    <i class="fa-solid fa-sliders text-base sm:text-lg"></i>
                 </button>
             </div>
         </div>
     </header>
-    <main class="container mx-auto p-4 md:p-8 space-y-8 pb-28">
-        <div>
-            <h1 id="listTitle" class="text-4xl font-bold text-base-content break-words">Carregando...</h1>
+    <main class="container mx-auto px-3 sm:px-4 md:px-8 py-4 md:py-6 space-y-6 md:space-y-8 pb-28" role="main">
+        <!-- Região para anúncios dinâmicos para leitores de tela -->
+        <div id="announcements" class="aria-live-region" aria-live="polite" aria-atomic="true"></div>
+        
+        <div class="mb-2">
+            <h1 id="listTitle" class="text-3xl sm:text-4xl font-bold text-base-content break-words leading-tight tracking-tight" tabindex="-1">Carregando...</h1>
         </div>
-        <div class="collapse collapse-arrow bg-base-100 shadow-md" id="adder-collapse">
+        <div class="collapse collapse-arrow bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300/50 hover:border-primary/30" id="adder-collapse">
             <input type="checkbox" id="adder-toggle" />
-            <div class="collapse-title text-lg font-medium">
-                Resumo e Adição Rápida
+            <div class="collapse-title text-lg font-medium flex items-center gap-2">
+                <i class="fa-solid fa-plus text-primary"></i>
+                <span>Resumo e Adição Rápida</span>
             </div>
-            <div class="collapse-content space-y-4">
+            <div class="collapse-content space-y-4 pt-2">
                 <div class="stats shadow w-full stats-vertical lg:stats-horizontal">
                     <div class="stat">
                         <div class="stat-figure text-primary"><i class="fa-solid fa-dollar-sign text-2xl"></i></div>
@@ -81,35 +419,49 @@
                 </div>
                 <div class="card bg-base-200/50">
                     <div class="card-body p-4">
-                        <form id="addItemForm" class="space-y-3">
-                            <input type="text" id="itemName" placeholder="Nome do item" class="input input-bordered w-full" required maxlength="50">
+                        <form id="addItemForm" class="space-y-3" role="form" aria-label="Formulário para adicionar novo item">
+                            <div class="form-control">
+                                <label for="itemName" class="label sr-only"><span class="label-text">Nome do item</span></label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="itemName" placeholder="Digite o nome do item..." class="input input-bordered flex-1 focus:input-primary focus:scale-105 transition-all duration-200 text-base" required maxlength="50" aria-describedby="itemName-help" autocomplete="off">
+                                    <button type="button" id="barcodeBtn" class="btn btn-primary btn-square hover:scale-110 transition-all duration-200 shadow-lg hover:shadow-xl" aria-label="Escanear código de barras">
+                                        <i class="fa-solid fa-barcode" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div id="itemName-help" class="sr-only">Digite o nome do item que deseja adicionar à lista</div>
+                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <div class="flex gap-2">
-                                    <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1" placeholder="Qtd" required>
-                                    <button type="button" data-action="open-unit-selector" data-target-input="itemUnit" data-target-button="itemUnitBtn" class="btn btn-bordered min-w-fit" id="itemUnitBtn">
-                                        <span class="truncate">Un</span> <i class="fa-solid fa-chevron-down text-xs"></i>
+                                    <div class="form-control flex-1">
+                                        <label for="itemQuantity" class="label sr-only"><span class="label-text">Quantidade</span></label>
+                                        <input type="number" id="itemQuantity" value="1" min="0.01" step="0.01" class="input input-bordered flex-1 focus:input-primary transition-all duration-200" placeholder="Qtd" required aria-describedby="quantity-help">
+                                        <div id="quantity-help" class="sr-only">Quantidade do item</div>
+                                    </div>
+                                    <button type="button" data-action="open-unit-selector" data-target-input="itemUnit" data-target-button="itemUnitBtn" class="btn btn-bordered min-w-fit hover:btn-primary hover:scale-105 transition-all duration-200" id="itemUnitBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar unidade de medida">
+                                        <span class="truncate">Un</span> <i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i>
                                     </button>
                                     <input type="hidden" id="itemUnit" value="un">
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="button" data-action="open-section-selector" data-target-input="itemSection" data-target-button="itemSectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSectionBtn">
+                                    <button type="button" data-action="open-section-selector" data-target-input="itemSection" data-target-button="itemSectionBtn" class="btn btn-bordered flex-1 justify-start font-normal hover:btn-primary hover:scale-105 transition-all duration-200" id="itemSectionBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar seção">
                                         <span class="truncate">Selecione uma seção</span>
-                                        <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                                        <i class="fa-solid fa-chevron-down text-xs ml-auto" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary btn-square" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus"></i></button>
-                                    <input type="hidden" id="itemSection" required>
+                                    <button type="button" class="btn btn-primary btn-square hover:scale-110 transition-all duration-200 shadow-lg hover:shadow-xl" data-action="open-section-modal-from-adder" aria-label="Adicionar nova seção"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+                                    <input type="hidden" id="itemSection">
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="button" data-action="open-subsection-selector" data-target-input="itemSubsection" data-target-button="itemSubsectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSubsectionBtn" disabled>
+                                    <button type="button" data-action="open-subsection-selector" data-target-input="itemSubsection" data-target-button="itemSubsectionBtn" class="btn btn-bordered flex-1 justify-start font-normal" id="itemSubsectionBtn" disabled aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar subseção">
                                         <span class="truncate">Sem subseção</span>
-                                        <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+                                        <i class="fa-solid fa-chevron-down text-xs ml-auto" aria-hidden="true"></i>
                                     </button>
                                     <input type="hidden" id="itemSubsection">
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-full gap-2">
-                                <i class="fa-solid fa-plus"></i> Adicionar Item
+                            <button type="submit" class="btn btn-primary w-full gap-2 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl text-base font-semibold" aria-describedby="add-item-help">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Item
                             </button>
+                            <div id="add-item-help" class="sr-only">Toque para adicionar o item à lista</div>
                         </form>
                     </div>
                 </div>
@@ -117,27 +469,29 @@
         </div>
         <div id="shoppingListContainer" class="space-y-4"></div>
     </main>
-    <footer class="fixed bottom-0 left-0 right-0 z-30 bg-base-100/80 backdrop-blur-md border-t border-base-300/50 shadow-inner">
-        <div class="flex justify-between items-center w-full px-4 py-2 container mx-auto">
+    <footer class="fixed bottom-0 left-0 right-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300/50 shadow-lg">
+        <div class="flex justify-between items-center w-full px-3 sm:px-4 py-3 container mx-auto">
             <div class="text-left">
-                <div class="text-xs text-base-content/60">Total</div>
-                <div id="footerTotalPrice" class="text-xl sm:text-2xl font-bold text-primary currency-display">R$ 0,00</div>
+                <div class="text-xs text-base-content/60 font-medium">Total</div>
+                <div id="footerTotalPrice" class="text-xl sm:text-2xl font-bold text-primary currency-display transition-all duration-300">R$ 0,00</div>
             </div>
             <div class="text-right">
-                <div class="text-xs text-base-content/60">Itens</div>
-                <div id="footerItemCount" class="text-base sm:text-lg font-semibold">0</div>
+                <div class="text-xs text-base-content/60 font-medium">Itens</div>
+                <div id="footerItemCount" class="text-base sm:text-lg font-semibold transition-all duration-300">0</div>
             </div>
         </div>
     </footer>
 
-    <dialog id="edit_modal" class="modal">
+    <dialog id="edit_modal" class="modal" role="dialog" aria-labelledby="edit-modal-title" aria-describedby="edit-modal-description">
         <div class="modal-box">
-            <h3 class="font-bold text-lg mb-4">Editar Item</h3>
-            <form id="editItemForm" method="dialog" class="space-y-3">
+            <h3 id="edit-modal-title" class="font-bold text-lg mb-4">Editar Item</h3>
+            <p id="edit-modal-description" class="sr-only">Formulário para editar as informações do item selecionado</p>
+            <form id="editItemForm" method="dialog" class="space-y-3" role="form" aria-label="Formulário de edição de item">
                 <input type="hidden" id="editItemId">
                 <div class="form-control">
-                    <label class="label"><span class="label-text">Nome do Item</span></label>
-                    <input type="text" id="editItemName" class="input input-bordered w-full" required maxlength="60">
+                    <label class="label" for="editItemName"><span class="label-text">Nome do Item</span></label>
+                    <input type="text" id="editItemName" class="input input-bordered w-full" required maxlength="60" aria-describedby="edit-name-help">
+                    <div id="edit-name-help" class="sr-only">Digite o nome do item, máximo 60 caracteres</div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="form-control">
@@ -179,6 +533,8 @@
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
+    
+
     <dialog id="section_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg mb-4" id="sectionModalTitle">Adicionar Seção/Subseção</h3>
@@ -213,6 +569,63 @@
         <div class="modal-box">
             <h3 class="font-bold text-lg">Configurações da Lista</h3>
             <div class="py-4 space-y-4">
+                <div>
+                    <h4 class="font-semibold mb-2">Configurações de Visualização</h4>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Modo Compacto</span>
+                            <input type="checkbox" id="compact-mode-toggle" class="toggle toggle-primary" />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Reduz o espaçamento entre itens para visualizar mais conteúdo</span>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Mostrar Quantidades</span>
+                            <input type="checkbox" id="show-quantities-toggle" class="toggle toggle-primary" checked />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Exibe as quantidades dos itens na lista</span>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Mostrar Categorias</span>
+                            <input type="checkbox" id="show-categories-toggle" class="toggle toggle-primary" checked />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Exibe as categorias dos itens na lista</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div>
+                    <h4 class="font-semibold mb-2">Feedback Háptico</h4>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Vibração Habilitada</span>
+                            <input type="checkbox" id="haptic-enabled-toggle" class="toggle toggle-primary" checked />
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Ativa vibração em dispositivos móveis</span>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Intensidade</span>
+                            <select id="haptic-intensity-select" class="select select-bordered select-sm w-full max-w-xs">
+                                <option value="light">Leve</option>
+                                <option value="medium" selected>Média</option>
+                                <option value="strong">Forte</option>
+                            </select>
+                        </label>
+                        <div class="label">
+                            <span class="label-text-alt text-base-content/60">Intensidade da vibração</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider"></div>
                 <div>
                     <h4 class="font-semibold mb-2">Gerenciar Seções</h4>
                     <p class="text-xs text-base-content/60 mb-2">Arraste as seções para reordenar.</p>
@@ -335,14 +748,62 @@
         let currentManagingSubsectionId = null;
 
         const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-        const sanitizeText = (text) => text.replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™]/g, '');
+        
+        // Funções de validação e sanitização melhoradas
+        const sanitizeText = (text) => {
+            if (!text || typeof text !== 'string') return '';
+            return text
+                .replace(/[<>"'&]/g, '') // Remove caracteres perigosos
+                .replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™°%/]/g, '') // Permite mais caracteres úteis
+                .trim()
+                .substring(0, 100); // Limita tamanho
+        };
+        
         const sanitizeNumber = (value) => {
+            if (!value) return '';
             let sanitized = String(value).replace(/[^0-9,.]/g, '').replace(',', '.');
             const parts = sanitized.split('.');
             if (parts.length > 1) {
                 sanitized = parts[0] + '.' + parts.slice(1).join('').slice(0, 2);
             }
+            // Limita a 10 dígitos antes da vírgula
+            const beforeDecimal = sanitized.split('.')[0];
+            if (beforeDecimal.length > 10) {
+                sanitized = beforeDecimal.substring(0, 10) + (sanitized.includes('.') ? '.' + sanitized.split('.')[1] : '');
+            }
             return sanitized;
+        };
+        
+        const validateItemName = (name) => {
+            const sanitized = sanitizeText(name);
+            return {
+                isValid: sanitized.length >= 2 && sanitized.length <= 60,
+                sanitized,
+                error: sanitized.length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : 
+                       sanitized.length > 60 ? 'Nome muito longo (máximo 60 caracteres)' : null
+            };
+        };
+        
+        const validateQuantity = (quantity) => {
+            const num = parseFloat(quantity);
+            return {
+                isValid: !isNaN(num) && num > 0 && num <= 9999,
+                value: num,
+                error: isNaN(num) || num <= 0 ? 'Quantidade deve ser maior que zero' :
+                       num > 9999 ? 'Quantidade muito alta (máximo 9999)' : null
+            };
+        };
+        
+        const validatePrice = (price) => {
+            if (!price || price === '') return { isValid: true, value: 0, error: null };
+            const sanitized = sanitizeNumber(price);
+            const num = parseFloat(sanitized);
+            return {
+                isValid: !isNaN(num) && num >= 0 && num <= 999999,
+                value: num,
+                error: isNaN(num) || num < 0 ? 'Preço deve ser um valor válido' :
+                       num > 999999 ? 'Preço muito alto (máximo R$ 999.999)' : null
+            };
         };
 
         const showConfirmModal = (title, message, onConfirm) => {
@@ -416,11 +877,23 @@
             selectionModalSearchInput.addEventListener('input', currentSearchHandler);
 
             renderItems();
+            selectionModal.classList.add('modal-enter');
             selectionModal.showModal();
+            setTimeout(() => selectionModal.classList.remove('modal-enter'), 50);
         };
 
         const loadState = () => {
             try {
+                // Se não há LIST_ID, criar uma lista padrão
+                if (!LIST_ID) {
+                    document.getElementById('listTitle').textContent = 'Lista de Compras';
+                    document.title = 'Lista de Compras - poupe.com.br';
+                    shoppingList = [];
+                    sections = defaultSections.map(s => ({...s}));
+                    collapsedState = { sections: [], adder: true };
+                    return;
+                }
+                
                 const saved = localStorage.getItem(LISTS_KEY);
                 const allLists = saved ? JSON.parse(saved) : [];
                 const currentList = allLists.find(l => l.id === LIST_ID);
@@ -443,6 +916,835 @@
                 document.getElementById('listTitle').textContent = 'Erro ao carregar a lista';
                 shoppingList = [];
                 sections = defaultSections.map(s => ({...s}));
+            }
+        };
+        
+        // Função para anunciar mudanças para leitores de tela
+        const announceToScreenReader = (message) => {
+            const announcements = document.getElementById('announcements');
+            if (announcements) {
+                announcements.textContent = message;
+                // Limpar após um tempo para não acumular mensagens
+                setTimeout(() => {
+                    announcements.textContent = '';
+                }, 1000);
+            }
+        };
+
+        // Função de debounce para otimizar performance
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
+
+        // Sistema de sugestões inteligentes
+        let itemHistory = JSON.parse(localStorage.getItem('itemHistory')) || [];
+        
+        const saveItemToHistory = (itemName, section, subsection) => {
+            const normalizedName = itemName.toLowerCase().trim();
+            const existingIndex = itemHistory.findIndex(item => 
+                item.name.toLowerCase() === normalizedName
+            );
+            
+            if (existingIndex !== -1) {
+                // Atualizar item existente
+                itemHistory[existingIndex].count++;
+                itemHistory[existingIndex].lastUsed = Date.now();
+                itemHistory[existingIndex].section = section;
+                itemHistory[existingIndex].subsection = subsection;
+            } else {
+                // Adicionar novo item
+                itemHistory.push({
+                    name: itemName,
+                    normalizedName,
+                    count: 1,
+                    lastUsed: Date.now(),
+                    section,
+                    subsection
+                });
+            }
+            
+            // Manter apenas os 100 itens mais usados
+            itemHistory.sort((a, b) => b.count - a.count);
+            if (itemHistory.length > 100) {
+                itemHistory = itemHistory.slice(0, 100);
+            }
+            
+            localStorage.setItem('itemHistory', JSON.stringify(itemHistory));
+        };
+        
+        const getSuggestions = (input) => {
+            if (!input || input.length < 2) return [];
+            
+            const normalizedInput = input.toLowerCase().trim();
+            const suggestions = itemHistory
+                .filter(item => 
+                    item.normalizedName.includes(normalizedInput) ||
+                    item.name.toLowerCase().includes(normalizedInput)
+                )
+                .sort((a, b) => {
+                    // Priorizar por relevância: exata > começa com > contém
+                    const aExact = a.normalizedName === normalizedInput ? 3 : 0;
+                    const bExact = b.normalizedName === normalizedInput ? 3 : 0;
+                    const aStarts = a.normalizedName.startsWith(normalizedInput) ? 2 : 0;
+                    const bStarts = b.normalizedName.startsWith(normalizedInput) ? 2 : 0;
+                    const aContains = a.normalizedName.includes(normalizedInput) ? 1 : 0;
+                    const bContains = b.normalizedName.includes(normalizedInput) ? 1 : 0;
+                    
+                    const aScore = aExact + aStarts + aContains;
+                    const bScore = bExact + bStarts + bContains;
+                    
+                    if (aScore !== bScore) return bScore - aScore;
+                    
+                    // Se empate, priorizar por frequência e uso recente
+                    const aRecentScore = a.count + (Date.now() - a.lastUsed) / (1000 * 60 * 60 * 24 * 30); // Peso para uso recente
+                    const bRecentScore = b.count + (Date.now() - b.lastUsed) / (1000 * 60 * 60 * 24 * 30);
+                    
+                    return bRecentScore - aRecentScore;
+                })
+                .slice(0, 5); // Máximo 5 sugestões
+                
+            return suggestions;
+        };
+        
+        const createSuggestionsDropdown = (input, suggestions) => {
+            // Remover dropdown existente
+            const existingDropdown = document.getElementById('suggestions-dropdown');
+            if (existingDropdown) {
+                existingDropdown.remove();
+            }
+            
+            if (suggestions.length === 0) return;
+            
+            const dropdown = document.createElement('div');
+            dropdown.id = 'suggestions-dropdown';
+            dropdown.className = 'absolute z-50 w-full bg-base-100 border border-base-300 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto';
+            dropdown.setAttribute('role', 'listbox');
+            dropdown.setAttribute('aria-label', 'Sugestões de itens');
+            
+            suggestions.forEach((suggestion, index) => {
+                const item = document.createElement('div');
+                item.className = 'px-3 py-2 hover:bg-base-200 cursor-pointer border-b border-base-300 last:border-b-0';
+                item.setAttribute('role', 'option');
+                item.setAttribute('tabindex', '0');
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="font-medium">${suggestion.name}</span>
+                            <div class="text-xs text-base-content/60">
+                                ${suggestion.section}${suggestion.subsection ? ' > ' + suggestion.subsection : ''}
+                            </div>
+                        </div>
+                        <div class="text-xs text-base-content/40">
+                            ${suggestion.count}x
+                        </div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    selectSuggestion(suggestion, input);
+                });
+                
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        selectSuggestion(suggestion, input);
+                    }
+                });
+                
+                dropdown.appendChild(item);
+            });
+            
+            // Posicionar dropdown
+            const inputRect = input.getBoundingClientRect();
+            const container = input.closest('.relative') || input.parentElement;
+            container.style.position = 'relative';
+            container.appendChild(dropdown);
+        };
+        
+        const selectSuggestion = (suggestion, input) => {
+            input.value = suggestion.name;
+            
+            // Preencher seção e subseção se disponíveis
+            const sectionSelect = document.getElementById('itemSection');
+            const subsectionSelect = document.getElementById('itemSubsection');
+            
+            if (sectionSelect && suggestion.section) {
+                const sectionOption = Array.from(sectionSelect.options)
+                    .find(option => option.textContent.includes(suggestion.section));
+                if (sectionOption) {
+                    sectionSelect.value = sectionOption.value;
+                    sectionSelect.dispatchEvent(new Event('change'));
+                    
+                    // Aguardar atualização das subseções
+                    setTimeout(() => {
+                        if (subsectionSelect && suggestion.subsection) {
+                            const subsectionOption = Array.from(subsectionSelect.options)
+                                .find(option => option.textContent.includes(suggestion.subsection));
+                            if (subsectionOption) {
+                                subsectionSelect.value = subsectionOption.value;
+                            }
+                        }
+                    }, 100);
+                }
+            }
+            
+            // Remover dropdown
+            const dropdown = document.getElementById('suggestions-dropdown');
+            if (dropdown) {
+                dropdown.remove();
+            }
+            
+            announceToScreenReader(`Sugestão selecionada: ${suggestion.name}`);
+        };
+        
+        // Debounced function para buscar sugestões
+        const debouncedShowSuggestions = debounce((input) => {
+            const suggestions = getSuggestions(input.value);
+            createSuggestionsDropdown(input, suggestions);
+        }, 300);
+        
+        // Sistema de busca avançada e filtros
+        let currentFilters = {
+            search: '',
+            section: '',
+            status: 'all', // all, inCart, notInCart
+            priceRange: { min: 0, max: Infinity }
+        };
+        
+        const applyFilters = () => {
+            const filteredItems = shoppingList.filter(item => {
+                // Filtro de busca por nome
+                if (currentFilters.search) {
+                    const searchTerm = currentFilters.search.toLowerCase();
+                    if (!item.name.toLowerCase().includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Filtro por seção
+                if (currentFilters.section && currentFilters.section !== 'all') {
+                    if (item.section !== currentFilters.section) {
+                        return false;
+                    }
+                }
+                
+                // Filtro por status
+                if (currentFilters.status !== 'all') {
+                    if (currentFilters.status === 'inCart' && !item.inCart) {
+                        return false;
+                    }
+                    if (currentFilters.status === 'notInCart' && item.inCart) {
+                        return false;
+                    }
+                }
+                
+                // Filtro por faixa de preço
+                const itemPrice = item.price || 0;
+                if (itemPrice < currentFilters.priceRange.min || itemPrice > currentFilters.priceRange.max) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            renderFilteredList(filteredItems);
+            announceToScreenReader(`${filteredItems.length} itens encontrados`);
+        };
+        
+        const renderFilteredList = (filteredItems) => {
+            // Agrupar itens filtrados por seção
+            const groupedItems = {};
+            filteredItems.forEach(item => {
+                const sectionId = item.section;
+                if (!groupedItems[sectionId]) {
+                    groupedItems[sectionId] = {};
+                }
+                
+                const subsectionId = item.subsection || 'no-subsection';
+                if (!groupedItems[sectionId][subsectionId]) {
+                    groupedItems[sectionId][subsectionId] = [];
+                }
+                
+                groupedItems[sectionId][subsectionId].push(item);
+            });
+            
+            // Renderizar apenas as seções que têm itens filtrados
+            shoppingListContainer.innerHTML = '';
+            
+            if (filteredItems.length === 0) {
+                shoppingListContainer.innerHTML = `
+                    <div class="text-center py-8 text-base-content/60">
+                        <i class="fa-solid fa-search text-4xl mb-4"></i>
+                        <p>Nenhum item encontrado com os filtros aplicados.</p>
+                        <button class="btn btn-sm btn-outline mt-2" onclick="clearFilters()">
+                            <i class="fa-solid fa-times"></i> Limpar Filtros
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            Object.keys(groupedItems).forEach(sectionId => {
+                const section = sections.find(s => s.id === sectionId);
+                if (!section) return;
+                
+                const sectionElement = createSectionElement(section, groupedItems[sectionId]);
+                shoppingListContainer.appendChild(sectionElement);
+            });
+            
+            initSectionSortable(shoppingListContainer);
+        };
+        
+        const clearFilters = () => {
+            currentFilters = {
+                search: '',
+                section: '',
+                status: 'all',
+                priceRange: { min: 0, max: Infinity }
+            };
+            
+            // Limpar campos de filtro na UI
+            const searchInput = document.getElementById('search-filter');
+            const sectionFilter = document.getElementById('section-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const minPriceFilter = document.getElementById('min-price-filter');
+            const maxPriceFilter = document.getElementById('max-price-filter');
+            
+            if (searchInput) searchInput.value = '';
+            if (sectionFilter) sectionFilter.value = 'all';
+            if (statusFilter) statusFilter.value = 'all';
+            if (minPriceFilter) minPriceFilter.value = '';
+            if (maxPriceFilter) maxPriceFilter.value = '';
+            
+            renderList();
+            announceToScreenReader('Filtros limpos');
+        };
+        
+        // Debounced function para busca
+        const debouncedSearch = debounce((searchTerm) => {
+            currentFilters.search = searchTerm;
+            applyFilters();
+        }, 300);
+        
+        const setupFilters = () => {
+            // Configurar event listeners para filtros
+            const searchInput = document.getElementById('search-filter');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    debouncedSearch(e.target.value);
+                });
+            }
+            
+            const sectionFilter = document.getElementById('section-filter');
+            if (sectionFilter) {
+                sectionFilter.addEventListener('change', (e) => {
+                    currentFilters.section = e.target.value;
+                    applyFilters();
+                });
+            }
+            
+            const statusFilter = document.getElementById('status-filter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', (e) => {
+                    currentFilters.status = e.target.value;
+                    applyFilters();
+                });
+            }
+            
+            const minPriceFilter = document.getElementById('min-price-filter');
+            const maxPriceFilter = document.getElementById('max-price-filter');
+            
+            if (minPriceFilter) {
+                minPriceFilter.addEventListener('input', debounce((e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    currentFilters.priceRange.min = value;
+                    applyFilters();
+                }, 500));
+            }
+            
+            if (maxPriceFilter) {
+                maxPriceFilter.addEventListener('input', debounce((e) => {
+                    const value = parseFloat(e.target.value) || Infinity;
+                    currentFilters.priceRange.max = value;
+                    applyFilters();
+                }, 500));
+            }
+        };
+
+        // Sistema de Histórico de Preços e Sugestões Avançadas
+        const saveItemPriceHistory = (item) => {
+            const priceHistory = JSON.parse(localStorage.getItem('price_history') || '[]');
+            const existingIndex = priceHistory.findIndex(h => h.name.toLowerCase() === item.name.toLowerCase());
+            
+            const historyItem = {
+                name: item.name,
+                unit: item.unit,
+                section: item.section,
+                subsection: item.subsection,
+                prices: [],
+                lastUsed: new Date().toISOString(),
+                usageCount: 1
+            };
+            
+            if (existingIndex >= 0) {
+                // Atualizar item existente
+                const existing = priceHistory[existingIndex];
+                historyItem.prices = existing.prices || [];
+                historyItem.usageCount = (existing.usageCount || 0) + 1;
+                
+                // Adicionar novo preço se fornecido
+                if (item.price && item.price > 0) {
+                    historyItem.prices.push({
+                        value: item.price,
+                        date: new Date().toISOString(),
+                        store: item.store || 'Não informado'
+                    });
+                    
+                    // Manter apenas os últimos 10 preços
+                    if (historyItem.prices.length > 10) {
+                        historyItem.prices = historyItem.prices.slice(-10);
+                    }
+                }
+                
+                priceHistory[existingIndex] = historyItem;
+            } else {
+                // Novo item
+                if (item.price && item.price > 0) {
+                    historyItem.prices.push({
+                        value: item.price,
+                        date: new Date().toISOString(),
+                        store: item.store || 'Não informado'
+                    });
+                }
+                priceHistory.push(historyItem);
+            }
+            
+            // Manter apenas os últimos 500 itens
+            if (priceHistory.length > 500) {
+                priceHistory.sort((a, b) => new Date(b.lastUsed) - new Date(a.lastUsed));
+                priceHistory.splice(500);
+            }
+            
+            localStorage.setItem('price_history', JSON.stringify(priceHistory));
+        };
+        
+        const getAdvancedItemSuggestions = (query) => {
+            if (!query || query.length < 2) return [];
+            
+            const priceHistory = JSON.parse(localStorage.getItem('price_history') || '[]');
+            const queryLower = query.toLowerCase();
+            
+            return priceHistory
+                .filter(item => item.name.toLowerCase().includes(queryLower))
+                .sort((a, b) => {
+                    // Priorizar por uso recente e frequência
+                    const aScore = (a.usageCount || 0) + (new Date(a.lastUsed) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) ? 10 : 0);
+                    const bScore = (b.usageCount || 0) + (new Date(b.lastUsed) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) ? 10 : 0);
+                    return bScore - aScore;
+                })
+                .slice(0, 5);
+        };
+        
+        const getPriceHistory = (itemName) => {
+            const priceHistory = JSON.parse(localStorage.getItem('price_history') || '[]');
+            const item = priceHistory.find(h => h.name.toLowerCase() === itemName.toLowerCase());
+            return item ? item.prices || [] : [];
+        };
+        
+        const getAveragePrice = (itemName) => {
+            const prices = getPriceHistory(itemName);
+            if (prices.length === 0) return 0;
+            
+            const sum = prices.reduce((acc, p) => acc + p.value, 0);
+            return sum / prices.length;
+        };
+        
+        const getLastPrice = (itemName) => {
+            const prices = getPriceHistory(itemName);
+            if (prices.length === 0) return 0;
+            
+            return prices[prices.length - 1].value;
+        };
+        
+        const setupSmartSuggestions = () => {
+            const itemNameInput = document.getElementById('itemName');
+            if (!itemNameInput) return;
+            
+            let suggestionContainer = document.getElementById('smart-suggestions');
+            if (!suggestionContainer) {
+                suggestionContainer = document.createElement('div');
+                suggestionContainer.id = 'smart-suggestions';
+                suggestionContainer.className = 'absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden';
+                suggestionContainer.style.top = '100%';
+                suggestionContainer.style.left = '0';
+                
+                const inputContainer = itemNameInput.parentElement;
+                inputContainer.style.position = 'relative';
+                inputContainer.appendChild(suggestionContainer);
+            }
+            
+            let debounceTimer;
+            itemNameInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const query = e.target.value.trim();
+                    const suggestions = getAdvancedItemSuggestions(query);
+                    
+                    if (suggestions.length > 0 && query.length >= 2) {
+                        suggestionContainer.innerHTML = suggestions.map(item => {
+                            const avgPrice = item.prices.length > 0 ? getAveragePrice(item.name) : 0;
+                            const lastPrice = item.prices.length > 0 ? getLastPrice(item.name) : 0;
+                            const section = getSectionById(item.section);
+                            
+                            return `
+                                <div class="suggestion-item p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0" 
+                                     data-name="${item.name}" 
+                                     data-unit="${item.unit}" 
+                                     data-section="${item.section}" 
+                                     data-subsection="${item.subsection || ''}" 
+                                     data-price="${lastPrice}">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900">${item.name}</div>
+                                            <div class="text-sm text-gray-600">
+                                                ${section ? section.icon + ' ' + section.name : ''} • ${item.unit}
+                                            </div>
+                                            ${item.prices.length > 0 ? `
+                                                <div class="text-xs text-gray-500 mt-1">
+                                                    Último: ${formatCurrency(lastPrice)} • Média: ${formatCurrency(avgPrice)}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            ${item.usageCount}x usado
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        suggestionContainer.classList.remove('hidden');
+                        
+                        // Adicionar event listeners para as sugestões
+                        suggestionContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const name = item.dataset.name;
+                                const unit = item.dataset.unit;
+                                const section = item.dataset.section;
+                                const subsection = item.dataset.subsection;
+                                const price = parseFloat(item.dataset.price) || 0;
+                                
+                                // Preencher o formulário
+                                itemNameInput.value = name;
+                                document.getElementById('itemUnit').value = unit;
+                                document.getElementById('itemSection').value = section;
+                                
+                                if (subsection) {
+                                    const subsectionSelect = document.getElementById('itemSubsection');
+                                    if (subsectionSelect) {
+                                        subsectionSelect.value = subsection;
+                                    }
+                                }
+                                
+                                if (price > 0) {
+                                    document.getElementById('itemPrice').value = price.toFixed(2);
+                                }
+                                
+                                suggestionContainer.classList.add('hidden');
+                                
+                                // Focar no próximo campo
+                                document.getElementById('itemQuantity').focus();
+                            });
+                        });
+                    } else {
+                        suggestionContainer.classList.add('hidden');
+                    }
+                }, 300);
+            });
+            
+            // Esconder sugestões quando clicar fora
+            document.addEventListener('click', (e) => {
+                if (!itemNameInput.contains(e.target) && !suggestionContainer.contains(e.target)) {
+                    suggestionContainer.classList.add('hidden');
+                }
+            });
+            
+            // Navegação por teclado nas sugestões
+            itemNameInput.addEventListener('keydown', (e) => {
+                const suggestions = suggestionContainer.querySelectorAll('.suggestion-item');
+                const currentActive = suggestionContainer.querySelector('.suggestion-item.bg-blue-100');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (suggestions.length > 0) {
+                        if (currentActive) {
+                            currentActive.classList.remove('bg-blue-100');
+                            const next = currentActive.nextElementSibling || suggestions[0];
+                            next.classList.add('bg-blue-100');
+                        } else {
+                            suggestions[0].classList.add('bg-blue-100');
+                        }
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (suggestions.length > 0) {
+                        if (currentActive) {
+                            currentActive.classList.remove('bg-blue-100');
+                            const prev = currentActive.previousElementSibling || suggestions[suggestions.length - 1];
+                            prev.classList.add('bg-blue-100');
+                        } else {
+                            suggestions[suggestions.length - 1].classList.add('bg-blue-100');
+                        }
+                    }
+                } else if (e.key === 'Enter' && currentActive) {
+                    e.preventDefault();
+                    currentActive.click();
+                } else if (e.key === 'Escape') {
+                    suggestionContainer.classList.add('hidden');
+                }
+            });
+        };
+        
+        // Sistema de Backup/Restore e Exportação
+        const exportToCSV = () => {
+            const headers = ['Nome', 'Quantidade', 'Unidade', 'Preço', 'Total', 'Seção', 'Subseção', 'Status'];
+            const csvContent = [headers.join(',')];
+            
+            shoppingList.forEach(item => {
+                const section = getSectionById(item.section);
+                const subsection = item.subsection ? getSectionById(item.subsection) : null;
+                const total = (item.price || 0) * item.quantity;
+                const status = item.inCart ? 'Comprado' : 'Pendente';
+                
+                const row = [
+                    `"${item.name}"`,
+                    item.quantity,
+                    `"${item.unit}"`,
+                    item.price || 0,
+                    total.toFixed(2),
+                    `"${section ? section.name : ''}"`,
+                    `"${subsection ? subsection.name : ''}"`,
+                    `"${status}"`
+                ];
+                csvContent.push(row.join(','));
+            });
+            
+            const blob = new Blob([csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `lista-compras-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            announceToScreenReader('Lista exportada para CSV com sucesso');
+        };
+        
+        const exportToPDF = () => {
+            const printWindow = window.open('', '_blank');
+            const listTitle = document.getElementById('listTitle').textContent;
+            const totalItems = shoppingList.length;
+            const completedItems = shoppingList.filter(item => item.inCart).length;
+            const totalPrice = shoppingList.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+            
+            let htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${listTitle}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .stats { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f5f5f5; }
+                        .section { margin-bottom: 20px; }
+                        .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; padding: 8px; background: #e0e0e0; }
+                        .item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #ddd; }
+                        .item.completed { text-decoration: line-through; opacity: 0.6; }
+                        .item-name { flex: 1; }
+                        .item-details { display: flex; gap: 15px; }
+                        @media print { body { margin: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${listTitle}</h1>
+                        <p>Gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div class="stats">
+                        <div><strong>Total de Itens:</strong> ${totalItems}</div>
+                        <div><strong>Comprados:</strong> ${completedItems}</div>
+                        <div><strong>Pendentes:</strong> ${totalItems - completedItems}</div>
+                        <div><strong>Valor Total:</strong> ${formatCurrency(totalPrice)}</div>
+                    </div>
+            `;
+            
+            const mainSections = sections.filter(s => !s.parent).sort((a, b) => a.order - b.order);
+            mainSections.forEach(section => {
+                const sectionItems = shoppingList.filter(item => item.section === section.id);
+                if (sectionItems.length > 0) {
+                    htmlContent += `<div class="section">`;
+                    htmlContent += `<div class="section-title">${section.icon} ${section.name}</div>`;
+                    
+                    const itemsInSection = sectionItems.filter(item => !item.subsection);
+                    itemsInSection.forEach(item => {
+                        const total = (item.price || 0) * item.quantity;
+                        htmlContent += `
+                            <div class="item ${item.inCart ? 'completed' : ''}">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-details">
+                                    <span>${item.quantity} ${item.unit}</span>
+                                    ${item.price > 0 ? `<span>${formatCurrency(item.price)}</span>` : ''}
+                                    ${total > 0 ? `<span><strong>${formatCurrency(total)}</strong></span>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    const subsections = getSubsections(section.id);
+                    subsections.forEach(subsection => {
+                        const subsectionItems = sectionItems.filter(item => item.subsection === subsection.id);
+                        if (subsectionItems.length > 0) {
+                            htmlContent += `<div style="margin-left: 20px; margin-top: 10px;">`;
+                            htmlContent += `<div style="font-weight: bold; margin-bottom: 5px;">${subsection.icon} ${subsection.name}</div>`;
+                            subsectionItems.forEach(item => {
+                                const total = (item.price || 0) * item.quantity;
+                                htmlContent += `
+                                    <div class="item ${item.inCart ? 'completed' : ''}">
+                                        <div class="item-name">${item.name}</div>
+                                        <div class="item-details">
+                                            <span>${item.quantity} ${item.unit}</span>
+                                            ${item.price > 0 ? `<span>${formatCurrency(item.price)}</span>` : ''}
+                                            ${total > 0 ? `<span><strong>${formatCurrency(total)}</strong></span>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            htmlContent += `</div>`;
+                        }
+                    });
+                    
+                    htmlContent += `</div>`;
+                }
+            });
+            
+            htmlContent += `
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+            
+            announceToScreenReader('Lista exportada para PDF com sucesso');
+        };
+        
+        const createBackup = () => {
+            const backupData = {
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                listId: LIST_ID,
+                listName: document.getElementById('listTitle').textContent,
+                items: shoppingList,
+                sections: sections,
+                collapsedState: collapsedState,
+                itemHistory: JSON.parse(localStorage.getItem('item_history') || '[]')
+            };
+            
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `backup-lista-${new Date().toISOString().split('T')[0]}.json`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            announceToScreenReader('Backup criado com sucesso');
+        };
+        
+        const restoreBackup = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const backupData = JSON.parse(e.target.result);
+                    
+                    if (!backupData.version || !backupData.items || !backupData.sections) {
+                        throw new Error('Formato de backup inválido');
+                    }
+                    
+                    // Confirmar restauração
+                    if (confirm('Tem certeza que deseja restaurar este backup? Isso substituirá todos os dados atuais.')) {
+                        shoppingList = backupData.items || [];
+                        sections = backupData.sections || [];
+                        collapsedState = backupData.collapsedState || { sections: [], adder: true };
+                        
+                        if (backupData.itemHistory) {
+                            localStorage.setItem('item_history', JSON.stringify(backupData.itemHistory));
+                        }
+                        
+                        if (backupData.listName) {
+                            document.getElementById('listTitle').textContent = backupData.listName;
+                            document.title = `${backupData.listName} - poupe.com.br`;
+                        }
+                        
+                        saveAndRender();
+                        announceToScreenReader('Backup restaurado com sucesso');
+                    }
+                } catch (error) {
+                    console.error('Erro ao restaurar backup:', error);
+                    alert('Erro ao restaurar backup. Verifique se o arquivo é válido.');
+                }
+            };
+            reader.readAsText(file);
+        };
+        
+        const setupBackupExportButtons = () => {
+            // Adicionar botões de backup/exportação ao menu de configurações
+            const settingsModal = document.getElementById('settingsModal');
+            if (settingsModal) {
+                const existingBackupSection = settingsModal.querySelector('.backup-section');
+                if (!existingBackupSection) {
+                    const backupSection = document.createElement('div');
+                    backupSection.className = 'backup-section mt-6';
+                    backupSection.innerHTML = `
+                        <h3 class="text-lg font-semibold mb-4">📁 Backup e Exportação</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button class="btn btn-outline btn-primary" onclick="exportToCSV()">
+                                <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                            </button>
+                            <button class="btn btn-outline btn-secondary" onclick="exportToPDF()">
+                                <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+                            </button>
+                            <button class="btn btn-outline btn-accent" onclick="createBackup()">
+                                <i class="fa-solid fa-download"></i> Criar Backup
+                            </button>
+                            <label class="btn btn-outline btn-warning cursor-pointer">
+                                <i class="fa-solid fa-upload"></i> Restaurar Backup
+                                <input type="file" accept=".json" class="hidden" onchange="if(this.files[0]) restoreBackup(this.files[0])">
+                            </label>
+                        </div>
+                    `;
+                    
+                    const modalContent = settingsModal.querySelector('.modal-box');
+                    if (modalContent) {
+                        modalContent.appendChild(backupSection);
+                    }
+                }
             }
         };
 
@@ -502,7 +1804,7 @@
             const subsections = getSubsections(section.id);
             
             const sectionElement = document.createElement('div');
-            sectionElement.className = 'bg-base-100 rounded-lg shadow-md section-card';
+            sectionElement.className = 'bg-base-100 rounded-lg shadow-md section-card section-enter';
             sectionElement.dataset.sectionId = section.id;
 
             const header = document.createElement('div');
@@ -591,8 +1893,104 @@
             const hasPrice = item.price > 0;
             const itemTotal = item.price * item.quantity;
             const card = document.createElement('div');
-            card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200';
+            card.className = 'card bg-base-200 item-card border border-base-300 hover:border-primary/30 transition-all duration-200 item-enter';
             card.dataset.id = item.id;
+            
+            // Adicionar suporte a gestos touch (swipe) melhorado
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchEndX = 0;
+            let touchEndY = 0;
+            let isDragging = false;
+            
+            card.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+                isDragging = false;
+            }, { passive: true });
+            
+            card.addEventListener('touchmove', (e) => {
+                if (!isDragging) {
+                    const deltaX = e.changedTouches[0].screenX - touchStartX;
+                    const deltaY = e.changedTouches[0].screenY - touchStartY;
+                    
+                    // Verificar se é um movimento horizontal
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+                        isDragging = true;
+                        card.style.transition = 'none';
+                    }
+                }
+                
+                if (isDragging) {
+                    const deltaX = e.changedTouches[0].screenX - touchStartX;
+                    const maxSwipe = 100;
+                    const clampedDelta = Math.max(-maxSwipe, Math.min(maxSwipe, deltaX));
+                    
+                    card.style.transform = `translateX(${clampedDelta}px)`;
+                    
+                    // Feedback visual baseado na direção
+                    if (clampedDelta > 30) {
+                        card.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                    } else if (clampedDelta < -30) {
+                        card.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    } else {
+                        card.style.backgroundColor = '';
+                    }
+                }
+            }, { passive: true });
+            
+            card.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                
+                // Resetar estilos
+                card.style.transition = '';
+                card.style.transform = '';
+                card.style.backgroundColor = '';
+                
+                if (isDragging) {
+                    handleSwipeGesture(item.id);
+                }
+                isDragging = false;
+            }, { passive: true });
+            
+            function handleSwipeGesture(itemId) {
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                const minSwipeDistance = 50;
+                
+                // Verificar se é um swipe horizontal (não vertical)
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                    // Swipe para direita = marcar como comprado
+                    // Swipe para esquerda = desmarcar
+                    const shouldMarkAsCompleted = deltaX > 0;
+                    const currentItem = shoppingList.find(i => i.id === itemId);
+                    if (currentItem && currentItem.price > 0 && currentItem.inCart !== shouldMarkAsCompleted) {
+                        // Feedback háptico
+                        if (navigator.vibrate) {
+                            navigator.vibrate(50);
+                        }
+                        
+                        // Animação de feedback
+                        card.classList.add('swipe-feedback');
+                        setTimeout(() => card.classList.remove('swipe-feedback'), 300);
+                        
+                        updateItem(itemId, { inCart: shouldMarkAsCompleted });
+                        
+                        // Toast de feedback
+                        const message = shouldMarkAsCompleted 
+                            ? `${currentItem.name} adicionado ao carrinho!`
+                            : `${currentItem.name} removido do carrinho!`;
+                        showToast(message, shouldMarkAsCompleted ? 'success' : 'info');
+                        
+                        // Anunciar mudança para leitores de tela
+                        const announcement = shouldMarkAsCompleted 
+                            ? `${currentItem.name} marcado como comprado`
+                            : `${currentItem.name} desmarcado`;
+                        announceToScreenReader(announcement);
+                    }
+                }
+            }
             card.innerHTML = `
                 <div class="card-body p-3 sm:p-4">
                     <div class="flex justify-between items-start gap-3">
@@ -722,26 +2120,79 @@
             itemCountElements.forEach(el => el && (el.textContent = shoppingList.length));
         };
 
-        const addItem = (name, quantity, unit, sectionId, subsectionId) => {
+        const showToast = (message, type = 'success') => {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} toast-enter fixed top-4 right-4 z-50 max-w-sm shadow-lg`;
+            toast.innerHTML = `
+                <i class="fa-solid fa-${type === 'success' ? 'check' : type === 'info' ? 'info' : 'exclamation-triangle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastExit 0.3s ease-in forwards';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        };
+
+        const addItem = (name, quantity, unit, sectionId, subsectionId, price = 0) => {
             const order = shoppingList.filter(i => i.section === sectionId && i.subsection === subsectionId).length;
-            shoppingList.push({ id: crypto.randomUUID(), name: sanitizeText(name).trim(), quantity, unit, section: sectionId, subsection: subsectionId || null, price: 0, inCart: false, order });
+            const sanitizedName = sanitizeText(name).trim();
+            const newItem = { id: crypto.randomUUID(), name: sanitizedName, quantity, unit, section: sectionId, subsection: subsectionId || null, price: price || 0, inCart: false, order };
+            shoppingList.push(newItem);
+            
+            // Salvar no histórico para sugestões
+            const section = sections.find(s => s.id === sectionId);
+            const subsection = subsectionId ? sections.find(s => s.id === subsectionId) : null;
+            saveItemToHistory(sanitizedName, section?.name || '', subsection?.name || '');
+            
+            // Salvar no histórico de preços se um preço foi fornecido
+            if (price && price > 0) {
+                saveItemPriceHistory({
+                    name: sanitizedName,
+                    unit: unit,
+                    section: section?.name || '',
+                    subsection: subsection?.name || '',
+                    price: price
+                });
+            }
+            
             localStorage.setItem('lastUsedSection', sectionId);
             localStorage.setItem('lastUsedSubsection', subsectionId || '');
             saveAndRender();
+            showToast(`${sanitizedName} adicionado à lista!`);
         };
 
         const updateItem = (id, updates) => {
             const item = shoppingList.find(i => i.id === id);
             if (item) { 
                 if (updates.name) updates.name = sanitizeText(updates.name).trim();
+                
+                // Se o preço foi atualizado, salvar no histórico
+                if (updates.price && updates.price > 0 && updates.price !== item.price) {
+                    const section = sections.find(s => s.id === item.section);
+                    const subsection = item.subsection ? sections.find(s => s.id === item.subsection) : null;
+                    
+                    saveItemPriceHistory({
+                        name: item.name,
+                        unit: item.unit,
+                        section: section?.name || '',
+                        subsection: subsection?.name || '',
+                        price: updates.price
+                    });
+                }
+                
                 Object.assign(item, updates); 
                 saveAndRender(); 
             }
         };
 
         const removeItem = (id) => {
+            const item = shoppingList.find(i => i.id === id);
+            const itemName = item ? item.name : 'Item';
             shoppingList = shoppingList.filter(i => i.id !== id);
             saveAndRender();
+            showToast(`${itemName} removido da lista!`, 'info');
         };
 
         const addOrUpdateSection = (id, name, icon, parentId) => {
@@ -807,38 +2258,96 @@
         addItemForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const itemName = document.getElementById('itemName').value;
-            const itemQuantity = parseFloat(document.getElementById('itemQuantity').value);
+            const itemQuantity = document.getElementById('itemQuantity').value;
             const itemUnit = document.getElementById('itemUnit').value;
             const itemSection = document.getElementById('itemSection').value;
             const itemSubsection = document.getElementById('itemSubsection').value;
-            if (sanitizeText(itemName).trim() && !isNaN(itemQuantity) && itemQuantity > 0 && itemSection) {
-                addItem(itemName, itemQuantity, itemUnit, itemSection, itemSubsection);
-                
-                document.getElementById('itemName').value = '';
-                document.getElementById('itemQuantity').value = '1';
-                document.getElementById('itemName').focus();
-
-                saveAndRender();
-            } else {
-                const submitButton = addItemForm.querySelector('button[type="submit"]');
-                submitButton.classList.add('btn-error');
-                setTimeout(() => submitButton.classList.remove('btn-error'), 2000);
+            
+            // Validação do nome
+            const nameValidation = validateItemName(itemName);
+            if (!nameValidation.isValid) {
+                showError(nameValidation.error);
+                return;
             }
+            
+            // Validação da quantidade
+            const quantityValidation = validateQuantity(itemQuantity);
+            if (!quantityValidation.isValid) {
+                showError(quantityValidation.error);
+                return;
+            }
+            
+            // Seção é opcional - não há validação necessária
+            
+            addItem(nameValidation.sanitized, quantityValidation.value, itemUnit, itemSection, itemSubsection);
+            
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemQuantity').value = '1';
+            document.getElementById('itemName').focus();
+
+            saveAndRender();
         });
+        
+        const showError = (message) => {
+            const submitButton = addItemForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
         editItemForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('editItemId').value;
+            const itemName = document.getElementById('editItemName').value;
+            const itemQuantity = document.getElementById('editItemQuantity').value;
+            const itemPrice = document.getElementById('editItemPrice').value;
+            
+            // Validação do nome
+            const nameValidation = validateItemName(itemName);
+            if (!nameValidation.isValid) {
+                showEditError(nameValidation.error);
+                return;
+            }
+            
+            // Validação da quantidade
+            const quantityValidation = validateQuantity(itemQuantity);
+            if (!quantityValidation.isValid) {
+                showEditError(quantityValidation.error);
+                return;
+            }
+            
+            // Validação do preço
+            const priceValidation = validatePrice(itemPrice);
+            if (!priceValidation.isValid) {
+                showEditError(priceValidation.error);
+                return;
+            }
+            
             updateItem(id, {
-                name: document.getElementById('editItemName').value,
-                quantity: parseFloat(document.getElementById('editItemQuantity').value),
+                name: nameValidation.sanitized,
+                quantity: quantityValidation.value,
                 unit: document.getElementById('editItemUnit').value,
-                price: parseFloat(document.getElementById('editItemPrice').value.replace(',', '.')) || 0,
+                price: priceValidation.value,
                 section: document.getElementById('editItemSection').value,
                 subsection: document.getElementById('editItemSubsection').value || null
             });
             editModal.close();
         });
+        
+        const showEditError = (message) => {
+            const submitButton = editItemForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
         sectionForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -846,17 +2355,64 @@
             const name = document.getElementById('sectionName').value;
             const icon = document.getElementById('sectionIcon').value.trim();
             const parentId = document.getElementById('sectionParent').value || null;
-            if (sanitizeText(name).trim()) {
-                addOrUpdateSection(id, name, icon, parentId);
-                sectionModal.close();
-                if (settingsModal.open) renderSectionManager();
+            
+            // Validação do nome da seção
+            const nameValidation = validateItemName(name); // Reutiliza a validação de nome
+            if (!nameValidation.isValid) {
+                showSectionError(nameValidation.error);
+                return;
             }
+            
+            addOrUpdateSection(id, nameValidation.sanitized, icon, parentId);
+            sectionModal.close();
+            if (settingsModal.open) renderSectionManager();
         });
+        
+        const showSectionError = (message) => {
+            const submitButton = sectionForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
+        // Validação em tempo real
         document.body.addEventListener('input', (e) => {
             const target = e.target;
-            if (target.matches('#itemName, #editItemName, #sectionName')) {
-                target.value = sanitizeText(target.value);
+            
+            // Validação do nome do item
+            if (target.id === 'itemName' || target.id === 'editItemName') {
+                const validation = validateItemName(target.value);
+                target.setCustomValidity(validation.isValid ? '' : validation.error);
+                target.classList.toggle('input-error', !validation.isValid);
+            }
+            
+            // Validação da quantidade
+            if (target.id === 'itemQuantity' || target.id === 'editItemQuantity') {
+                const validation = validateQuantity(target.value);
+                target.setCustomValidity(validation.isValid ? '' : validation.error);
+                target.classList.toggle('input-error', !validation.isValid);
+            }
+            
+            // Validação do preço
+             if (target.id === 'editItemPrice') {
+                 const validation = validatePrice(target.value);
+                 target.setCustomValidity(validation.isValid ? '' : validation.error);
+                 target.classList.toggle('input-error', !validation.isValid);
+             }
+             
+             // Validação do nome da seção
+             if (target.id === 'sectionName') {
+                 const validation = validateItemName(target.value);
+                 target.setCustomValidity(validation.isValid ? '' : validation.error);
+                 target.classList.toggle('input-error', !validation.isValid);
+             }
+             
+             if (target.matches('#itemName, #editItemName, #sectionName')) {
+                 target.value = sanitizeText(target.value);
             }
             if (target.matches('#itemQuantity, #editItemQuantity, [data-action="update-price-input"], #editItemPrice')) {
                 target.value = sanitizeNumber(target.value);
@@ -920,7 +2476,9 @@
                         }
                         editSubsectionBtn.disabled = !item.section;
 
+                        editModal.classList.add('modal-enter');
                         editModal.showModal();
+                        setTimeout(() => editModal.classList.remove('modal-enter'), 50);
                     }
                     break;
                 case 'remove-item':
@@ -938,7 +2496,14 @@
                     }
                     break;
                 case 'toggle-cart-status':
-                    if (item && item.price > 0) updateItem(id, { inCart: !item.inCart });
+                    if (item && item.price > 0) {
+                        const itemCard = document.querySelector(`[data-id="${id}"]`);
+                        if (itemCard) {
+                            itemCard.classList.add('action-feedback');
+                            setTimeout(() => itemCard.classList.remove('action-feedback'), 300);
+                        }
+                        updateItem(id, { inCart: !item.inCart });
+                    }
                     break;
                 case 'open-section-modal':
                 case 'open-section-modal-from-adder':
@@ -947,8 +2512,12 @@
                     document.getElementById('sectionParent').value = '';
                     document.getElementById('sectionParentBtn').querySelector('.truncate').innerHTML = `📁 Nenhuma (Criar Seção Principal)`;
                     updateSectionModalUI(null, false);
+                    sectionModal.classList.add('modal-enter');
                     sectionModal.showModal();
-                    setTimeout(() => document.getElementById('sectionName').focus(), 50);
+                    setTimeout(() => {
+                        document.getElementById('sectionName').focus();
+                        sectionModal.classList.remove('modal-enter');
+                    }, 50);
                     break;
                 case 'open-subsection-modal-from-section': {
                     const parentId = actionTarget.dataset.id;
@@ -1005,6 +2574,10 @@
                 case 'open-settings-modal':
                     renderSectionManager();
                     settingsModal.showModal();
+                    break;
+
+                case 'start-tutorial':
+                    startInteractiveTutorial();
                     break;
                 case 'open-unit-selector': {
                     const currentVal = document.getElementById(targetInput).value;
@@ -1250,9 +2823,33 @@
             initSectionSortable(container);
         };
 
+        const detectSystemTheme = () => {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'cupcake';
+        };
+
+        const initTheme = () => {
+            let theme = localStorage.getItem('theme');
+            
+            if (!theme) {
+                theme = detectSystemTheme();
+                localStorage.setItem('theme', theme);
+            }
+            
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Escutar mudanças na preferência do sistema
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                const savedTheme = localStorage.getItem('theme');
+                if (!savedTheme) {
+                    const newTheme = e.matches ? 'dark' : 'cupcake';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                }
+            });
+        };
+
         const init = () => {
-            const currentTheme = localStorage.getItem('theme') || 'cupcake';
-            document.documentElement.setAttribute('data-theme', currentTheme);
+            initTheme();
             
             loadState();
             
@@ -1270,10 +2867,1350 @@
             applyLastUsedSelection();
             initSectionSortable(shoppingListContainer);
             document.getElementById('itemName')?.focus();
+            
+            // Configurar sistema de sugestões
+            const itemNameInput = document.getElementById('itemName');
+            if (itemNameInput) {
+                // Adicionar event listener para sugestões
+                itemNameInput.addEventListener('input', (e) => {
+                    debouncedShowSuggestions(e.target);
+                });
+                
+                // Fechar dropdown ao perder foco
+                itemNameInput.addEventListener('blur', (e) => {
+                    // Delay para permitir clique nas sugestões
+                    setTimeout(() => {
+                        const dropdown = document.getElementById('suggestions-dropdown');
+                        if (dropdown && !dropdown.contains(document.activeElement)) {
+                            dropdown.remove();
+                        }
+                    }, 150);
+                });
+                
+                // Navegação por teclado nas sugestões
+                itemNameInput.addEventListener('keydown', (e) => {
+                    const dropdown = document.getElementById('suggestions-dropdown');
+                    if (!dropdown) return;
+                    
+                    const suggestions = dropdown.querySelectorAll('[role="option"]');
+                    const currentFocus = dropdown.querySelector('[role="option"]:focus');
+                    
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (!currentFocus) {
+                            suggestions[0]?.focus();
+                        } else {
+                            const currentIndex = Array.from(suggestions).indexOf(currentFocus);
+                            const nextIndex = Math.min(currentIndex + 1, suggestions.length - 1);
+                            suggestions[nextIndex]?.focus();
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (!currentFocus) {
+                            suggestions[suggestions.length - 1]?.focus();
+                        } else {
+                            const currentIndex = Array.from(suggestions).indexOf(currentFocus);
+                            const nextIndex = Math.max(currentIndex - 1, 0);
+                            suggestions[nextIndex]?.focus();
+                        }
+                    } else if (e.key === 'Escape') {
+                        dropdown.remove();
+                        itemNameInput.focus();
+                    }
+                });
+            }
+            
+            // Configurar filtros
+            setupFilters();
+            
+            // Configurar botões de backup e exportação
+            setupBackupExportButtons();
+            
+            // Configurar sugestões inteligentes
+            setupSmartSuggestions();
+            
+            // ===== ATALHOS DE TECLADO AVANÇADOS =====
+            document.addEventListener('keydown', (e) => {
+                // Prevenir ações padrão apenas quando necessário
+                const isInputFocused = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
+                
+                // Ctrl+N ou Cmd+N - Focar no campo de adicionar item
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    const itemNameInput = document.getElementById('itemName');
+                    if (itemNameInput) {
+                        // Abrir o collapse se estiver fechado
+                        const adderToggle = document.getElementById('adder-toggle');
+                        if (adderToggle && !adderToggle.checked) {
+                            adderToggle.checked = true;
+                            collapsedState.adder = true;
+                            saveState();
+                        }
+                        itemNameInput.focus();
+                        announceToScreenReader('Campo de novo item focado');
+                    }
+                }
+                
+                // Ctrl+S ou Cmd+S - Salvar lista (exportar)
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    const exportBtn = document.querySelector('[data-action="export-list"]');
+                    if (exportBtn) {
+                        exportBtn.click();
+                        showToast('Lista exportada!', 'success');
+                    }
+                }
+                
+                // Ctrl+F ou Cmd+F - Focar na busca
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                        announceToScreenReader('Campo de busca focado');
+                    }
+                }
+                
+                // Ctrl+M ou Cmd+M - Abrir gerenciador de itens
+                if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
+                    e.preventDefault();
+                    const manageBtn = document.querySelector('[data-action="open-manage-items-modal"]');
+                    if (manageBtn) {
+                        manageBtn.click();
+                        announceToScreenReader('Gerenciador de itens aberto');
+                    }
+                }
+                
+
+                
+                // Ctrl+Shift+C ou Cmd+Shift+C - Limpar lista completa
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+                    e.preventDefault();
+                    const clearBtn = document.querySelector('[data-action="clear-completed"]');
+                    if (clearBtn) {
+                        clearBtn.click();
+                        announceToScreenReader('Itens concluídos removidos');
+                    }
+                }
+                
+                // Ctrl+A ou Cmd+A - Selecionar todos os itens (marcar como concluídos)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !isInputFocused) {
+                    e.preventDefault();
+                    const uncheckedItems = document.querySelectorAll('.item-card input[type="checkbox"]:not(:checked)');
+                    uncheckedItems.forEach(checkbox => {
+                        checkbox.checked = true;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    if (uncheckedItems.length > 0) {
+                        showToast(`${uncheckedItems.length} itens marcados como concluídos`, 'success');
+                        announceToScreenReader(`${uncheckedItems.length} itens marcados como concluídos`);
+                    }
+                }
+                
+                // Ctrl+Shift+A ou Cmd+Shift+A - Desmarcar todos os itens
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
+                    e.preventDefault();
+                    const checkedItems = document.querySelectorAll('.item-card input[type="checkbox"]:checked');
+                    checkedItems.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    if (checkedItems.length > 0) {
+                        showToast(`${checkedItems.length} itens desmarcados`, 'info');
+                        announceToScreenReader(`${checkedItems.length} itens desmarcados`);
+                    }
+                }
+                
+                // Delete - Remover item focado
+                if (e.key === 'Delete' && !isInputFocused) {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && focusedElement.closest('.item-card')) {
+                        const deleteBtn = focusedElement.closest('.item-card').querySelector('[data-action="delete-item"]');
+                        if (deleteBtn) {
+                            deleteBtn.click();
+                            announceToScreenReader('Item removido');
+                        }
+                    }
+                }
+                
+                // Space - Marcar/desmarcar item focado
+                if (e.key === ' ' && !isInputFocused) {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && focusedElement.closest('.item-card') && !focusedElement.matches('button, input')) {
+                        e.preventDefault();
+                        const checkbox = focusedElement.closest('.item-card').querySelector('input[type="checkbox"]');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                            announceToScreenReader(checkbox.checked ? 'Item marcado como concluído' : 'Item desmarcado');
+                        }
+                    }
+                }
+                
+                // Esc - Fechar modais ou limpar foco
+                if (e.key === 'Escape') {
+                    // Verificar se há algum modal aberto
+                    const openModals = document.querySelectorAll('dialog[open]');
+                    if (openModals.length === 0) {
+                        // Se não há modais, remover foco do elemento atual
+                        if (document.activeElement && document.activeElement !== document.body) {
+                            document.activeElement.blur();
+                            announceToScreenReader('Foco removido');
+                        }
+                    }
+                }
+                
+                // Enter no formulário de adicionar item
+                if (e.key === 'Enter' && e.target.closest('#addItemForm')) {
+                    const form = document.getElementById('addItemForm');
+                    const itemName = document.getElementById('itemName').value.trim();
+                    if (itemName) {
+                        // O evento de submit do formulário já vai lidar com isso
+                        announceToScreenReader('Item adicionado à lista');
+                    }
+                }
+                
+                // Navegação por teclado nos itens da lista
+                if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !isInputFocused) {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && (focusedElement.closest('.item-card') || focusedElement.matches('.item-card'))) {
+                        e.preventDefault();
+                        const allItems = Array.from(document.querySelectorAll('.item-card'));
+                        const currentItem = focusedElement.closest('.item-card') || focusedElement;
+                        const currentIndex = allItems.indexOf(currentItem);
+                        
+                        if (currentIndex !== -1) {
+                            const nextIndex = e.key === 'ArrowDown' 
+                                ? Math.min(currentIndex + 1, allItems.length - 1)
+                                : Math.max(currentIndex - 1, 0);
+                            
+                            if (nextIndex !== currentIndex) {
+                                allItems[nextIndex].focus();
+                                allItems[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                announceToScreenReader(`Item ${nextIndex + 1} de ${allItems.length} focado`);
+                            }
+                        }
+                    }
+                }
+                
+                // Tab - Navegação melhorada entre elementos
+                if (e.key === 'Tab' && !e.shiftKey) {
+                    // Permitir navegação normal, mas anunciar para leitores de tela
+                    setTimeout(() => {
+                        const focused = document.activeElement;
+                        if (focused && focused.closest('.item-card')) {
+                            const itemName = focused.closest('.item-card').querySelector('.item-name')?.textContent;
+                            if (itemName) {
+                                announceToScreenReader(`Focado em: ${itemName}`);
+                            }
+                        }
+                    }, 10);
+                }
+                
+
+            });
+            
+
         };
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registrado com sucesso:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Falha ao registrar SW:', error);
+                    });
+            });
+        }
+
+        // Variáveis globais para o scanner
+        let barcodeStream = null;
+        let barcodeScanning = false;
+        let currentProductData = null;
+
+        // Função para inicializar o scanner de código de barras
+        const initBarcodeScanner = async () => {
+            const video = document.getElementById('barcodeVideo');
+            const status = document.getElementById('barcodeStatus');
+            
+            try {
+                // Solicitar acesso à câmera
+                barcodeStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment', // Câmera traseira
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                });
+                
+                video.srcObject = barcodeStream;
+                barcodeScanning = true;
+                
+                status.innerHTML = '<p class="text-sm text-base-content/60">Posicione o código de barras dentro do quadro</p>';
+                
+                // Iniciar detecção de código de barras
+                startBarcodeDetection();
+                
+            } catch (error) {
+                console.error('Erro ao acessar câmera:', error);
+                status.innerHTML = '<p class="text-sm text-error">Erro ao acessar a câmera. Verifique as permissões.</p>';
+            }
+        };
+
+        // Função para detectar código de barras usando BarcodeDetector API
+        const startBarcodeDetection = () => {
+            const video = document.getElementById('barcodeVideo');
+            
+            // Fallback para navegadores que não suportam BarcodeDetector
+            if (!('BarcodeDetector' in window)) {
+                // Usar detecção manual simples
+                startManualBarcodeDetection();
+                return;
+            }
+            
+            const barcodeDetector = new BarcodeDetector({
+                formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e']
+            });
+            
+            const detectBarcode = async () => {
+                if (!barcodeScanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
+                    if (barcodeScanning) {
+                        requestAnimationFrame(detectBarcode);
+                    }
+                    return;
+                }
+                
+                try {
+                    const barcodes = await barcodeDetector.detect(video);
+                    
+                    if (barcodes.length > 0) {
+                        const barcode = barcodes[0].rawValue;
+                        console.log('Código de barras detectado:', barcode);
+                        await searchProductByBarcode(barcode);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Erro na detecção:', error);
+                }
+                
+                requestAnimationFrame(detectBarcode);
+            };
+            
+            video.addEventListener('loadeddata', () => {
+                detectBarcode();
+            });
+        };
+
+        // Função de detecção manual para navegadores sem BarcodeDetector
+        const startManualBarcodeDetection = () => {
+            const status = document.getElementById('barcodeStatus');
+            status.innerHTML = `
+                <p class="text-sm text-base-content/60 mb-2">Posicione o código de barras dentro do quadro</p>
+                <div class="form-control">
+                    <input type="text" id="manualBarcode" placeholder="Ou digite o código manualmente" class="input input-bordered input-sm">
+                    <button type="button" id="searchManualBarcode" class="btn btn-sm btn-primary mt-2">
+                        <i class="fa-solid fa-search mr-1"></i> Buscar
+                    </button>
+                </div>
+            `;
+            
+            // Event listener para busca manual
+            document.getElementById('searchManualBarcode').addEventListener('click', () => {
+                const barcode = document.getElementById('manualBarcode').value.trim();
+                if (barcode) {
+                    searchProductByBarcode(barcode);
+                }
+            });
+            
+            document.getElementById('manualBarcode').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const barcode = e.target.value.trim();
+                    if (barcode) {
+                        searchProductByBarcode(barcode);
+                    }
+                }
+            });
+        };
+
+        // Função para sugerir seção baseada no produto
+        const suggestSectionForProduct = (productName, categories) => {
+            const name = productName.toLowerCase();
+            
+            // Mapeamento de palavras-chave para seções
+            const sectionKeywords = {
+                'frutas': ['banana', 'maçã', 'laranja', 'uva', 'pêra', 'abacaxi', 'manga', 'mamão', 'melancia', 'melão', 'morango', 'kiwi', 'limão', 'fruta'],
+                'verduras': ['alface', 'tomate', 'cebola', 'cenoura', 'batata', 'abobrinha', 'pepino', 'pimentão', 'brócolis', 'couve', 'espinafre', 'verdura', 'legume'],
+                'carnes': ['carne', 'frango', 'peixe', 'porco', 'boi', 'linguiça', 'salsicha', 'presunto', 'bacon', 'costela', 'filé'],
+                'laticínios': ['leite', 'queijo', 'iogurte', 'manteiga', 'cream cheese', 'requeijão', 'nata', 'creme de leite'],
+                'padaria': ['pão', 'bolo', 'biscoito', 'torrada', 'croissant', 'sonho', 'donut'],
+                'bebidas': ['água', 'refrigerante', 'suco', 'cerveja', 'vinho', 'café', 'chá', 'energético'],
+                'limpeza': ['detergente', 'sabão', 'amaciante', 'desinfetante', 'papel higiênico', 'shampoo', 'condicionador'],
+                'mercearia': ['arroz', 'feijão', 'açúcar', 'sal', 'óleo', 'vinagre', 'macarrão', 'farinha', 'molho']
+            };
+            
+            // Verificar categorias da API do Open Food Facts
+            if (categories) {
+                const apiCategories = categories.toLowerCase();
+                if (apiCategories.includes('fruit') || apiCategories.includes('fruta')) return 'frutas';
+                if (apiCategories.includes('vegetable') || apiCategories.includes('verdura')) return 'verduras';
+                if (apiCategories.includes('meat') || apiCategories.includes('carne')) return 'carnes';
+                if (apiCategories.includes('dairy') || apiCategories.includes('laticínio')) return 'laticínios';
+                if (apiCategories.includes('beverage') || apiCategories.includes('bebida')) return 'bebidas';
+                if (apiCategories.includes('bread') || apiCategories.includes('bakery')) return 'padaria';
+            }
+            
+            // Verificar palavras-chave no nome do produto
+            for (const [section, keywords] of Object.entries(sectionKeywords)) {
+                if (keywords.some(keyword => name.includes(keyword))) {
+                    return section;
+                }
+            }
+            
+            return null;
+        };
+
+        // Função para buscar produto na API do Open Food Facts
+        const searchProductByBarcode = async (barcode) => {
+            const status = document.getElementById('barcodeStatus');
+            const result = document.getElementById('barcodeResult');
+            const productInfo = document.getElementById('productInfo');
+            const useBtn = document.getElementById('useBarcodeBtn');
+            
+            status.innerHTML = '<p class="text-sm text-primary"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Buscando produto...</p>';
+            
+            try {
+                const response = await fetch(`https://br.openfoodfacts.org/api/v2/product/${barcode}`);
+                const data = await response.json();
+                
+                if (data.status === 1 && data.product) {
+                    const product = data.product;
+                    const productName = product.product_name_pt || product.product_name || 'Produto sem nome';
+                    const brand = product.brands || '';
+                    const quantity = product.quantity || '';
+                    const categories = product.categories || '';
+                    
+                    // Sugerir seção baseada no produto
+                    const suggestedSection = suggestSectionForProduct(productName, categories);
+                    
+                    currentProductData = {
+                        name: productName,
+                        barcode: barcode,
+                        brand: brand,
+                        quantity: quantity,
+                        suggestedSection: suggestedSection
+                    };
+                    
+                    productInfo.innerHTML = `
+                        <div class="font-semibold">${productName}</div>
+                        ${brand ? `<div class="text-xs text-base-content/60">Marca: ${brand}</div>` : ''}
+                        ${quantity ? `<div class="text-xs text-base-content/60">Quantidade: ${quantity}</div>` : ''}
+                        ${suggestedSection ? `<div class="text-xs text-primary font-medium mt-1">💡 Seção sugerida: ${suggestedSection}</div>` : ''}
+                        <div class="text-xs text-base-content/60 mt-1">Código: ${barcode}</div>
+                    `;
+                    
+                    result.classList.remove('hidden');
+                    useBtn.classList.remove('hidden');
+                    status.innerHTML = '<p class="text-sm text-success"><i class="fa-solid fa-check mr-2"></i>Produto encontrado!</p>';
+                    
+                } else {
+                    status.innerHTML = '<p class="text-sm text-warning"><i class="fa-solid fa-exclamation-triangle mr-2"></i>Produto não encontrado na base de dados.</p>';
+                    result.classList.add('hidden');
+                    useBtn.classList.add('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao buscar produto:', error);
+                status.innerHTML = '<p class="text-sm text-error"><i class="fa-solid fa-times mr-2"></i>Erro ao buscar produto. Tente novamente.</p>';
+                result.classList.add('hidden');
+                useBtn.classList.add('hidden');
+            }
+        };
+
+        // Função para parar o scanner
+        const stopBarcodeScanner = () => {
+            barcodeScanning = false;
+            
+            if (barcodeStream) {
+                barcodeStream.getTracks().forEach(track => track.stop());
+                barcodeStream = null;
+            }
+            
+            const video = document.getElementById('barcodeVideo');
+            video.srcObject = null;
+            
+            // Reset do modal
+            document.getElementById('barcodeStatus').innerHTML = '<p class="text-sm text-base-content/60">Posicione o código de barras dentro do quadro</p>';
+            document.getElementById('barcodeResult').classList.add('hidden');
+            document.getElementById('useBarcodeBtn').classList.add('hidden');
+            currentProductData = null;
+        };
+
+        // Event listeners para o scanner
+        document.getElementById('barcodeBtn').addEventListener('click', () => {
+            const modal = document.getElementById('barcodeModal');
+            modal.showModal();
+            initBarcodeScanner();
+        });
+
+        document.getElementById('stopBarcodeBtn').addEventListener('click', () => {
+            stopBarcodeScanner();
+            document.getElementById('barcodeModal').close();
+        });
+
+        document.getElementById('useBarcodeBtn').addEventListener('click', () => {
+            if (currentProductData) {
+                // Preencher o campo de nome do item
+                document.getElementById('itemName').value = currentProductData.name;
+                
+                // Preencher seção sugerida se disponível
+                if (currentProductData.suggestedSection) {
+                    const sectionBtn = document.getElementById('itemSectionBtn');
+                    const sectionInput = document.getElementById('itemSection');
+                    
+                    // Procurar pela seção sugerida nas seções disponíveis
+                    const matchingSection = sections.find(section => 
+                        section.name.toLowerCase().includes(currentProductData.suggestedSection.toLowerCase()) ||
+                        currentProductData.suggestedSection.toLowerCase().includes(section.name.toLowerCase())
+                    );
+                    
+                    if (matchingSection) {
+                        sectionInput.value = matchingSection.id;
+                        sectionBtn.querySelector('.truncate').innerHTML = `${matchingSection.icon || ''} ${matchingSection.name}`;
+                        sectionBtn.disabled = false;
+                        
+                        // Habilitar o botão de subseção
+                        const subsectionBtn = document.getElementById('itemSubsectionBtn');
+                        subsectionBtn.disabled = false;
+                        
+                        announceToScreenReader(`Seção ${matchingSection.name} sugerida automaticamente - você pode alterá-la ou deixar em branco`);
+                    }
+                }
+                
+                // Fechar o modal
+                stopBarcodeScanner();
+                document.getElementById('barcodeModal').close();
+                
+                // Focar no próximo campo (quantidade)
+                document.getElementById('itemQuantity').focus();
+                
+                announceToScreenReader(`Produto ${currentProductData.name} adicionado ao formulário`);
+            }
+        });
+
+        // Fechar modal quando clicar no backdrop
+        document.getElementById('barcodeModal').addEventListener('close', () => {
+            stopBarcodeScanner();
+        });
 
         init();
     });
+
     </script>
+
+    <!-- Modal do Scanner de Código de Barras -->
+    <dialog id="barcodeModal" class="modal">
+        <div class="modal-box max-w-md">
+            <h3 class="font-bold text-lg mb-4">
+                <i class="fa-solid fa-barcode mr-2"></i>
+                Scanner de Código de Barras
+            </h3>
+            
+            <div id="barcodeScanner" class="mb-4">
+                <video id="barcodeVideo" class="w-full rounded-lg bg-black" style="aspect-ratio: 4/3;" autoplay muted playsinline></video>
+                <div id="barcodeOverlay" class="relative -mt-4 pointer-events-none">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent rounded-lg opacity-50"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="barcodeStatus" class="text-center mb-4">
+                <p class="text-sm text-base-content/60">Posicione o código de barras dentro do quadro</p>
+            </div>
+            
+            <div id="barcodeResult" class="hidden mb-4 p-3 bg-success/10 border border-success/20 rounded-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-check-circle text-success"></i>
+                    <span class="font-semibold text-success">Produto encontrado!</span>
+                </div>
+                <div id="productInfo" class="text-sm"></div>
+            </div>
+            
+            <div class="modal-action">
+                <button id="stopBarcodeBtn" class="btn btn-outline">
+                    <i class="fa-solid fa-stop mr-2"></i>
+                    Parar Scanner
+                </button>
+                <button id="useBarcodeBtn" class="btn btn-primary hidden">
+                    <i class="fa-solid fa-check mr-2"></i>
+                    Usar Produto
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>Fechar</button>
+        </form>
+    </dialog>
+
+    <script>
+        
+        // ===== SISTEMA DE TUTORIAL INTERATIVO =====
+        let tutorialState = {
+            isActive: false,
+            currentStep: 0,
+            overlay: null,
+            tooltip: null,
+            steps: [
+                {
+                    target: '#itemName',
+                    title: 'Bem-vindo à Lista de Compras!',
+                    content: 'Comece digitando o nome de um item aqui. A aplicação irá sugerir automaticamente produtos e categorias.',
+                    position: 'bottom',
+                    action: () => {
+                        const adderToggle = document.getElementById('adder-toggle');
+                        if (adderToggle && !adderToggle.checked) {
+                            adderToggle.checked = true;
+                        }
+                    }
+                },
+                {
+                    target: '#addItemForm button[type="submit"]',
+                    title: 'Adicionar Itens',
+                    content: 'Toque aqui para adicionar o item à sua lista de compras.',
+                    position: 'top'
+                },
+                {
+                    target: '.item-card:first-child',
+                    title: 'Gerenciar Itens',
+                    content: 'Toque na checkbox para marcar como concluído, ou use os botões para editar quantidade e remover itens. Você pode arrastar para reordenar!',
+                    position: 'right',
+                    fallback: '#sections-container'
+                },
+                {
+                    target: '#searchInput',
+                    title: 'Buscar na Lista',
+                    content: 'Use este campo para filtrar itens na sua lista de forma rápida e fácil.',
+                    position: 'bottom'
+                },
+                {
+                    target: '[data-action="open-manage-items-modal"]',
+                    title: 'Gerenciar Produtos',
+                    content: 'Aqui você pode gerenciar todos os produtos cadastrados, criar categorias e organizar sua base de dados.',
+                    position: 'bottom'
+                },
+
+                {
+                    target: '[data-action="open-settings-modal"]',
+                    title: 'Configurações',
+                    content: 'Personalize sua experiência: exporte listas, configure categorias, ajuste preferências e muito mais.',
+                    position: 'bottom'
+                },
+                {
+                    target: 'body',
+                    title: 'Funcionalidades Avançadas',
+                    content: 'Explore todas as funcionalidades: marque todos os itens de uma vez, use filtros, organize por categorias e muito mais!',
+                    position: 'center'
+                },
+                {
+                    target: 'body',
+                    title: 'Tutorial Concluído!',
+                    content: 'Agora você está pronto para usar a Lista de Compras! Explore todas as funcionalidades e aproveite a experiência otimizada.',
+                    position: 'center'
+                }
+            ]
+        };
+        
+        function startInteractiveTutorial() {
+            if (tutorialState.isActive) {
+                endTutorial();
+                return;
+            }
+            
+            tutorialState.isActive = true;
+            tutorialState.currentStep = 0;
+            createTutorialOverlay();
+            showTutorialStep(0);
+            announceToScreenReader('Tutorial interativo iniciado');
+        }
+        
+        function createTutorialOverlay() {
+            // Criar overlay escuro
+            tutorialState.overlay = document.createElement('div');
+            tutorialState.overlay.className = 'tutorial-overlay';
+            tutorialState.overlay.innerHTML = `
+                <style>
+                    .tutorial-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.7);
+                        z-index: 9998;
+                        pointer-events: none;
+                    }
+                    .tutorial-highlight {
+                        position: absolute;
+                        border: 3px solid #3b82f6;
+                        border-radius: 8px;
+                        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(59, 130, 246, 0.5);
+                        pointer-events: none;
+                        z-index: 9999;
+                        transition: all 0.3s ease;
+                    }
+                    .tutorial-tooltip {
+                        position: absolute;
+                        background: white;
+                        border-radius: 12px;
+                        padding: 20px;
+                        max-width: 320px;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                        z-index: 10000;
+                        pointer-events: auto;
+                        border: 1px solid #e5e7eb;
+                    }
+                    .tutorial-tooltip h3 {
+                        margin: 0 0 12px 0;
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #1f2937;
+                    }
+                    .tutorial-tooltip p {
+                        margin: 0 0 16px 0;
+                        color: #6b7280;
+                        line-height: 1.5;
+                    }
+                    .tutorial-tooltip .tutorial-controls {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        gap: 12px;
+                    }
+                    .tutorial-tooltip .tutorial-progress {
+                        font-size: 12px;
+                        color: #9ca3af;
+                        font-weight: 500;
+                    }
+                    .tutorial-tooltip .tutorial-buttons {
+                        display: flex;
+                        gap: 8px;
+                    }
+                    .tutorial-btn {
+                        padding: 8px 16px;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    }
+                    .tutorial-btn-primary {
+                        background: #3b82f6;
+                        color: white;
+                    }
+                    .tutorial-btn-primary:hover {
+                        background: #2563eb;
+                    }
+                    .tutorial-btn-secondary {
+                        background: #f3f4f6;
+                        color: #374151;
+                    }
+                    .tutorial-btn-secondary:hover {
+                        background: #e5e7eb;
+                    }
+                    .tutorial-btn-danger {
+                        background: #ef4444;
+                        color: white;
+                    }
+                    .tutorial-btn-danger:hover {
+                        background: #dc2626;
+                    }
+                </style>
+            `;
+            document.body.appendChild(tutorialState.overlay);
+        }
+        
+        function showTutorialStep(stepIndex) {
+            if (stepIndex >= tutorialState.steps.length) {
+                endTutorial();
+                return;
+            }
+            
+            const step = tutorialState.steps[stepIndex];
+            tutorialState.currentStep = stepIndex;
+            
+            // Executar ação do passo se existir
+            if (step.action) {
+                step.action();
+            }
+            
+            // Aguardar um pouco para elementos aparecerem
+            setTimeout(() => {
+                const target = document.querySelector(step.target);
+                if (!target && step.fallback) {
+                    target = document.querySelector(step.fallback);
+                }
+                
+                if (target || step.position === 'center') {
+                    highlightElement(target, step);
+                    showTooltip(target, step);
+                } else {
+                    // Se elemento não existe, pular para próximo
+                    showTutorialStep(stepIndex + 1);
+                }
+            }, 100);
+        }
+        
+        function highlightElement(element, step) {
+            // Remover highlight anterior
+            const oldHighlight = document.querySelector('.tutorial-highlight');
+            if (oldHighlight) {
+                oldHighlight.remove();
+            }
+            
+            if (!element || step.position === 'center') return;
+            
+            const rect = element.getBoundingClientRect();
+            const highlight = document.createElement('div');
+            highlight.className = 'tutorial-highlight';
+            highlight.style.left = (rect.left - 5) + 'px';
+            highlight.style.top = (rect.top - 5) + 'px';
+            highlight.style.width = (rect.width + 10) + 'px';
+            highlight.style.height = (rect.height + 10) + 'px';
+            
+            document.body.appendChild(highlight);
+            
+            // Scroll para o elemento
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function showTooltip(element, step) {
+            // Remover tooltip anterior
+            if (tutorialState.tooltip) {
+                tutorialState.tooltip.remove();
+            }
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tutorial-tooltip';
+            
+            const isLastStep = tutorialState.currentStep === tutorialState.steps.length - 1;
+            const isFirstStep = tutorialState.currentStep === 0;
+            
+            tooltip.innerHTML = `
+                <h3>${step.title}</h3>
+                <p>${step.content}</p>
+                <div class="tutorial-controls">
+                    <div class="tutorial-progress">
+                        ${tutorialState.currentStep + 1} de ${tutorialState.steps.length}
+                    </div>
+                    <div class="tutorial-buttons">
+                        <button class="tutorial-btn tutorial-btn-danger" onclick="endTutorial()">
+                            Pular
+                        </button>
+                        ${!isFirstStep ? '<button class="tutorial-btn tutorial-btn-secondary" onclick="previousTutorialStep()">Anterior</button>' : ''}
+                        <button class="tutorial-btn tutorial-btn-primary" onclick="${isLastStep ? 'endTutorial()' : 'nextTutorialStep()'}">
+                            ${isLastStep ? 'Concluir' : 'Próximo'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(tooltip);
+            tutorialState.tooltip = tooltip;
+            
+            // Posicionar tooltip
+            positionTooltip(tooltip, element, step.position);
+        }
+        
+        function positionTooltip(tooltip, element, position) {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            if (position === 'center' || !element) {
+                tooltip.style.left = (viewportWidth - tooltipRect.width) / 2 + 'px';
+                tooltip.style.top = (viewportHeight - tooltipRect.height) / 2 + 'px';
+                return;
+            }
+            
+            const elementRect = element.getBoundingClientRect();
+            let left, top;
+            
+            switch (position) {
+                case 'top':
+                    left = elementRect.left + (elementRect.width - tooltipRect.width) / 2;
+                    top = elementRect.top - tooltipRect.height - 15;
+                    break;
+                case 'bottom':
+                    left = elementRect.left + (elementRect.width - tooltipRect.width) / 2;
+                    top = elementRect.bottom + 15;
+                    break;
+                case 'left':
+                    left = elementRect.left - tooltipRect.width - 15;
+                    top = elementRect.top + (elementRect.height - tooltipRect.height) / 2;
+                    break;
+                case 'right':
+                    left = elementRect.right + 15;
+                    top = elementRect.top + (elementRect.height - tooltipRect.height) / 2;
+                    break;
+            }
+            
+            // Ajustar se sair da tela
+            left = Math.max(10, Math.min(left, viewportWidth - tooltipRect.width - 10));
+            top = Math.max(10, Math.min(top, viewportHeight - tooltipRect.height - 10));
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        function nextTutorialStep() {
+            showTutorialStep(tutorialState.currentStep + 1);
+        }
+        
+        function previousTutorialStep() {
+            showTutorialStep(tutorialState.currentStep - 1);
+        }
+        
+        function endTutorial() {
+            tutorialState.isActive = false;
+            
+            // Remover elementos do tutorial
+            if (tutorialState.overlay) {
+                tutorialState.overlay.remove();
+                tutorialState.overlay = null;
+            }
+            
+            if (tutorialState.tooltip) {
+                tutorialState.tooltip.remove();
+                tutorialState.tooltip = null;
+            }
+            
+            const highlight = document.querySelector('.tutorial-highlight');
+            if (highlight) {
+                highlight.remove();
+            }
+            
+            // Marcar tutorial como concluído
+            localStorage.setItem('tutorial_completed', 'true');
+            showToast('Tutorial concluído! Explore todas as funcionalidades.', 'success');
+            announceToScreenReader('Tutorial concluído');
+        }
+        
+        // Verificar se é primeira visita e mostrar tutorial
+        function checkFirstVisit() {
+            const tutorialCompleted = localStorage.getItem('tutorial_completed');
+            const hasItems = document.querySelectorAll('.item-card').length > 0;
+            
+            // Mostrar tutorial se nunca foi concluído e não há itens na lista
+            if (!tutorialCompleted && !hasItems) {
+                setTimeout(() => {
+                    if (confirm('Bem-vindo à Lista de Compras! Gostaria de fazer um tour rápido para conhecer as funcionalidades?')) {
+                        startInteractiveTutorial();
+                    } else {
+                        localStorage.setItem('tutorial_completed', 'true');
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Tornar funções globais para os botões
+        window.nextTutorialStep = nextTutorialStep;
+        window.previousTutorialStep = previousTutorialStep;
+        window.endTutorial = endTutorial;
+        
+        // Verificar primeira visita quando a página carregar
+        document.addEventListener('DOMContentLoaded', checkFirstVisit);
+        
+        // Se já carregou, verificar agora
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkFirstVisit);
+        } else {
+            checkFirstVisit();
+        }
+        
+        // ===== SISTEMA DE MODO COMPACTO =====
+        let viewSettings = {
+            compactMode: false,
+            showQuantities: true,
+            showCategories: true
+        };
+        
+        function loadViewSettings() {
+            const saved = localStorage.getItem('view_settings');
+            if (saved) {
+                viewSettings = { ...viewSettings, ...JSON.parse(saved) };
+            }
+            
+            // Aplicar configurações aos toggles
+            const compactToggle = document.getElementById('compact-mode-toggle');
+            const quantitiesToggle = document.getElementById('show-quantities-toggle');
+            const categoriesToggle = document.getElementById('show-categories-toggle');
+            
+            if (compactToggle) compactToggle.checked = viewSettings.compactMode;
+            if (quantitiesToggle) quantitiesToggle.checked = viewSettings.showQuantities;
+            if (categoriesToggle) categoriesToggle.checked = viewSettings.showCategories;
+            
+            // Aplicar estilos
+            applyViewSettings();
+        }
+        
+        function saveViewSettings() {
+            localStorage.setItem('view_settings', JSON.stringify(viewSettings));
+        }
+        
+        function applyViewSettings() {
+            const body = document.body;
+            
+            // Aplicar modo compacto
+            if (viewSettings.compactMode) {
+                body.classList.add('compact-mode');
+            } else {
+                body.classList.remove('compact-mode');
+            }
+            
+            // Aplicar visibilidade de quantidades
+            if (viewSettings.showQuantities) {
+                body.classList.remove('hide-quantities');
+            } else {
+                body.classList.add('hide-quantities');
+            }
+            
+            // Aplicar visibilidade de categorias
+            if (viewSettings.showCategories) {
+                body.classList.remove('hide-categories');
+            } else {
+                body.classList.add('hide-categories');
+            }
+        }
+        
+        function loadHapticSettingsIntoUI() {
+            const hapticSettings = loadHapticSettings();
+            const hapticEnabledToggle = document.getElementById('haptic-enabled-toggle');
+            const hapticIntensitySelect = document.getElementById('haptic-intensity-select');
+            
+            if (hapticEnabledToggle) {
+                hapticEnabledToggle.checked = hapticSettings.enabled;
+            }
+            
+            if (hapticIntensitySelect) {
+                hapticIntensitySelect.value = hapticSettings.intensity;
+            }
+        }
+        
+        function setupViewSettingsListeners() {
+            const compactToggle = document.getElementById('compact-mode-toggle');
+            const quantitiesToggle = document.getElementById('show-quantities-toggle');
+            const categoriesToggle = document.getElementById('show-categories-toggle');
+            
+            if (compactToggle) {
+                compactToggle.addEventListener('change', (e) => {
+                    viewSettings.compactMode = e.target.checked;
+                    saveViewSettings();
+                    applyViewSettings();
+                    announceToScreenReader(e.target.checked ? 'Modo compacto ativado' : 'Modo compacto desativado');
+                    showToast(e.target.checked ? 'Modo compacto ativado' : 'Modo compacto desativado', 'info');
+                });
+            }
+            
+            if (quantitiesToggle) {
+                quantitiesToggle.addEventListener('change', (e) => {
+                    viewSettings.showQuantities = e.target.checked;
+                    saveViewSettings();
+                    applyViewSettings();
+                    announceToScreenReader(e.target.checked ? 'Quantidades visíveis' : 'Quantidades ocultas');
+                });
+            }
+            
+            if (categoriesToggle) {
+                categoriesToggle.addEventListener('change', (e) => {
+                    viewSettings.showCategories = e.target.checked;
+                    saveViewSettings();
+                    applyViewSettings();
+                    announceToScreenReader(e.target.checked ? 'Categorias visíveis' : 'Categorias ocultas');
+                });
+            }
+            
+            // Event listeners para configurações de feedback háptico
+            const hapticEnabledToggle = document.getElementById('haptic-enabled-toggle');
+            const hapticIntensitySelect = document.getElementById('haptic-intensity-select');
+            
+            if (hapticEnabledToggle) {
+                hapticEnabledToggle.addEventListener('change', (e) => {
+                    const hapticSettings = loadHapticSettings();
+                    hapticSettings.enabled = e.target.checked;
+                    saveHapticSettings(hapticSettings);
+                    
+                    // Feedback háptico de teste
+                    if (e.target.checked) {
+                        hapticFeedback.success();
+                    }
+                    
+                    announceToScreenReader(e.target.checked ? 'Feedback háptico ativado' : 'Feedback háptico desativado');
+                });
+            }
+            
+            if (hapticIntensitySelect) {
+                hapticIntensitySelect.addEventListener('change', (e) => {
+                    const hapticSettings = loadHapticSettings();
+                    hapticSettings.intensity = e.target.value;
+                    saveHapticSettings(hapticSettings);
+                    
+                    // Feedback háptico de teste com nova intensidade
+                    switch (e.target.value) {
+                        case 'light':
+                            hapticFeedback.light();
+                            break;
+                        case 'medium':
+                            hapticFeedback.medium();
+                            break;
+                        case 'strong':
+                            hapticFeedback.strong();
+                            break;
+                    }
+                    
+                    announceToScreenReader(`Intensidade alterada para ${e.target.options[e.target.selectedIndex].text}`);
+                });
+            }
+        }
+        
+        // Adicionar estilos CSS para modo compacto
+        function addCompactModeStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                /* Modo Compacto */
+                .compact-mode .item-card {
+                    padding: 8px 12px !important;
+                    margin-bottom: 4px !important;
+                }
+                
+                .compact-mode .item-card .item-content {
+                    gap: 8px !important;
+                }
+                
+                .compact-mode .item-card .item-name {
+                    font-size: 14px !important;
+                    line-height: 1.3 !important;
+                }
+                
+                .compact-mode .item-card .item-quantity {
+                    font-size: 12px !important;
+                    padding: 2px 6px !important;
+                }
+                
+                .compact-mode .item-card .item-category {
+                    font-size: 11px !important;
+                    padding: 1px 4px !important;
+                }
+                
+                .compact-mode .item-card .item-actions {
+                    gap: 4px !important;
+                }
+                
+                .compact-mode .item-card .btn {
+                    padding: 4px 8px !important;
+                    font-size: 12px !important;
+                    min-height: 28px !important;
+                    height: 28px !important;
+                }
+                
+                .compact-mode .section-header {
+                    padding: 8px 12px !important;
+                    margin-bottom: 8px !important;
+                }
+                
+                .compact-mode .section-header h3 {
+                    font-size: 16px !important;
+                }
+                
+                /* Ocultar quantidades */
+                .hide-quantities .item-quantity {
+                    display: none !important;
+                }
+                
+                /* Ocultar categorias */
+                .hide-categories .item-category {
+                    display: none !important;
+                }
+                
+                /* Ajustes responsivos para modo compacto */
+                @media (max-width: 768px) {
+                    .compact-mode .item-card {
+                        padding: 6px 10px !important;
+                    }
+                    
+                    .compact-mode .item-card .item-name {
+                        font-size: 13px !important;
+                    }
+                    
+                    .compact-mode .item-card .btn {
+                        padding: 3px 6px !important;
+                        font-size: 11px !important;
+                        min-height: 24px !important;
+                        height: 24px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Inicializar configurações de visualização
+        document.addEventListener('DOMContentLoaded', () => {
+            addCompactModeStyles();
+            loadViewSettings();
+            loadHapticSettingsIntoUI();
+            setupViewSettingsListeners();
+        });
+        
+        // Se já carregou, inicializar agora
+        if (document.readyState !== 'loading') {
+            addCompactModeStyles();
+            loadViewSettings();
+            loadHapticSettingsIntoUI();
+            setupViewSettingsListeners();
+        }
+        
+        // Sistema de Feedback Háptico
+        const hapticFeedback = {
+            // Configurações de vibração
+            patterns: {
+                light: 25,      // Feedback leve
+                medium: 50,     // Feedback médio
+                strong: 100,    // Feedback forte
+                success: [50, 50, 50],  // Padrão de sucesso
+                error: [100, 50, 100],  // Padrão de erro
+                warning: [75, 25, 75],  // Padrão de aviso
+                tap: 15,        // Toque simples
+                longPress: [25, 50, 25] // Pressão longa
+            },
+            
+            // Verificar se o dispositivo suporta vibração
+            isSupported() {
+                return 'vibrate' in navigator && typeof navigator.vibrate === 'function';
+            },
+            
+            // Executar vibração
+            vibrate(pattern) {
+                if (!this.isSupported()) return;
+                
+                // Verificar configurações do usuário
+                const settings = JSON.parse(localStorage.getItem('hapticSettings') || '{}');
+                if (settings.enabled === false) return;
+                
+                try {
+                    navigator.vibrate(pattern);
+                } catch (error) {
+                    console.warn('Erro ao executar feedback háptico:', error);
+                }
+            },
+            
+            // Métodos de conveniência
+            light() { this.vibrate(this.patterns.light); },
+            medium() { this.vibrate(this.patterns.medium); },
+            strong() { this.vibrate(this.patterns.strong); },
+            success() { this.vibrate(this.patterns.success); },
+            error() { this.vibrate(this.patterns.error); },
+            warning() { this.vibrate(this.patterns.warning); },
+            tap() { this.vibrate(this.patterns.tap); },
+            longPress() { this.vibrate(this.patterns.longPress); }
+        };
+        
+        // Configurações de feedback háptico
+        function loadHapticSettings() {
+            const settings = JSON.parse(localStorage.getItem('hapticSettings') || '{}');
+            const defaultSettings = {
+                enabled: true,
+                intensity: 'medium' // light, medium, strong
+            };
+            return { ...defaultSettings, ...settings };
+        }
+        
+        function saveHapticSettings(settings) {
+            localStorage.setItem('hapticSettings', JSON.stringify(settings));
+        }
+        
+        // Adicionar feedback háptico às ações existentes
+        function enhanceWithHapticFeedback() {
+            // Sobrescrever função addItem original
+            const originalAddItem = window.addItem || addItem;
+            window.addItem = function(name, quantity, unit, sectionId, subsectionId, price = 0) {
+                hapticFeedback.success();
+                return originalAddItem.call(this, name, quantity, unit, sectionId, subsectionId, price);
+            };
+            
+            // Sobrescrever função updateItem original
+            const originalUpdateItem = window.updateItem || updateItem;
+            window.updateItem = function(id, updates) {
+                if (updates.inCart !== undefined) {
+                    // Feedback diferente para marcar/desmarcar
+                    hapticFeedback.medium();
+                } else {
+                    // Feedback leve para outras atualizações
+                    hapticFeedback.light();
+                }
+                return originalUpdateItem.call(this, id, updates);
+            };
+            
+            // Sobrescrever função removeItem original
+            const originalRemoveItem = window.removeItem || removeItem;
+            window.removeItem = function(id) {
+                hapticFeedback.warning();
+                return originalRemoveItem.call(this, id);
+            };
+            
+            // Adicionar feedback a botões importantes
+            document.addEventListener('click', (e) => {
+                const target = e.target.closest('[data-action]');
+                if (!target) return;
+                
+                const action = target.dataset.action;
+                switch (action) {
+                    case 'open-settings-modal':
+                    case 'start-tutorial':
+                        hapticFeedback.tap();
+                        break;
+                    case 'confirm-action':
+                        hapticFeedback.success();
+                        break;
+                    case 'cancel-action':
+                        hapticFeedback.light();
+                        break;
+                }
+            });
+            
+            // Feedback para formulários
+            document.addEventListener('submit', (e) => {
+                if (e.target.id === 'addItemForm') {
+                    hapticFeedback.success();
+                }
+            });
+            
+            // Feedback para gestos de toque (já existe, mas vamos padronizar)
+            document.addEventListener('touchend', (e) => {
+                const card = e.target.closest('.item-card');
+                if (card && e.changedTouches) {
+                    const touch = e.changedTouches[0];
+                    if (touch && touch.screenX !== undefined) {
+                        // Este feedback já existe no código de swipe, mas garantimos consistência
+                        // hapticFeedback.medium(); // Já implementado no código de swipe
+                    }
+                }
+            });
+        }
+        
+        // Inicializar sistema de feedback háptico
+        document.addEventListener('DOMContentLoaded', () => {
+            enhanceWithHapticFeedback();
+        });
+        
+        // Se já carregou, inicializar agora
+        if (document.readyState !== 'loading') {
+            enhanceWithHapticFeedback();
+        }
+    </script>
+
 </body>
 </html>

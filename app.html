@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="cupcake">
+<html lang="pt-BR" data-theme="emerald">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Minhas Listas - poupe.com.br</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="poupe.com.br">
+    <meta name="theme-color" content="#570df8">
+    
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/9d986ddfce.js" crossorigin="anonymous"></script>
@@ -16,7 +28,6 @@
             border-color: oklch(var(--p));
             border-style: solid;
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 25px -8px oklch(var(--p)/.2);
         }
         .hero-bg-gradient {
             background-color: oklch(var(--b2));
@@ -30,31 +41,86 @@
         }
         .list-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+        }
+        .input-error {
+            border-color: oklch(var(--er)) !important;
+            box-shadow: 0 0 0 1px oklch(var(--er)) !important;
+        }
+        .input-error:focus {
+            border-color: oklch(var(--er)) !important;
+            box-shadow: 0 0 0 2px oklch(var(--er)/.2) !important;
+        }
+        
+        /* Microinterações e feedback visual */
+        .btn {
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .modal-box {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-success {
+            animation: pulseSuccess 0.6s ease-out;
+        }
+        
+        @keyframes pulseSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen font-sans">
-    <header class="sticky top-0 z-30 bg-base-100/80 backdrop-blur-md shadow-sm">
-        <div class="navbar container mx-auto px-4">
+    <header class="sticky top-0 z-30 bg-base-100 border-b border-base-300">
+        <div class="navbar container mx-auto px-3 sm:px-4 md:px-8">
             <div class="flex-1">
-                <a href="index.html" class="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">poupe.com.br</a>
+                <a href="index.html" class="text-xl sm:text-2xl font-bold text-primary hover:opacity-80 transition-all duration-200 hover:scale-105">poupe.com.br</a>
             </div>
-            <div class="flex-none">
-                 <button class="btn btn-ghost btn-circle" data-action="open-settings-modal" aria-label="Abrir configurações">
-                    <i class="fa-solid fa-gear text-lg"></i>
+            <div class="flex-none gap-2">
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="open-backup-modal" aria-label="Backup e Restauração">
+                    <i class="fa-solid fa-download text-base sm:text-lg"></i>
+                </button>
+                <button class="btn btn-ghost btn-circle hover:btn-primary hover:scale-105 transition-all duration-200" data-action="open-settings-modal" aria-label="Abrir configurações">
+                    <i class="fa-solid fa-gear text-base sm:text-lg"></i>
                 </button>
             </div>
         </div>
     </header>
-    <main class="container mx-auto p-4 md:p-8 space-y-16">
-        <div class="hero rounded-2xl hero-bg-gradient shadow-lg overflow-hidden">
-          <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-8 md:p-12">
-            <i class="fa-solid fa-cart-shopping text-primary/20 text-8xl lg:text-9xl -rotate-12 hidden lg:block"></i>
+    <main class="container mx-auto px-3 sm:px-4 md:px-8 py-4 md:py-6 space-y-12 md:space-y-16">
+        <div class="hero rounded-2xl hero-bg-gradient transition-all duration-300 overflow-hidden">
+          <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-6 sm:p-8 md:p-12">
+            <i class="fa-solid fa-cart-shopping text-primary/20 text-6xl sm:text-8xl lg:text-9xl -rotate-12 hidden lg:block transition-transform duration-500 hover:rotate-0"></i>
             <div class="max-w-xl">
-              <h1 class="text-4xl md:text-5xl font-bold">Suas Listas de Compras</h1>
-              <p class="py-6 text-base-content/80">Organize suas compras, planeje seus gastos e poupe. Crie uma nova lista ou comece com um de nossos modelos.</p>
-              <button class="btn btn-primary btn-wide gap-2 shadow-md" id="createNewListBtn">
+              <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-4">Suas Listas de Compras</h1>
+              <p class="py-4 sm:py-6 text-base-content/80 text-base sm:text-lg leading-relaxed">Organize suas compras, planeje seus gastos e poupe. Crie uma nova lista ou comece com um de nossos modelos.</p>
+              <button class="btn btn-primary btn-wide gap-2 hover:scale-105 transition-all duration-200 text-base font-semibold" id="createNewListBtn">
                 <i class="fa-solid fa-plus"></i>
                 Criar Nova Lista
               </button>
@@ -62,22 +128,22 @@
           </div>
         </div>
         <div>
-            <div class="flex items-center gap-4 mb-6">
-                <span class="bg-primary/10 p-3 rounded-full"><i class="fa-solid fa-list-check text-primary text-xl"></i></span>
-                <h2 class="text-3xl font-bold">Minhas Listas</h2>
+            <div class="flex items-center gap-4 mb-6 sm:mb-8">
+                <span class="bg-primary/10 p-3 rounded-full hover:bg-primary/20 transition-all duration-200 hover:scale-110"><i class="fa-solid fa-list-check text-primary text-lg sm:text-xl"></i></span>
+                <h2 class="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">Minhas Listas</h2>
             </div>
-            <div id="listsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="listsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             </div>
         </div>
         <div>
-            <div class="flex items-center gap-4 mb-6">
-                <span class="bg-secondary/10 p-3 rounded-full"><i class="fa-solid fa-wand-magic-sparkles text-secondary text-xl"></i></span>
-                <h2 class="text-3xl font-bold">Comece com um Modelo</h2>
+            <div class="flex items-center gap-4 mb-6 sm:mb-8">
+                <span class="bg-secondary/10 p-3 rounded-full hover:bg-secondary/20 transition-all duration-200 hover:scale-110"><i class="fa-solid fa-wand-magic-sparkles text-secondary text-lg sm:text-xl"></i></span>
+                <h2 class="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">Comece com um Modelo</h2>
             </div>
-            <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             </div>
         </div>
-        <div class="card bg-base-100 shadow-lg mt-12">
+        <div class="card bg-base-100 mt-12">
             <div class="card-body flex-col md:flex-row items-center gap-6 p-8">
                 <div class="text-5xl text-secondary">
                     <i class="fa-solid fa-comments"></i>
@@ -108,10 +174,10 @@
         <div class="modal-box">
             <h3 class="font-bold text-lg" id="listNameModalTitle">Criar Nova Lista</h3>
             <form id="listNameForm" method="dialog" class="py-4">
-                <input type="text" id="listNameInput" placeholder="Ex: Compras do Mês" class="input input-bordered w-full" required maxlength="50">
+                <input type="text" id="listNameInput" placeholder="Ex: Compras do Mês" class="input input-bordered w-full focus:input-primary focus:scale-105 transition-all duration-200 text-base" required maxlength="50">
                 <div class="modal-action mt-6">
-                    <button type="button" class="btn" id="cancelListName">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn hover:scale-105 transition-all duration-200" id="cancelListName">Cancelar</button>
+                    <button type="submit" class="btn btn-primary hover:scale-105 transition-all duration-200 font-semibold">Salvar</button>
                 </div>
             </form>
         </div>
@@ -120,10 +186,10 @@
     <dialog id="confirm_delete_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg">Excluir Lista</h3>
-            <p class="py-4" id="confirmDeleteMessage">Você tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.</p>
+            <p class="py-4 text-base leading-relaxed" id="confirmDeleteMessage">Você tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.</p>
             <div class="modal-action">
-                <button class="btn" id="confirmDeleteCancel">Cancelar</button>
-                <button class="btn btn-error" id="confirmDeleteConfirm">Excluir</button>
+                <button class="btn hover:scale-105 transition-all duration-200" id="confirmDeleteCancel">Cancelar</button>
+                <button class="btn btn-error hover:scale-105 transition-all duration-200 font-semibold" id="confirmDeleteConfirm">Excluir</button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
@@ -164,7 +230,51 @@
         </div>
         <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
     </dialog>
-
+    
+    <!-- Modal de Backup/Export -->
+    <dialog id="backup_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Backup e Restauração</h3>
+            <div class="py-4 space-y-4">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Seus dados ficam apenas no seu dispositivo. Use essas opções para fazer backup ou transferir suas listas.</span>
+                </div>
+                
+                <div class="divider">Exportar Dados</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="btn btn-outline hover:btn-primary hover:scale-105 transition-all duration-200" id="exportJsonBtn">
+                        <i class="fas fa-download"></i>
+                        Exportar JSON
+                    </button>
+                    <button class="btn btn-outline hover:btn-secondary hover:scale-105 transition-all duration-200" id="exportCsvBtn">
+                        <i class="fas fa-file-csv"></i>
+                        Exportar CSV
+                    </button>
+                </div>
+                
+                <div class="divider">Importar Dados</div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Selecione um arquivo de backup (JSON)</span>
+                    </label>
+                    <input type="file" id="importFileInput" accept=".json" class="file-input file-input-bordered w-full focus:file-input-primary transition-all duration-200" />
+                    <label class="label">
+                        <span class="label-text-alt text-warning font-medium">⚠️ Isso substituirá todas as suas listas atuais</span>
+                    </label>
+                </div>
+                <button class="btn btn-warning w-full hover:scale-105 hover:shadow-lg transition-all duration-200 font-semibold" id="importDataBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    Importar e Substituir Dados
+                </button>
+            </div>
+            <div class="modal-action">
+                <form method="dialog"><button class="btn">Fechar</button></form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>fechar</button></form>
+    </dialog>
+    
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const LISTS_KEY = 'poupe_all_lists_V1';
@@ -179,8 +289,28 @@
         const settingsModal = document.getElementById('settings_modal');
         const themeSelectorContainer = document.getElementById('theme-selector-container');
         
-        const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Água", "lofi": "Lofi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Pálido", "nord": "Nórdico", "sunset": "Pôr do Sol" };
+        const themeNames = { "light": "Claro", "dark": "Escuro", "cupcake": "Cupcake", "bumblebee": "Abelha", "emerald": "Esmeralda", "corporate": "Corporativo", "synthwave": "Synthwave", "retro": "Retrô", "cyberpunk": "Cyberpunk", "valentine": "Namorados", "halloween": "Halloween", "garden": "Jardim", "forest": "Floresta", "aqua": "Aqua", "lofi": "Lo-fi", "pastel": "Pastel", "fantasy": "Fantasia", "wireframe": "Wireframe", "black": "Preto", "luxury": "Luxo", "dracula": "Drácula", "cmyk": "CMYK", "autumn": "Outono", "business": "Negócios", "acid": "Ácido", "lemonade": "Limonada", "night": "Noite", "coffee": "Café", "winter": "Inverno", "dim": "Escuro Suave", "nord": "Nord", "sunset": "Pôr do Sol" };
         const daisyuiThemes = Object.keys(themeNames);
+        
+        // Funções de validação e sanitização
+        const sanitizeText = (text) => {
+            if (!text || typeof text !== 'string') return '';
+            return text
+                .replace(/[<>"'&]/g, '') // Remove caracteres perigosos
+                .replace(/[^a-zA-Z0-9\u00C0-\u017F \-.,()®™°%/]/g, '') // Permite mais caracteres úteis
+                .trim()
+                .substring(0, 100); // Limita tamanho
+        };
+        
+        const validateListName = (name) => {
+            const sanitized = sanitizeText(name);
+            return {
+                isValid: sanitized.length >= 2 && sanitized.length <= 60,
+                sanitized,
+                error: sanitized.length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : 
+                       sanitized.length > 60 ? 'Nome muito longo (máximo 60 caracteres)' : null
+            };
+        };
 
         const templates = [
             {
@@ -202,6 +332,49 @@
                     ],
                     items: [
                         { name: 'Arroz', quantity: 5, unit: 'kg' }, { name: 'Feijão', quantity: 2, unit: 'kg' }, { name: 'Óleo de Soja', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'kg' }, { name: 'Macarrão', quantity: 2, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 2, unit: 'un' }, { name: 'Sabão em Pó', quantity: 1, unit: 'cx' }, { name: 'Detergente', quantity: 2, unit: 'un' }, { name: 'Papel Higiênico', quantity: 1, unit: 'pct' }, { name: 'Creme Dental', quantity: 1, unit: 'un' },
+                    ]
+                }
+            },
+            // Templates por Tamanho de Família
+            {
+                id: 'template_solteiro', name: 'Compras para Solteiro(a)', icon: '👤', description: 'Porções individuais e práticas para quem mora sozinho.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Básicos', icon: '🛒', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Proteínas', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Lanches', icon: '🥪', parent: null, order: 2 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 1, unit: 'kg' }, { name: 'Feijão', quantity: 500, unit: 'g' }, { name: 'Óleo', quantity: 1, unit: 'un' }, { name: 'Sal', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Leite', quantity: 1, unit: 'l' }, { name: 'Ovos', quantity: 6, unit: 'un' }, { name: 'Frango', quantity: 1, unit: 'kg' }, { name: 'Pão de Forma', quantity: 1, unit: 'un' }, { name: 'Queijo', quantity: 200, unit: 'g' }, { name: 'Presunto', quantity: 200, unit: 'g' }, { name: 'Iogurte', quantity: 4, unit: 'un' }, { name: 'Banana', quantity: 6, unit: 'un' }
+                    ]
+                }
+            },
+            {
+                id: 'template_casal', name: 'Compras para Casal', icon: '👫', description: 'Quantidades ideais para duas pessoas.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Mercearia', icon: '🛒', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Carnes', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Hortifruti', icon: '🥬', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Laticínios', icon: '🥛', parent: null, order: 3 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 2, unit: 'kg' }, { name: 'Feijão', quantity: 1, unit: 'kg' }, { name: 'Macarrão', quantity: 2, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 2, unit: 'un' }, { name: 'Óleo', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'un' }, { name: 'Frango', quantity: 2, unit: 'kg' }, { name: 'Carne Moída', quantity: 1, unit: 'kg' }, { name: 'Ovos', quantity: 12, unit: 'un' }, { name: 'Leite', quantity: 2, unit: 'l' }, { name: 'Queijo', quantity: 300, unit: 'g' }, { name: 'Iogurte', quantity: 6, unit: 'un' }, { name: 'Tomate', quantity: 1, unit: 'kg' }, { name: 'Cebola', quantity: 1, unit: 'kg' }, { name: 'Alface', quantity: 2, unit: 'un' }, { name: 'Banana', quantity: 1, unit: 'kg' }, { name: 'Maçã', quantity: 1, unit: 'kg' }
+                    ]
+                }
+            },
+            {
+                id: 'template_familia', name: 'Família (4 pessoas)', icon: '👨‍👩‍👧‍👦', description: 'Compras completas para família de 4 pessoas.',
+                data: {
+                    sections: [
+                        { id: crypto.randomUUID(), name: 'Mercearia', icon: '🛒', parent: null, order: 0 },
+                        { id: crypto.randomUUID(), name: 'Carnes', icon: '🥩', parent: null, order: 1 },
+                        { id: crypto.randomUUID(), name: 'Hortifruti', icon: '🥬', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Laticínios', icon: '🥛', parent: null, order: 3 },
+                        { id: crypto.randomUUID(), name: 'Limpeza', icon: '🧽', parent: null, order: 4 }
+                    ],
+                    items: [
+                        { name: 'Arroz', quantity: 5, unit: 'kg' }, { name: 'Feijão', quantity: 2, unit: 'kg' }, { name: 'Macarrão', quantity: 4, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 4, unit: 'un' }, { name: 'Óleo', quantity: 2, unit: 'un' }, { name: 'Açúcar', quantity: 2, unit: 'kg' }, { name: 'Café', quantity: 2, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'kg' }, { name: 'Farinha de Trigo', quantity: 1, unit: 'kg' }, { name: 'Frango', quantity: 3, unit: 'kg' }, { name: 'Carne Bovina', quantity: 2, unit: 'kg' }, { name: 'Peixe', quantity: 1, unit: 'kg' }, { name: 'Ovos', quantity: 24, unit: 'un' }, { name: 'Leite', quantity: 4, unit: 'l' }, { name: 'Queijo', quantity: 500, unit: 'g' }, { name: 'Iogurte', quantity: 12, unit: 'un' }, { name: 'Pão', quantity: 2, unit: 'un' }, { name: 'Tomate', quantity: 2, unit: 'kg' }, { name: 'Cebola', quantity: 2, unit: 'kg' }, { name: 'Batata', quantity: 2, unit: 'kg' }, { name: 'Cenoura', quantity: 1, unit: 'kg' }, { name: 'Alface', quantity: 3, unit: 'un' }, { name: 'Banana', quantity: 2, unit: 'kg' }, { name: 'Maçã', quantity: 2, unit: 'kg' }, { name: 'Laranja', quantity: 2, unit: 'kg' }, { name: 'Detergente', quantity: 2, unit: 'un' }, { name: 'Sabão em Pó', quantity: 1, unit: 'cx' }, { name: 'Papel Higiênico', quantity: 1, unit: 'pct' }
                     ]
                 }
             }
@@ -342,23 +515,48 @@
         listNameForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = listNameInput.value;
-            if (!name.trim()) return;
+            
+            // Validação do nome da lista
+            const nameValidation = validateListName(name);
+            if (!nameValidation.isValid) {
+                showListNameError(nameValidation.error);
+                return;
+            }
 
             if (currentEditingListId) {
                 const listToUpdate = allLists.find(l => l.id === currentEditingListId);
                 if (listToUpdate) {
-                    listToUpdate.name = name.trim();
+                    listToUpdate.name = nameValidation.sanitized;
                     saveLists();
                     render();
                 }
                 currentEditingListId = null;
             } else {
-                handleCreateList(name);
+                handleCreateList(nameValidation.sanitized);
             }
             listNameModal.close();
         });
+        
+        const showListNameError = (message) => {
+            const submitButton = listNameForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = message;
+            submitButton.classList.add('btn-error');
+            setTimeout(() => {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('btn-error');
+            }, 3000);
+        };
 
         cancelListNameBtn.addEventListener('click', () => listNameModal.close());
+        
+        // Validação em tempo real para nome da lista
+        listNameInput.addEventListener('input', (e) => {
+            const validation = validateListName(e.target.value);
+            e.target.setCustomValidity(validation.isValid ? '' : validation.error);
+            e.target.classList.toggle('input-error', !validation.isValid);
+            e.target.value = sanitizeText(e.target.value);
+        });
 
         document.body.addEventListener('click', (e) => {
             const target = e.target.closest('[data-action]');
@@ -421,15 +619,149 @@
                     renderThemeSelector();
                     settingsModal.showModal();
                     break;
+                case 'open-backup-modal':
+                    document.getElementById('backup_modal').showModal();
+                    break;
             }
         });
 
-        const init = () => {
-            const currentTheme = localStorage.getItem('theme') || 'cupcake';
+        // Funcionalidades de Backup/Export/Import
+        const exportToJson = () => {
+            const data = {
+                lists: allLists,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poupe-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        const exportToCsv = () => {
+            let csvContent = 'Lista,Seção,Item,Quantidade,Preço,Comprado\n';
+            allLists.forEach(list => {
+                list.sections.forEach(section => {
+                    section.items.forEach(item => {
+                        const row = [
+                            `"${list.name}"`,
+                            `"${section.name}"`,
+                            `"${item.name}"`,
+                            item.quantity || 1,
+                            item.price || '',
+                            item.purchased ? 'Sim' : 'Não'
+                        ].join(',');
+                        csvContent += row + '\n';
+                    });
+                });
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poupe-listas-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        const importFromJson = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.lists && Array.isArray(data.lists)) {
+                        allLists = data.lists;
+                        saveLists();
+                        render();
+                        alert('Dados importados com sucesso!');
+                        document.getElementById('backup_modal').close();
+                    } else {
+                        alert('Arquivo inválido. Certifique-se de que é um backup válido do poupe.com.br');
+                    }
+                } catch (error) {
+                    alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo JSON válido.');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // Event listeners para backup/export/import
+        document.getElementById('exportJsonBtn').addEventListener('click', exportToJson);
+        document.getElementById('exportCsvBtn').addEventListener('click', exportToCsv);
+        
+        const importFileInput = document.getElementById('importFileInput');
+        const importDataBtn = document.getElementById('importDataBtn');
+        
+        importFileInput.addEventListener('change', (e) => {
+            importDataBtn.disabled = !e.target.files.length;
+        });
+        
+        importDataBtn.addEventListener('click', () => {
+            const file = importFileInput.files[0];
+            if (file && confirm('Isso substituirá todas as suas listas atuais. Tem certeza?')) {
+                importFromJson(file);
+            }
+        });
+
+        const detectSystemTheme = () => {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+            return 'light';
+        };
+
+        const initTheme = () => {
+            let currentTheme = localStorage.getItem('theme');
+            
+            // Se não há tema salvo, detectar preferência do sistema
+            if (!currentTheme) {
+                currentTheme = detectSystemTheme();
+                localStorage.setItem('theme', currentTheme);
+            }
+            
             document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            // Escutar mudanças na preferência do sistema
+            if (window.matchMedia) {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addEventListener('change', (e) => {
+                    // Só atualizar automaticamente se o usuário não definiu um tema específico
+                    const savedTheme = localStorage.getItem('theme');
+                    if (savedTheme === 'light' || savedTheme === 'dark') {
+                        const newTheme = e.matches ? 'dark' : 'light';
+                        document.documentElement.setAttribute('data-theme', newTheme);
+                        localStorage.setItem('theme', newTheme);
+                        renderThemeSelector();
+                    }
+                });
+            }
+        };
+
+        const init = () => {
+            initTheme();
             loadLists();
             render();
         };
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registrado com sucesso:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Falha ao registrar SW:', error);
+                    });
+            });
+        }
 
         init();
     });
