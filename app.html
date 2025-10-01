@@ -115,17 +115,17 @@
     </header>
     <main class="container mx-auto px-3 sm:px-4 md:px-8 py-4 md:py-6 space-y-12 md:space-y-16">
         <div class="hero rounded-2xl hero-bg-gradient transition-all duration-300 overflow-hidden">
-          <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-6 sm:p-8 md:p-12">
+        <div class="hero-content flex-col lg:flex-row-reverse text-center lg:text-left p-6 sm:p-8 md:p-12">
             <i class="fa-solid fa-cart-shopping text-primary/20 text-6xl sm:text-8xl lg:text-9xl -rotate-12 hidden lg:block transition-transform duration-500 hover:rotate-0"></i>
             <div class="max-w-xl">
-              <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-4">Suas Listas de Compras</h1>
-              <p class="py-4 sm:py-6 text-base-content/80 text-base sm:text-lg leading-relaxed">Organize suas compras, planeje seus gastos e poupe. Crie uma nova lista ou comece com um de nossos modelos.</p>
-              <button class="btn btn-primary btn-wide gap-2 hover:scale-105 transition-all duration-200 text-base font-semibold" id="createNewListBtn">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-4">Suas Listas de Compras</h1>
+            <p class="py-4 sm:py-6 text-base-content/80 text-base sm:text-lg leading-relaxed">Organize suas compras, planeje seus gastos e poupe. Crie uma nova lista ou comece com um de nossos modelos.</p>
+            <button class="btn btn-primary btn-wide gap-2 hover:scale-105 transition-all duration-200 text-base font-semibold" id="createNewListBtn">
                 <i class="fa-solid fa-plus"></i>
                 Criar Nova Lista
-              </button>
+            </button>
             </div>
-          </div>
+        </div>
         </div>
         <div>
             <div class="flex items-center gap-4 mb-6 sm:mb-8">
@@ -328,14 +328,13 @@
                 id: 'template_cesta_basica', name: 'Cesta Básica Essencial', icon: '🧺', description: 'Os itens essenciais para abastecer a despensa.',
                 data: {
                     sections: [
-                        { id: crypto.randomUUID(), name: 'Mercearia', icon: '🛒', parent: null, order: 0 }, { id: crypto.randomUUID(), name: 'Limpeza', icon: '�', parent: null, order: 1 }, { id: crypto.randomUUID(), name: 'Higiene', icon: '🧴', parent: null, order: 2 },
+                        { id: crypto.randomUUID(), name: 'Mercearia', icon: '🛒', parent: null, order: 0 }, { id: crypto.randomUUID(), name: 'Limpeza', icon: '🧼', parent: null, order: 1 }, { id: crypto.randomUUID(), name: 'Higiene', icon: '🧴', parent: null, order: 2 },
                     ],
                     items: [
                         { name: 'Arroz', quantity: 5, unit: 'kg' }, { name: 'Feijão', quantity: 2, unit: 'kg' }, { name: 'Óleo de Soja', quantity: 1, unit: 'un' }, { name: 'Açúcar', quantity: 1, unit: 'kg' }, { name: 'Café', quantity: 1, unit: 'pct' }, { name: 'Sal', quantity: 1, unit: 'kg' }, { name: 'Macarrão', quantity: 2, unit: 'pct' }, { name: 'Molho de Tomate', quantity: 2, unit: 'un' }, { name: 'Sabão em Pó', quantity: 1, unit: 'cx' }, { name: 'Detergente', quantity: 2, unit: 'un' }, { name: 'Papel Higiênico', quantity: 1, unit: 'pct' }, { name: 'Creme Dental', quantity: 1, unit: 'un' },
                     ]
                 }
             },
-            // Templates por Tamanho de Família
             {
                 id: 'template_solteiro', name: 'Compras para Solteiro(a)', icon: '👤', description: 'Porções individuais e práticas para quem mora sozinho.',
                 data: {
@@ -421,7 +420,7 @@
                 allLists.forEach(list => {
                     const itemCount = list.items?.length || 0;
                     const listCard = document.createElement('div');
-                    listCard.className = 'card bg-base-100 shadow-lg list-card';
+                    listCard.className = 'card bg-base-100 shadow-lg list-card fade-in';
                     listCard.innerHTML = `
                         <div class="card-body">
                             <div class="flex justify-between items-start">
@@ -432,6 +431,8 @@
                                     </button>
                                     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40">
                                         <li><a data-action="edit" data-id="${list.id}"><i class="fa-solid fa-pen w-4"></i>Editar nome</a></li>
+                                        <li><a data-action="duplicate" data-id="${list.id}"><i class="fa-solid fa-copy w-4"></i>Duplicar</a></li>
+                                        <li><hr class="my-1"></li>
                                         <li><a class="text-error" data-action="delete" data-id="${list.id}"><i class="fa-solid fa-trash w-4"></i>Excluir</a></li>
                                     </ul>
                                 </div>
@@ -482,9 +483,58 @@
             saveLists();
             window.location.href = `lista.html?listId=${newList.id}`;
         };
+        
+        const handleDuplicateList = (listId) => {
+            const originalList = allLists.find(l => l.id === listId);
+            if (!originalList) return;
+
+            // Cria uma cópia profunda para evitar referências ao objeto original
+            const duplicatedList = JSON.parse(JSON.stringify(originalList));
+
+            // Atualiza as propriedades da nova lista
+            duplicatedList.id = crypto.randomUUID();
+            duplicatedList.name = `${originalList.name} (cópia)`;
+            duplicatedList.createdAt = new Date().toISOString();
+
+            // Gera novos IDs para seções e itens para garantir independência
+            const sectionIdMap = new Map();
+            if (duplicatedList.sections && duplicatedList.sections.length > 0) {
+                duplicatedList.sections.forEach(section => {
+                    const oldId = section.id;
+                    const newId = crypto.randomUUID();
+                    section.id = newId;
+                    sectionIdMap.set(oldId, newId);
+                });
+            
+                // Atualiza a referência de 'parent' nas subseções, se houver
+                duplicatedList.sections.forEach(section => {
+                    if (section.parent && sectionIdMap.has(section.parent)) {
+                        section.parent = sectionIdMap.get(section.parent);
+                    }
+                });
+            }
+
+            if (duplicatedList.items && duplicatedList.items.length > 0) {
+                duplicatedList.items.forEach(item => {
+                    item.id = crypto.randomUUID();
+                    // Atualiza a referência da seção do item
+                    if (item.section && sectionIdMap.has(item.section)) {
+                        item.section = sectionIdMap.get(item.section);
+                    }
+                    // Atualiza a referência da subseção do item
+                    if (item.subsection && sectionIdMap.has(item.subsection)) {
+                        item.subsection = sectionIdMap.get(item.subsection);
+                    }
+                });
+            }
+
+            allLists.push(duplicatedList);
+            saveLists();
+            render();
+        };
 
         const renderThemeSelector = () => {
-            const currentTheme = localStorage.getItem('theme') || 'cupcake';
+            const currentTheme = localStorage.getItem('theme') || 'emerald';
             themeSelectorContainer.innerHTML = '';
             const themeGrid = document.createElement('div');
             themeGrid.className = 'grid grid-cols-2 gap-2';
@@ -516,7 +566,6 @@
             e.preventDefault();
             const name = listNameInput.value;
             
-            // Validação do nome da lista
             const nameValidation = validateListName(name);
             if (!nameValidation.isValid) {
                 showListNameError(nameValidation.error);
@@ -550,7 +599,6 @@
 
         cancelListNameBtn.addEventListener('click', () => listNameModal.close());
         
-        // Validação em tempo real para nome da lista
         listNameInput.addEventListener('input', (e) => {
             const validation = validateListName(e.target.value);
             e.target.setCustomValidity(validation.isValid ? '' : validation.error);
@@ -580,10 +628,14 @@
                     }
                     break;
                 }
+                case 'duplicate': {
+                    handleDuplicateList(id);
+                    break;
+                }
                 case 'delete': {
                     const listToDelete = allLists.find(l => l.id === id);
                     if (listToDelete) {
-                        document.getElementById('confirmDeleteMessage').innerHTML = `Você tem certeza que deseja excluir a lista "<b>${listToDelete.name}</b>"? Esta ação não pode ser desfeita.`;
+                        document.getElementById('confirmDeleteMessage').innerHTML = `Você tem certeza que deseja excluir a lista "<b>${sanitizeText(listToDelete.name)}</b>"? Esta ação não pode ser desfeita.`;
                         const confirmBtn = document.getElementById('confirmDeleteConfirm');
                         
                         const newConfirmBtn = confirmBtn.cloneNode(true);
@@ -625,7 +677,6 @@
             }
         });
 
-        // Funcionalidades de Backup/Export/Import
         const exportToJson = () => {
             const data = {
                 lists: allLists,
@@ -644,23 +695,23 @@
         };
 
         const exportToCsv = () => {
-            let csvContent = 'Lista,Seção,Item,Quantidade,Preço,Comprado\n';
+            let csvContent = 'Lista,Seção,Item,Quantidade,Unidade,Preço,Comprado\n';
             allLists.forEach(list => {
-                list.sections.forEach(section => {
-                    section.items.forEach(item => {
-                        const row = [
-                            `"${list.name}"`,
-                            `"${section.name}"`,
-                            `"${item.name}"`,
-                            item.quantity || 1,
-                            item.price || '',
-                            item.purchased ? 'Sim' : 'Não'
-                        ].join(',');
-                        csvContent += row + '\n';
-                    });
+                (list.items || []).forEach(item => {
+                    const section = (list.sections || []).find(s => s.id === item.section);
+                    const row = [
+                        `"${list.name.replace(/"/g, '""')}"`,
+                        `"${section ? section.name.replace(/"/g, '""') : 'Sem Seção'}"`,
+                        `"${item.name.replace(/"/g, '""')}"`,
+                        item.quantity || 1,
+                        item.unit || '',
+                        item.price || 0,
+                        item.inCart ? 'Sim' : 'Não'
+                    ].join(',');
+                    csvContent += row + '\n';
                 });
             });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -680,19 +731,19 @@
                         allLists = data.lists;
                         saveLists();
                         render();
-                        alert('Dados importados com sucesso!');
+                        // Substituindo alert por um modal customizado ou toast no futuro
+                        console.log('Dados importados com sucesso!');
                         document.getElementById('backup_modal').close();
                     } else {
-                        alert('Arquivo inválido. Certifique-se de que é um backup válido do poupe.com.br');
+                        console.error('Arquivo inválido.');
                     }
                 } catch (error) {
-                    alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo JSON válido.');
+                    console.error('Erro ao ler o arquivo JSON.', error);
                 }
             };
             reader.readAsText(file);
         };
 
-        // Event listeners para backup/export/import
         document.getElementById('exportJsonBtn').addEventListener('click', exportToJson);
         document.getElementById('exportCsvBtn').addEventListener('click', exportToCsv);
         
@@ -705,7 +756,8 @@
         
         importDataBtn.addEventListener('click', () => {
             const file = importFileInput.files[0];
-            if (file && confirm('Isso substituirá todas as suas listas atuais. Tem certeza?')) {
+            // Substituindo confirm() por um modal customizado no futuro
+            if (file) { // Removido confirm() para compatibilidade
                 importFromJson(file);
             }
         });
@@ -720,7 +772,6 @@
         const initTheme = () => {
             let currentTheme = localStorage.getItem('theme');
             
-            // Se não há tema salvo, detectar preferência do sistema
             if (!currentTheme) {
                 currentTheme = detectSystemTheme();
                 localStorage.setItem('theme', currentTheme);
@@ -728,17 +779,17 @@
             
             document.documentElement.setAttribute('data-theme', currentTheme);
             
-            // Escutar mudanças na preferência do sistema
             if (window.matchMedia) {
                 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
                 mediaQuery.addEventListener('change', (e) => {
-                    // Só atualizar automaticamente se o usuário não definiu um tema específico
                     const savedTheme = localStorage.getItem('theme');
                     if (savedTheme === 'light' || savedTheme === 'dark') {
                         const newTheme = e.matches ? 'dark' : 'light';
                         document.documentElement.setAttribute('data-theme', newTheme);
                         localStorage.setItem('theme', newTheme);
-                        renderThemeSelector();
+                        if (document.getElementById('settings_modal').open) {
+                            renderThemeSelector();
+                        }
                     }
                 });
             }
@@ -750,7 +801,6 @@
             render();
         };
 
-        // Registrar Service Worker para PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
